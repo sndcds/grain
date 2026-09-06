@@ -1,127 +1,149 @@
 #import <AppKit/AppKit.h>
 
-#include <grain/Platform/Window.hpp>
+#include "../Platform.hpp"
+
 #include <grain/UI/View.hpp>
 
 #include "GrainRootView.hpp"
 
-#include <memory>
+#include <string>
 #include <string_view>
 
-namespace Grain {
+namespace Grain::Platform {
 
-class Window::Impl {
+class CocoaWindow final : public Window {
 public:
-    NSWindow* window = nil;
+    CocoaWindow(
+        std::string_view title,
+        int width,
+        int height
+    );
 
-    // Grain owns the View.
-    std::unique_ptr<View> root_view;
+    ~CocoaWindow() override;
 
-    // NSWindow owns this through its contentView hierarchy.
-    NSView* native_root_view = nil;
+    void show() override;
+
+    void setRootView(
+        Grain::View* view
+    ) override;
+
+private:
+    NSWindow* window_ = nil;
+
+    Grain::View* root_view_ = nullptr;
+
+    NSView* native_root_view_ = nil;
 };
 
 
-Window::Window(
+CocoaWindow::CocoaWindow(
     std::string_view title,
     int width,
     int height
 )
-    : impl_(std::make_unique<Impl>())
 {
-    NSString* ns_title = [
-        [NSString alloc]
-        initWithBytes:title.data()
-        length:title.size()
-        encoding:NSUTF8StringEncoding
-    ];
+    NSString* ns_title =
+        [
+            [NSString alloc]
+            initWithBytes:title.data()
+            length:title.size()
+            encoding:NSUTF8StringEncoding
+        ];
 
     if (ns_title == nil) {
         ns_title = @"Grain";
     }
 
     NSRect rect = NSMakeRect(
-        100,
-        100,
-        width,
-        height
+        100.0,
+        100.0,
+        static_cast<CGFloat>(width),
+        static_cast<CGFloat>(height)
     );
 
-    impl_->window = [[NSWindow alloc]
-        initWithContentRect:rect
-        styleMask:
-            NSWindowStyleMaskTitled |
-            NSWindowStyleMaskClosable |
-            NSWindowStyleMaskMiniaturizable |
-            NSWindowStyleMaskResizable
-        backing:NSBackingStoreBuffered
-        defer:NO
-    ];
+    window_ =
+        [[NSWindow alloc]
+            initWithContentRect:rect
+            styleMask:
+                NSWindowStyleMaskTitled |
+                NSWindowStyleMaskClosable |
+                NSWindowStyleMaskMiniaturizable |
+                NSWindowStyleMaskResizable
+            backing:NSBackingStoreBuffered
+            defer:NO
+        ];
 
-    [impl_->window setTitle:ns_title];
-    [impl_->window center];
-}
-
-
-Window::~Window()
-{
-    if (impl_->window != nil) {
-        [impl_->window close];
-        impl_->window = nil;
-    }
-
-    impl_->native_root_view = nil;
-}
-
-
-void Window::show()
-{
-    if (impl_->window == nil) {
+    if (window_ == nil) {
         return;
     }
 
-    [impl_->window makeKeyAndOrderFront:nil];
+    [window_ setTitle:ns_title];
+    [window_ center];
 }
 
 
-void Window::setRootView(std::unique_ptr<View> view)
+CocoaWindow::~CocoaWindow()
 {
-    impl_->root_view = std::move(view);
+    if (window_ != nil) {
+        [window_ close];
+        window_ = nil;
+    }
 
-    if (impl_->window == nil) {
+    native_root_view_ = nil;
+    root_view_ = nullptr;
+}
+
+
+void CocoaWindow::show()
+{
+    if (window_ == nil) {
         return;
     }
 
-    // Remove the previous native root view.
-    [impl_->window setContentView:nil];
-    impl_->native_root_view = nil;
+    [window_ makeKeyAndOrderFront:nil];
+}
 
-    if (!impl_->root_view) {
+
+void CocoaWindow::setRootView(
+    Grain::View* view
+)
+{
+    root_view_ = view;
+
+    if (window_ == nil) {
         return;
     }
 
-    // Create the native macOS backing view for the Grain View.
-    impl_->native_root_view =
+    [window_ setContentView:nil];
+
+    native_root_view_ = nil;
+
+    if (root_view_ == nullptr) {
+        return;
+    }
+
+    native_root_view_ =
         createGrainRootView(
-            impl_->root_view.get()
+            root_view_
         );
 
-    if (impl_->native_root_view == nil) {
+    if (native_root_view_ == nil) {
         return;
     }
 
-    [impl_->window setContentView:impl_->native_root_view];
+    [window_ setContentView:native_root_view_];
 
-    NSView* content_view = [impl_->window contentView];
+    NSView* content_view =
+        [window_ contentView];
 
     if (content_view != nil) {
-        impl_->native_root_view.frame =
+        native_root_view_.frame =
             content_view.bounds;
 
-        impl_->native_root_view.autoresizingMask =
+        native_root_view_.autoresizingMask =
             NSViewWidthSizable |
             NSViewHeightSizable;
     }
 }
 
-} // namespace Grain
+} // namespace Grain::Platform

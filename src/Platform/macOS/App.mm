@@ -1,58 +1,102 @@
 #import <AppKit/AppKit.h>
 
-#include <grain/Platform/App.hpp>
+#include "../Platform.hpp"
 
 #include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
 
-namespace Grain {
+namespace Grain::Platform {
 
-class App::Impl {
+class CocoaWindow final : public Window {
 public:
-    NSApplication* application = nil;
-    std::vector<std::unique_ptr<Window>> windows;
+    CocoaWindow(
+        std::string_view title,
+        int width,
+        int height
+    );
+
+    ~CocoaWindow() override;
+
+    void show() override;
+
+    void setRootView(
+        Grain::View* view
+    ) override;
+
+private:
+    NSWindow* window_ = nil;
+
+    Grain::View* root_view_ = nullptr;
+
+    NSView* native_root_view_ = nil;
 };
 
-App& App::instance()
-{
-    static App app;
-    return app;
-}
 
-App::App()
-    : impl_(std::make_unique<Impl>())
-{
-    impl_->application = [NSApplication sharedApplication];
+class CocoaApp final : public App {
+public:
+    CocoaApp();
 
-    [impl_->application setActivationPolicy:
+    ~CocoaApp() override = default;
+
+    std::unique_ptr<Window> createWindow(
+        std::string_view title,
+        int width,
+        int height
+    ) override;
+
+    void run() override;
+
+private:
+    NSApplication* application_ = nil;
+
+    std::vector<CocoaWindow*> windows_;
+};
+
+
+CocoaApp::CocoaApp()
+{
+    application_ = [NSApplication sharedApplication];
+
+    [application_ setActivationPolicy:
         NSApplicationActivationPolicyRegular];
 }
 
-App::~App() = default;
 
-Window* App::createWindow(
+std::unique_ptr<Window> CocoaApp::createWindow(
     std::string_view title,
     int width,
     int height
 )
 {
-    auto window = std::unique_ptr<Window>(
-        new Window(title, width, height)
-    );
+    auto window =
+        std::make_unique<CocoaWindow>(
+            title,
+            width,
+            height
+        );
 
-    Window* result = window.get();
+    windows_.push_back(window.get());
 
-    impl_->windows.push_back(std::move(window));
-
-    result->show();
-
-    return result;
+    return window;
 }
 
-void App::run()
+
+void CocoaApp::run()
 {
-    [impl_->application activateIgnoringOtherApps:YES];
-    [impl_->application run];
+    if (application_ == nil) {
+        return;
+    }
+
+    [application_ activateIgnoringOtherApps:YES];
+    [application_ run];
 }
 
-} // namespace Grain
+
+std::unique_ptr<App> createApp()
+{
+    return std::make_unique<CocoaApp>();
+}
+
+} // namespace Grain::Platform
