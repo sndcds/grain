@@ -8,6 +8,10 @@ namespace Grain {
 class App;
 class View;
 
+namespace Platform {
+class Window;
+}
+
 class Window {
 public:
     Window(const Window&) = delete;
@@ -22,15 +26,19 @@ public:
 
     void show();
 
-    void setRootView(std::unique_ptr<View> view);
+    void setRootView(
+        std::unique_ptr<View> view
+        );
 
 private:
     class Impl;
 
     explicit Window(
-        std::string_view title,
-        int width,
-        int height
+        std::unique_ptr<Impl> impl
+        );
+
+    static std::unique_ptr<Window> create(
+        std::unique_ptr<Platform::Window> platform_window
         );
 
     std::unique_ptr<Impl> impl_;

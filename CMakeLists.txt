@@ -181,7 +181,23 @@ if(APPLE)
 
 elseif(WIN32)
 
-elseif(UNIX)
+elseif(UNIX AND NOT APPLE)
+    find_package(X11 REQUIRED)
+
+    target_sources(
+            Grain
+            PRIVATE
+            src/Platform/App.cpp
+            src/Platform/Window.cpp
+            src/Platform/Linux/App.cpp
+            src/Platform/Linux/Window.cpp
+    )
+
+    target_link_libraries(
+            Grain
+            PUBLIC
+            X11::X11
+    )
 
 endif()
 
