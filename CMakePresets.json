@@ -1,0 +1,51 @@
+{
+  "version": 6,
+
+  "configurePresets": [
+    {
+      "name": "macos-debug",
+      "displayName": "macOS Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "GRAIN_BUILD_TESTS": "ON",
+        "GRAIN_BUILD_EXAMPLES": "ON",
+        "GRAIN_ENABLE_SANITIZERS": "ON"
+      }
+    },
+    {
+      "name": "macos-release",
+      "displayName": "macOS Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GRAIN_BUILD_TESTS": "ON",
+        "GRAIN_BUILD_EXAMPLES": "OFF",
+        "GRAIN_ENABLE_SANITIZERS": "OFF"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-debug"
+    },
+    {
+      "name": "macos-release",
+      "configurePreset": "macos-release"
+    }
+  ],
+
+  "testPresets": [
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
