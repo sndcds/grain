@@ -70,6 +70,4 @@ Testing/
 
 # Project and macOS specific
 .DS_Store
-.clang-format
-.clang-tidy
 .idea/
