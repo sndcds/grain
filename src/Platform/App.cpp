@@ -18,16 +18,20 @@ public:
     }
 };
 
+
 App& App::instance() {
     static App app;
     return app;
 }
 
+
 App::App()
     : impl_(std::make_unique<Impl>()) {
 }
 
+
 App::~App() = default;
+
 
 Window* App::createWindow(
     std::string_view title,
@@ -68,6 +72,7 @@ Window* App::createWindow(
 
     return result;
 }
+
 
 void App::run() {
     if (impl_->platform_app == nullptr) {

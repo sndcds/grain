@@ -23,7 +23,9 @@ public:
 
     virtual void show() = 0;
 
-    virtual void setRootView(View* view) = 0;
+    virtual void setRootView(
+        View* view
+        ) = 0;
 
 protected:
     Window() = default;

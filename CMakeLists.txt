@@ -165,8 +165,11 @@ if(APPLE)
     target_sources(
             Grain
             PRIVATE
-            src/Platform/macOS/App.mm
-            src/Platform/macOS/Window.mm
+            src/Platform/App.cpp
+            src/Platform/Window.cpp
+
+            src/Platform/macOS/CocoaApp.mm
+            src/Platform/macOS/CocoaWindow.mm
             src/Platform/macOS/GrainRootView.mm
             src/Platform/macOS/CoreGraphicContext.mm
     )
@@ -175,8 +178,7 @@ if(APPLE)
             Grain
             PUBLIC
             "-framework AppKit"
-            "-framework Metal"
-            "-framework QuartzCore"
+            "-framework CoreGraphics"
     )
 
 elseif(WIN32)

@@ -21,13 +21,16 @@ public:
     }
 };
 
+
 Window::Window(
     std::unique_ptr<Impl> impl
     )
     : impl_(std::move(impl)) {
 }
 
+
 Window::~Window() = default;
+
 
 void Window::show() {
     if (impl_ == nullptr ||
@@ -38,12 +41,14 @@ void Window::show() {
     impl_->platform_window->show();
 }
 
+
 void Window::setRootView(
     std::unique_ptr<View> view
     ) {
     impl_->root_view = std::move(view);
 
-    if (impl_->platform_window == nullptr) {
+    if (impl_ == nullptr ||
+        impl_->platform_window == nullptr) {
         return;
     }
 
@@ -51,6 +56,7 @@ void Window::setRootView(
         impl_->root_view.get()
         );
 }
+
 
 std::unique_ptr<Window> Window::create(
     std::unique_ptr<Platform::Window> platform_window
