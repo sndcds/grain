@@ -67,3 +67,9 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Project and macOS specific
+.DS_Store
+.clang-format
+.clang-tidy
+.idea/
