@@ -5,3 +5,4 @@
 #include <grain/Platform/App.hpp>
 #include <grain/Platform/Window.hpp>
 #include <grain/UI/View.hpp>
+#include <grain/Graphics/GraphicContext.hpp>

@@ -1,8 +1,17 @@
-//
-// Created by Roald Christesen on 06.09.26.
-//
+#pragma once
 
-#ifndef GRAIN_RECT_HPP
-#define GRAIN_RECT_HPP
+namespace Grain {
 
-#endif //GRAIN_RECT_HPP
+template <typename T>
+struct Rect {
+    T x = T{};
+    T y = T{};
+    T width = T{};
+    T height = T{};
+};
+
+using Rectd = Rect<double>;
+using Rectf = Rect<float>;
+using Recti = Rect<int>;
+
+} // namespace Grain

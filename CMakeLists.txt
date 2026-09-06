@@ -150,6 +150,8 @@ target_sources(
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
         include/grain/UI/View.hpp
+        include/grain/Graphics/GraphicContext.hpp
+        include/grain/Geometry/Rect.hpp
 )
 
 # ---------------------------------------------------------------------------
@@ -166,7 +168,7 @@ if(APPLE)
             src/Platform/macOS/App.mm
             src/Platform/macOS/Window.mm
             src/Platform/macOS/GrainRootView.mm
-            src/Platform/macOS/MetalCanvas.mm
+            src/Platform/macOS/CoreGraphicContext.mm
     )
 
     target_link_libraries(

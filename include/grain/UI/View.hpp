@@ -1,17 +1,13 @@
 #pragma once
 
 #include <grain/Core/ObjectBase.hpp>
-#include <grain/Graphics/Canvas.hpp>
+#include <grain/Graphics/GraphicContext.hpp>
 
 namespace Grain {
-
-class Canvas;
 
 class View : public ObjectBase {
 public:
     using Coordinate = double;
-
-    using Rect = Canvas::Rect;
 
     View() = default;
 
@@ -26,11 +22,11 @@ public:
     View& operator=(View&&) = delete;
 
     [[nodiscard]]
-    const Rect& bounds() const noexcept {
+    const Rectd& bounds() const noexcept {
         return bounds_;
     }
 
-    void setBounds(const Rect& bounds) noexcept {
+    void setBounds(const Rectd& bounds) noexcept {
         bounds_ = bounds;
     }
 
@@ -39,10 +35,10 @@ public:
         return parent_;
     }
 
-    virtual void draw(Canvas& canvas);
+    virtual void draw(GraphicContext& context);
 
 private:
-    Rect bounds_{};
+    Rectd bounds_{};
     View* parent_ = nullptr;
 };
 

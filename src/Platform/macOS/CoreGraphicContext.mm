@@ -1,17 +1,17 @@
-#include "CoreGraphicsContext.hpp"
+#include "CoreGraphicContext.hpp"
 
 #include <cmath>
 
 namespace Grain {
 
-CoreGraphicsContext::CoreGraphicsContext(
+CoreGraphicContext::CoreGraphicContext(
     CGContextRef context
 )
     : context_(context)
 {
 }
 
-void CoreGraphicsContext::save()
+void CoreGraphicContext::save()
 {
     if (context_ == nullptr) {
         return;
@@ -20,7 +20,7 @@ void CoreGraphicsContext::save()
     CGContextSaveGState(context_);
 }
 
-void CoreGraphicsContext::restore()
+void CoreGraphicContext::restore()
 {
     if (context_ == nullptr) {
         return;
@@ -29,7 +29,7 @@ void CoreGraphicsContext::restore()
     CGContextRestoreGState(context_);
 }
 
-void CoreGraphicsContext::setFillColor(Color color)
+void CoreGraphicContext::setFillColor(Color color)
 {
     if (context_ == nullptr) {
         return;
@@ -44,7 +44,7 @@ void CoreGraphicsContext::setFillColor(Color color)
     );
 }
 
-void CoreGraphicsContext::setStrokeColor(Color color)
+void CoreGraphicContext::setStrokeColor(Color color)
 {
     if (context_ == nullptr) {
         return;
@@ -59,7 +59,7 @@ void CoreGraphicsContext::setStrokeColor(Color color)
     );
 }
 
-void CoreGraphicsContext::setLineWidth(double width)
+void CoreGraphicContext::setLineWidth(double width)
 {
     if (context_ == nullptr) {
         return;
@@ -68,7 +68,7 @@ void CoreGraphicsContext::setLineWidth(double width)
     CGContextSetLineWidth(context_, width);
 }
 
-void CoreGraphicsContext::fillRect(const Rect& rect)
+void CoreGraphicContext::fillRect(const Rectd& rect)
 {
     if (context_ == nullptr) {
         return;
@@ -85,7 +85,7 @@ void CoreGraphicsContext::fillRect(const Rect& rect)
     );
 }
 
-void CoreGraphicsContext::strokeRect(const Rect& rect)
+void CoreGraphicContext::strokeRect(const Rectd& rect)
 {
     if (context_ == nullptr) {
         return;
@@ -102,7 +102,7 @@ void CoreGraphicsContext::strokeRect(const Rect& rect)
     );
 }
 
-void CoreGraphicsContext::translate(
+void CoreGraphicContext::translate(
     double x,
     double y
 )
@@ -118,7 +118,7 @@ void CoreGraphicsContext::translate(
     );
 }
 
-void CoreGraphicsContext::scale(
+void CoreGraphicContext::scale(
     double x,
     double y
 )
@@ -134,7 +134,7 @@ void CoreGraphicsContext::scale(
     );
 }
 
-void CoreGraphicsContext::rotate(
+void CoreGraphicContext::rotate(
     double radians
 )
 {

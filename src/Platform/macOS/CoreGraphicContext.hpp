@@ -2,15 +2,15 @@
 
 #include <CoreGraphics/CoreGraphics.h>
 
-#include <grain/Graphics/GraphicsContext.hpp>
+#include <grain/Graphics/GraphicContext.hpp>
 
 namespace Grain {
 
-class CoreGraphicsContext final : public GraphicsContext {
+class CoreGraphicContext final : public GraphicContext {
 public:
-    explicit CoreGraphicsContext(CGContextRef context);
+    explicit CoreGraphicContext(CGContextRef context);
 
-    ~CoreGraphicsContext() override = default;
+    ~CoreGraphicContext() override = default;
 
     void save() override;
 
@@ -22,9 +22,9 @@ public:
 
     void setLineWidth(double width) override;
 
-    void fillRect(const Rect& rect) override;
+    void fillRect(const Rectd& rect) override;
 
-    void strokeRect(const Rect& rect) override;
+    void strokeRect(const Rectd& rect) override;
 
     void translate(double x, double y) override;
 

@@ -6,24 +6,17 @@
 
 class TestView : public Grain::View {
 public:
-    void draw(Grain::Canvas& canvas) override {
+    void draw(Grain::GraphicContext& gc) override {
         std::cout << "Draw view\n";
-        canvas.clear({
-            0.1f,
-            0.1f,
-            0.1f,
-            1.0f
-        });
 
-        canvas.fillRect(
-            {
-                100.0,
-                100.0,
-                300.0,
-                200.0
-            },
-            Grain::Color::redColor()
-            );
+        gc.setFillColor(Grain::Color::redColor());
+
+        gc.fillRect({
+            100.0,
+            100.0,
+            300.0,
+            200.0
+        });
     }
 };
 
