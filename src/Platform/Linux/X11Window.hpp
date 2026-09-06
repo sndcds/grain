@@ -2,6 +2,7 @@
 
 #include "../Platform.hpp"
 
+
 #include <X11/Xlib.h>
 #include <cairo/cairo.h>
 

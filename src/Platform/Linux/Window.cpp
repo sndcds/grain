@@ -1,6 +1,8 @@
+#include "X11App.hpp"
 #include "X11Window.hpp"
 
 #include "CairoGraphicContext.hpp"
+#include <grain/UI/View.hpp>
 
 #include <cairo/cairo-xlib.h>
 
