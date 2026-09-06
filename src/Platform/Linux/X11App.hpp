@@ -6,8 +6,11 @@
 
 #include <memory>
 #include <string_view>
+#include <vector>
 
 namespace Grain::Platform {
+
+class X11Window;
 
 class X11App final : public App {
 public:
@@ -28,8 +31,14 @@ public:
         return display_;
     }
 
+    void addWindow(
+        X11Window* window
+        );
+
 private:
     Display* display_ = nullptr;
+
+    std::vector<X11Window*> windows_;
 };
 
 } // namespace Grain::Platform

@@ -184,7 +184,11 @@ if(APPLE)
 elseif(WIN32)
 
 elseif(UNIX AND NOT APPLE)
+
     find_package(X11 REQUIRED)
+    find_package(PkgConfig REQUIRED)
+
+    pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
 
     target_sources(
             Grain
@@ -193,12 +197,14 @@ elseif(UNIX AND NOT APPLE)
             src/Platform/Window.cpp
             src/Platform/Linux/App.cpp
             src/Platform/Linux/Window.cpp
+            src/Platform/Linux/CairoGraphicContext.cpp
     )
 
     target_link_libraries(
             Grain
             PUBLIC
             X11::X11
+            PkgConfig::CAIRO
     )
 
 endif()

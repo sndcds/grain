@@ -34,4 +34,4 @@ private:
     cairo_t* context_ = nullptr;
 };
 
-}
+} // namespace Grain::Platform

@@ -1,10 +1,10 @@
 #include "CairoGraphicContext.hpp"
 
-#include <cmath>
-
 namespace Grain::Platform {
 
-CairoGraphicContext::CairoGraphicContext(cairo_t* context) noexcept
+CairoGraphicContext::CairoGraphicContext(
+    cairo_t* context
+    ) noexcept
     : context_(context) {
 }
 
@@ -16,31 +16,42 @@ void CairoGraphicContext::restore() {
     cairo_restore(context_);
 }
 
-void CairoGraphicContext::setFillColor(Grain::Color color) {
+void CairoGraphicContext::setFillColor(
+    Grain::Color color
+    ) {
     cairo_set_source_rgba(
         context_,
-        color.r,
-        color.g,
-        color.b,
-        color.a
+        static_cast<double>(color.red),
+        static_cast<double>(color.green),
+        static_cast<double>(color.blue),
+        static_cast<double>(color.alpha)
         );
 }
 
-void CairoGraphicContext::setStrokeColor(Grain::Color color) {
+void CairoGraphicContext::setStrokeColor(
+    Grain::Color color
+    ) {
     cairo_set_source_rgba(
         context_,
-        color.r,
-        color.g,
-        color.b,
-        color.a
+        static_cast<double>(color.red),
+        static_cast<double>(color.green),
+        static_cast<double>(color.blue),
+        static_cast<double>(color.alpha)
         );
 }
 
-void CairoGraphicContext::setLineWidth(double width) {
-    cairo_set_line_width(context_, width);
+void CairoGraphicContext::setLineWidth(
+    double width
+    ) {
+    cairo_set_line_width(
+        context_,
+        width
+        );
 }
 
-void CairoGraphicContext::fillRect(const Grain::Rectd& rect) {
+void CairoGraphicContext::fillRect(
+    const Grain::Rectd& rect
+    ) {
     cairo_rectangle(
         context_,
         rect.x,
@@ -52,7 +63,9 @@ void CairoGraphicContext::fillRect(const Grain::Rectd& rect) {
     cairo_fill(context_);
 }
 
-void CairoGraphicContext::strokeRect(const Grain::Rectd& rect) {
+void CairoGraphicContext::strokeRect(
+    const Grain::Rectd& rect
+    ) {
     cairo_rectangle(
         context_,
         rect.x,
@@ -64,16 +77,35 @@ void CairoGraphicContext::strokeRect(const Grain::Rectd& rect) {
     cairo_stroke(context_);
 }
 
-void CairoGraphicContext::translate(double x, double y) {
-    cairo_translate(context_, x, y);
+void CairoGraphicContext::translate(
+    double x,
+    double y
+    ) {
+    cairo_translate(
+        context_,
+        x,
+        y
+        );
 }
 
-void CairoGraphicContext::scale(double x, double y) {
-    cairo_scale(context_, x, y);
+void CairoGraphicContext::scale(
+    double x,
+    double y
+    ) {
+    cairo_scale(
+        context_,
+        x,
+        y
+        );
 }
 
-void CairoGraphicContext::rotate(double radians) {
-    cairo_rotate(context_, radians);
+void CairoGraphicContext::rotate(
+    double radians
+    ) {
+    cairo_rotate(
+        context_,
+        radians
+        );
 }
 
-}
+} // namespace Grain::Platform
