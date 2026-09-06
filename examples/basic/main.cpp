@@ -7,16 +7,8 @@
 class TestView : public Grain::View {
 public:
     void draw(Grain::GraphicContext& gc) override {
-        std::cout << "Draw view\n";
-
         gc.setFillColor(Grain::Color::redColor());
-
-        gc.fillRect({
-            100.0,
-            100.0,
-            300.0,
-            200.0
-        });
+        gc.fillRect({100.0, 100.0, 200.0, 300.0});
     }
 };
 
