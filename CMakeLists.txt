@@ -137,6 +137,8 @@ target_sources(
         Grain
         PRIVATE
         src/Core/ObjectBase.cpp
+        src/Geometry/Vec2.cpp
+        src/String/String.cpp
         src/UI/View.cpp
 
         PUBLIC
@@ -146,12 +148,14 @@ target_sources(
         FILES
         include/Grain.hpp
         include/grain/Core/ObjectBase.hpp
+        include/grain/Geometry/Vec2.hpp
+        include/grain/Geometry/Rect.hpp
+        include/grain/String/String.hpp
         include/grain/Containers/List.hpp
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
         include/grain/UI/View.hpp
         include/grain/Graphics/GraphicContext.hpp
-        include/grain/Geometry/Rect.hpp
 )
 
 # ---------------------------------------------------------------------------

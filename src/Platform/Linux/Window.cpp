@@ -151,7 +151,7 @@ void X11Window::draw() {
         return;
     }
 
-    CairoGraphicContext graphics_context(
+    Grain::Platform::CairoGraphicContext graphics_context(
         context
         );
 
