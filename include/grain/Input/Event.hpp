@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#include <grain/Geometry/Vec2.hpp>
-
 namespace Grain {
+
+using WindowId = std::uint64_t;
 
 enum class EventType {
     None,
@@ -13,29 +13,17 @@ enum class EventType {
 
     WindowClose,
     WindowResize,
-    WindowMove,
-    WindowFocus,
-    WindowBlur,
+    WindowFocusGained,
+    WindowFocusLost,
 
     KeyDown,
     KeyUp,
     TextInput,
 
     MouseMove,
-    MouseDown,
-    MouseUp,
-    MouseWheel,
-
-    MouseEnter,
-    MouseLeave
-};
-
-enum class MouseButton {
-    Left,
-    Middle,
-    Right,
-    X1,
-    X2
+    MouseButtonDown,
+    MouseButtonUp,
+    MouseWheel
 };
 
 enum class Key {
@@ -56,7 +44,6 @@ enum class Key {
     End,
     PageUp,
     PageDown,
-
     Insert,
     Delete,
 
@@ -117,33 +104,78 @@ enum class Key {
     F12
 };
 
-struct Modifiers {
-    bool shift = false;
-    bool control = false;
-    bool alt = false;
-    bool super = false;
+enum class MouseButton {
+    Left,
+    Right,
+    Middle,
+    Other
 };
+
+enum class KeyModifiers : std::uint8_t {
+    None = 0,
+    Shift = 1 << 0,
+    Control = 1 << 1,
+    Alt = 1 << 2,
+    Super = 1 << 3
+};
+
+constexpr KeyModifiers operator|(
+    KeyModifiers lhs,
+    KeyModifiers rhs
+    ) noexcept {
+    return static_cast<KeyModifiers>(
+        static_cast<std::uint8_t>(lhs) |
+        static_cast<std::uint8_t>(rhs)
+    );
+}
+
+constexpr KeyModifiers operator&(
+    KeyModifiers lhs,
+    KeyModifiers rhs
+    ) noexcept {
+    return static_cast<KeyModifiers>(
+        static_cast<std::uint8_t>(lhs) &
+        static_cast<std::uint8_t>(rhs)
+    );
+}
+
+constexpr bool hasModifier(
+    KeyModifiers modifiers,
+    KeyModifiers modifier
+    ) noexcept {
+    return (modifiers & modifier) == modifier;
+}
 
 struct Event {
     EventType type = EventType::None;
 
-    Vec2d position{};
-    Vec2d delta{};
+    WindowId windowId = 0;
 
+    // Keyboard
     Key key = Key::Unknown;
-    MouseButton button = MouseButton::Left;
+    KeyModifiers modifiers = KeyModifiers::None;
 
-    Modifiers modifiers{};
+    // Text input.
+    char32_t character = U'\0';
 
+    // Mouse position.
+    double mouseX = 0.0;
+    double mouseY = 0.0;
+
+    // Mouse movement.
+    double deltaX = 0.0;
+    double deltaY = 0.0;
+
+    // Mouse button.
+    MouseButton mouseButton = MouseButton::Left;
+
+    // Mouse wheel.
     double wheelX = 0.0;
     double wheelY = 0.0;
 
-    char32_t character = U'\0';
-
+    // Window dimensions.
     int width = 0;
     int height = 0;
-
-    bool repeat = false;
 };
 
 } // namespace Grain

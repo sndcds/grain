@@ -1,6 +1,7 @@
 #pragma once
 
 #include "grain/Input/Event.hpp"
+#include "grain/Geometry/Vec2.hpp"
 
 namespace Grain {
 

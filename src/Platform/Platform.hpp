@@ -51,6 +51,7 @@ public:
         ) = 0;
 
     virtual void run() = 0;
+    virtual void quit() = 0;
 
 protected:
     App() = default;

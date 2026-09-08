@@ -155,6 +155,8 @@ target_sources(
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
         include/grain/Containers/List.hpp
+        include/grain/Input/Input.hpp
+        include/grain/Input/Event.hpp
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
         include/grain/UI/View.hpp
