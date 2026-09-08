@@ -5,13 +5,13 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace Grain {
 
 class App::Impl {
 public:
     std::unique_ptr<Platform::App> platform_app;
-
     std::vector<std::unique_ptr<Window> > windows;
 
     Input input;
@@ -23,15 +23,14 @@ public:
     }
 };
 
-
 App& App::instance() {
     static App app;
     return app;
 }
 
-
 App::App()
     : impl_(std::make_unique<Impl>()) {
+
     if (impl_->platform_app != nullptr) {
         impl_->platform_app->setEventHandler(
             [this](const Event& event) {
@@ -41,9 +40,7 @@ App::App()
     }
 }
 
-
 App::~App() = default;
-
 
 Window* App::createWindow(
     std::string_view title,
@@ -85,16 +82,13 @@ Window* App::createWindow(
     return result;
 }
 
-
 Input& App::input() noexcept {
     return impl_->input;
 }
 
-
 const Input& App::input() const noexcept {
     return impl_->input;
 }
-
 
 void App::run() {
     if (impl_ == nullptr ||
@@ -111,18 +105,22 @@ void App::run() {
     impl_->running = false;
 }
 
-
 void App::quit() noexcept {
     impl_->running = false;
 
-    if (impl_ != nullptr &&
-        impl_->platform_app != nullptr) {
+    if (impl_->platform_app != nullptr) {
         impl_->platform_app->quit();
     }
 }
 
-
 void App::processEvent(const Event& event) {
+    std::cout
+        << "event type: " << static_cast<int>(event.type)
+        << ", mouse_button: " << static_cast<int>(event.mouse_button)
+        << ", " << event.mouse_x
+        << ", " << event.mouse_y
+        << '\n';
+
     if (event.type == EventType::Quit) {
         quit();
         return;

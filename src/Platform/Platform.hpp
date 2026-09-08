@@ -1,7 +1,11 @@
 #pragma once
 
+#include <grain/Input/Event.hpp>
+
+#include <functional>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 namespace Grain {
 
@@ -31,9 +35,10 @@ protected:
     Window() = default;
 };
 
-
 class App {
 public:
+    using EventHandler = std::function<void(const Event&)>;
+
     App(const App&) = delete;
 
     App& operator=(const App&) = delete;
@@ -50,15 +55,29 @@ public:
         int height
         ) = 0;
 
+    void setEventHandler(EventHandler handler) {
+        event_handler_ = std::move(handler);
+    }
+
     virtual void run() = 0;
+
     virtual void quit() = 0;
 
 protected:
     App() = default;
-};
 
+    void emitEvent(const Event& event) {
+        if (event_handler_) {
+            event_handler_(event);
+        }
+    }
+
+private:
+    EventHandler event_handler_;
+};
 
 std::unique_ptr<App> createApp();
 
 } // namespace Platform
+
 } // namespace Grain

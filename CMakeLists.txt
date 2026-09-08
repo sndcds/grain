@@ -138,6 +138,7 @@ target_sources(
         PRIVATE
         src/Core/ObjectBase.cpp
         src/Geometry/Vec2.cpp
+        src/Input/Input.cpp
         src/String/String.cpp
         src/String/StringUtf8.cpp
         src/UI/View.cpp

@@ -2,17 +2,19 @@
 
 #import <AppKit/AppKit.h>
 
+#include <functional>
+
+#include <grain/Input/Event.hpp>
+
 namespace Grain {
 
 class View;
 
-/**
- * Creates the native macOS backing view for a Grain View.
- *
- * The returned NSView does not take ownership of grainView.
- * The Grain::Window remains responsible for the lifetime of the
- * Grain::View.
- */
-NSView* createGrainRootView(View* grainView);
+using EventHandler = std::function<void(const Event&)>;
+
+NSView* createGrainRootView(
+    View* grainView,
+    EventHandler eventHandler
+);
 
 } // namespace Grain

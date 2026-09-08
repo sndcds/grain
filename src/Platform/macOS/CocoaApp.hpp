@@ -20,6 +20,7 @@ public:
         ) override;
 
     void run() override;
+    void quit() override;
 
 private:
     class Impl;

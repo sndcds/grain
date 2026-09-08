@@ -5,24 +5,31 @@
 
 #include <grain/UI/View.hpp>
 
+#include <iostream>
+#include <memory>
+
 @interface GrainRootView : NSView
 
 - (instancetype)initWithFrame:(NSRect)frame
-                    grainView:(Grain::View*)grainView;
+                    grainView:(Grain::View*)grainView
+                 eventHandler:(Grain::EventHandler)eventHandler;
 
 @end
 
 @implementation GrainRootView {
     Grain::View* grainView_;
+    Grain::EventHandler eventHandler_;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame
                     grainView:(Grain::View*)grainView
+                  eventHandler:(Grain::EventHandler)eventHandler
 {
     self = [super initWithFrame:frame];
 
     if (self) {
         grainView_ = grainView;
+        eventHandler_ = std::move(eventHandler);
 
         self.wantsLayer = NO;
     }
@@ -48,6 +55,79 @@
     return YES;
 }
 
+- (void)mouseDown:(NSEvent*)event
+{
+    NSPoint position =
+        [self convertPoint:event.locationInWindow
+                  fromView:nil];
+
+    Grain::Event grainEvent;
+    grainEvent.type = Grain::EventType::MouseButtonDown;
+    grainEvent.mouse_button = Grain::MouseButton::Left;
+    grainEvent.mouse_x = position.x;
+    grainEvent.mouse_y = position.y;
+
+    if (eventHandler_) {
+        eventHandler_(grainEvent);
+    }
+}
+
+- (void)mouseUp:(NSEvent*)event
+{
+    NSPoint position =
+        [self convertPoint:event.locationInWindow
+                  fromView:nil];
+
+    Grain::Event grainEvent;
+
+    grainEvent.type = Grain::EventType::MouseButtonUp;
+    grainEvent.mouse_button = Grain::MouseButton::Left;
+    grainEvent.mouse_x = position.x;
+    grainEvent.mouse_y = position.y;
+
+    if (eventHandler_) {
+        eventHandler_(grainEvent);
+    }
+}
+
+- (void)mouseDragged:(NSEvent*)event
+{
+    NSPoint position =
+        [self convertPoint:event.locationInWindow
+                  fromView:nil];
+
+    Grain::Event grainEvent;
+
+    grainEvent.type = Grain::EventType::MouseMove;
+    grainEvent.mouse_x = position.x;
+    grainEvent.mouse_y = position.y;
+    grainEvent.delta_x = event.deltaX;
+    grainEvent.delta_y = event.deltaY;
+
+    if (eventHandler_) {
+        eventHandler_(grainEvent);
+    }
+}
+
+- (void)mouseMoved:(NSEvent*)event
+{
+    NSPoint position =
+        [self convertPoint:event.locationInWindow
+                  fromView:nil];
+
+    Grain::Event grainEvent;
+
+    grainEvent.type = Grain::EventType::MouseMove;
+    grainEvent.mouse_x = position.x;
+    grainEvent.mouse_y = position.y;
+    grainEvent.delta_x = event.deltaX;
+    grainEvent.delta_y = event.deltaY;
+
+    if (eventHandler_) {
+        eventHandler_(grainEvent);
+    }
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {
     (void)dirtyRect;
@@ -70,9 +150,13 @@
 
 @end
 
+
 namespace Grain {
 
-NSView* createGrainRootView(View* grainView)
+NSView* createGrainRootView(
+    View* grainView,
+    EventHandler eventHandler
+)
 {
     if (grainView == nullptr) {
         return nil;
@@ -80,7 +164,8 @@ NSView* createGrainRootView(View* grainView)
 
     return [[GrainRootView alloc]
         initWithFrame:NSZeroRect
-        grainView:grainView];
+        grainView:grainView
+        eventHandler:std::move(eventHandler)];
 }
 
 } // namespace Grain

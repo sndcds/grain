@@ -38,7 +38,10 @@ std::unique_ptr<Window> CocoaApp::createWindow(
     return std::make_unique<CocoaWindow>(
         title,
         width,
-        height
+        height,
+        [this](const Event& event) {
+            emitEvent(event);
+        }
     );
 }
 
@@ -53,6 +56,16 @@ void CocoaApp::run()
         activateIgnoringOtherApps:YES];
 
     [impl_->application run];
+}
+
+
+void CocoaApp::quit()
+{
+    if (impl_->application == nil) {
+        return;
+    }
+
+    [impl_->application terminate:nil];
 }
 
 

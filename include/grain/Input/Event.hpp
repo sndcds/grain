@@ -149,7 +149,7 @@ constexpr bool hasModifier(
 struct Event {
     EventType type = EventType::None;
 
-    WindowId windowId = 0;
+    WindowId window_id = 0;
 
     // Keyboard
     Key key = Key::Unknown;
@@ -159,19 +159,19 @@ struct Event {
     char32_t character = U'\0';
 
     // Mouse position.
-    double mouseX = 0.0;
-    double mouseY = 0.0;
+    double mouse_x = 0.0;
+    double mouse_y = 0.0;
 
     // Mouse movement.
-    double deltaX = 0.0;
-    double deltaY = 0.0;
+    double delta_x = 0.0;
+    double delta_y = 0.0;
 
     // Mouse button.
-    MouseButton mouseButton = MouseButton::Left;
+    MouseButton mouse_button = MouseButton::Left;
 
     // Mouse wheel.
-    double wheelX = 0.0;
-    double wheelY = 0.0;
+    double wheel_x = 0.0;
+    double wheel_y = 0.0;
 
     // Window dimensions.
     int width = 0;
