@@ -1,5 +1,7 @@
 #pragma once
 
+#include <grain/Input/Event.hpp>
+#include <grain/Input/Input.hpp>
 #include <grain/Platform/Window.hpp>
 
 #include <memory>
@@ -25,12 +27,20 @@ public:
         int height
         );
 
+    Input& input() noexcept;
+
+    const Input& input() const noexcept;
+
     void run();
+
+    void quit() noexcept;
 
 private:
     App();
 
     ~App();
+
+    void processEvent(const Event& event);
 
     class Impl;
     std::unique_ptr<Impl> impl_;

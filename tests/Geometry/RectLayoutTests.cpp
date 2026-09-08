@@ -550,7 +550,7 @@ TEST_CASE("RectLayout cellRect", "[RectLayout]")
 
         requireRectApprox(
             result,
-            Rectd{10.0, 20.0, 93.3333333333, 180.0}
+            Rectd{10.0, 20.0, 93.3333333333, 200.0}
         );
     }
 
@@ -570,9 +570,9 @@ TEST_CASE("RectLayout cellRect", "[RectLayout]")
             );
 
         REQUIRE(result.x == Catch::Approx(216.6666666667));
-        REQUIRE(result.y == Catch::Approx(140.0));
+        REQUIRE(result.y == Catch::Approx(130.0));
         REQUIRE(result.width == Catch::Approx(93.3333333333));
-        REQUIRE(result.height == Catch::Approx(80.0));
+        REQUIRE(result.height == Catch::Approx(90.0));
     }
 
     SECTION("indices are clamped")
@@ -590,7 +590,7 @@ TEST_CASE("RectLayout cellRect", "[RectLayout]")
 
         requireRectApprox(
             result,
-            Rectd{10.0, 20.0, 93.3333333333, 80.0}
+            Rectd{10.0, 20.0, 93.3333333333, 90.0}
         );
     }
 
@@ -622,18 +622,23 @@ TEST_CASE("RectLayout edgeAlignedRectRelative", "[RectLayout]")
 {
     const Rectd rect{100.0, 200.0, 300.0, 150.0};
 
+    const double top = 10.0;
+    const double right = 40.0;
+    const double bottom = 30.0;
+    const double left = 20.0;
+
     SECTION("center")
     {
         requireRectApprox(
             RectLayoutd::edgeAlignedRectRelative(
                 rect,
                 Alignment::Center,
-                10.0,
-                20.0,
-                30.0,
-                40.0
+                top,
+                right,
+                bottom,
+                left
             ),
-            Rectd{10.0, 20.0, 260.0, 140.0}
+            Rectd{20.0, 10.0, 240.0, 110.0}
         );
     }
 
@@ -643,12 +648,12 @@ TEST_CASE("RectLayout edgeAlignedRectRelative", "[RectLayout]")
             RectLayoutd::edgeAlignedRectRelative(
                 rect,
                 Alignment::TopLeft,
-                10.0,
-                20.0,
-                30.0,
-                40.0
+                top,
+                right,
+                bottom,
+                left
             ),
-            Rectd{40.0, 10.0, 240.0, 110.0}
+            Rectd{20.0, 10.0, 20.0, 20.0}
         );
     }
 
@@ -658,12 +663,12 @@ TEST_CASE("RectLayout edgeAlignedRectRelative", "[RectLayout]")
             RectLayoutd::edgeAlignedRectRelative(
                 rect,
                 Alignment::BottomRight,
-                10.0,
-                20.0,
-                30.0,
-                40.0
+                top,
+                right,
+                bottom,
+                left
             ),
-            Rectd{280.0, 90.0, 240.0, 110.0}
+            Rectd{260.0, 120.0, 20.0, 20.0}
         );
     }
 
@@ -673,12 +678,12 @@ TEST_CASE("RectLayout edgeAlignedRectRelative", "[RectLayout]")
             RectLayoutd::edgeAlignedRectRelative(
                 rect,
                 Alignment::Left,
-                10.0,
-                20.0,
-                30.0,
-                40.0
+                top,
+                right,
+                bottom,
+                left
             ),
-            Rectd{40.0, 10.0, 20.0, 110.0}
+            Rectd{20.0, 10.0, 20.0, 110.0}
         );
     }
 
@@ -688,12 +693,12 @@ TEST_CASE("RectLayout edgeAlignedRectRelative", "[RectLayout]")
             RectLayoutd::edgeAlignedRectRelative(
                 rect,
                 Alignment::Right,
-                10.0,
-                20.0,
-                30.0,
-                40.0
+                top,
+                right,
+                bottom,
+                left
             ),
-            Rectd{280.0, 10.0, 20.0, 110.0}
+            Rectd{260.0, 10.0, 20.0, 110.0}
         );
     }
 }
@@ -714,7 +719,7 @@ TEST_CASE("RectLayout innerRect", "[RectLayout]")
 
         requireRectApprox(
             result,
-            Rectd{200.0, 220.0, 200.0, 160.0}
+            Rectd{220.0, 220.0, 160.0, 160.0}
         );
     }
 
@@ -729,7 +734,7 @@ TEST_CASE("RectLayout innerRect", "[RectLayout]")
 
         requireRectApprox(
             result,
-            Rectd{120.0, 240.0, 360.0, 180.0}
+            Rectd{140.0, 220.0, 320.0, 160.0}
         );
     }
 

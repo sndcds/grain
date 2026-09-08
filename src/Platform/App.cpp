@@ -12,6 +12,8 @@ class App::Impl {
 public:
     std::unique_ptr<Platform::App> platform_app;
     std::vector<std::unique_ptr<Window> > windows;
+    Input input;
+    bool running = false;
 
     Impl()
         : platform_app(Platform::createApp()) {
@@ -79,7 +81,14 @@ void App::run() {
         return;
     }
 
-    impl_->platform_app->run();
+    impl_->running = true;
+
+    impl_->platform_app->run(*this);
+}
+
+
+void App::quit() noexcept {
+    impl_->running = false;
 }
 
 } // namespace Grain
