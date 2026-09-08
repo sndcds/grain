@@ -13,7 +13,52 @@ public:
 };
 
 
+void stringExample() {
+
+    using Grain::String;
+
+    String title = "  Sommer in Flensburg 🌊  ";
+
+    // Check the input.
+    if (!title.isValidUtf8()) {
+        return;
+    }
+
+    // Remove surrounding whitespace.
+    title.trim();
+
+    // Inspect the result.
+    if (title.empty()) {
+        return;
+    }
+
+    // Check whether it contains a particular word.
+    if (title.contains("Flensburg")) {
+        // ...
+    }
+
+    // Find a word. The result is a code-point index.
+    auto position = title.find("Flensburg");
+
+    if (position != String::npos) {
+        String location = title.substr(position);
+
+        std::cout << "Location: " << location << '\n';
+    }
+
+    // Append additional text.
+    title += " – Kultur";
+
+    // Compare the result.
+    if (title.startsWith("Sommer")) {
+        std::cout << title << '\n';
+    }
+}
+
 int main() {
+
+    stringExample();
+
     struct Point {
         int32_t a, b, c;
         double d;
@@ -32,22 +77,17 @@ int main() {
 
     auto& app = Grain::App::instance();
 
-    auto* window = app.createWindow(
-        "Grain",
-        800,
-        600
-        );
-
+    auto* window = app.createWindow("Grain", 800, 600);
     auto view = std::make_unique<TestView>();
-
-    view->setBounds({
-        0.0,
-        0.0,
-        800.0,
-        600.0
-    });
-
+    view->setBounds({0.0, 0.0, 800.0, 600.0});
     window->setRootView(std::move(view));
+
+    {
+        auto* window2 = app.createWindow("Grain2", 900, 700);
+        auto view2 = std::make_unique<TestView>();
+        view2->setBounds({0.0, 0.0, 800.0, 600.0});
+        window2->setRootView(std::move(view));
+    }
 
     app.run();
 

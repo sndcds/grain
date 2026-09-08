@@ -1,9 +1,7 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <iosfwd>
-#include <limits>
 #include <string>
 #include <string_view>
 
@@ -22,16 +20,21 @@ public:
     String() = default;
 
     String(const char* utf8);
+
     String(std::string_view utf8);
+
     String(std::string utf8);
 
     String(const String&) = default;
+
     String(String&&) noexcept = default;
 
     String& operator=(const String&) = default;
+
     String& operator=(String&&) noexcept = default;
 
     String& operator=(const char* utf8);
+
     String& operator=(std::string_view utf8);
 
     ~String() = default;
@@ -41,7 +44,10 @@ public:
     // -------------------------------------------------------------------------
 
     [[nodiscard]] bool empty() const noexcept;
-    [[nodiscard]] bool isEmpty() const noexcept { return empty(); }
+
+    [[nodiscard]] bool isEmpty() const noexcept {
+        return empty();
+    }
 
     /**
      * Number of UTF-8 code points.
@@ -81,7 +87,9 @@ public:
     /**
      * Alias used by the existing Grain API.
      */
-    [[nodiscard]] const char* utf8() const noexcept { return c_str(); }
+    [[nodiscard]] const char* utf8() const noexcept {
+        return c_str();
+    }
 
     /**
      * Read-only view of the underlying UTF-8 bytes.
@@ -104,12 +112,6 @@ public:
 
     /**
      * Returns the byte offset corresponding to a code-point index.
-     *
-     * For example, in "Äbc":
-     *
-     *   codePointIndex 0 -> byte offset 0
-     *   codePointIndex 1 -> byte offset 2
-     *   codePointIndex 2 -> byte offset 3
      */
     [[nodiscard]] size_type byteOffset(
         size_type code_point_index) const noexcept;
@@ -121,14 +123,19 @@ public:
     void clear() noexcept;
 
     void assign(std::string_view utf8);
+
     void assign(const char* utf8);
 
     void append(std::string_view utf8);
+
     void append(const String& other);
+
     void append(const char* utf8);
 
     String& operator+=(std::string_view utf8);
+
     String& operator+=(const String& other);
+
     String& operator+=(const char* utf8);
 
     void insert(size_type code_point_index, std::string_view utf8);
@@ -180,10 +187,13 @@ public:
     // -------------------------------------------------------------------------
 
     [[nodiscard]] size_type leadingWhitespace() const noexcept;
+
     [[nodiscard]] size_type trailingWhitespace() const noexcept;
 
     void trim();
+
     void trimLeft();
+
     void trimRight();
 
     // -------------------------------------------------------------------------
@@ -191,7 +201,9 @@ public:
     // -------------------------------------------------------------------------
 
     [[nodiscard]] int compare(const String& other) const noexcept;
+
     [[nodiscard]] int compare(std::string_view other) const noexcept;
+
     [[nodiscard]] int compare(const char* other) const noexcept;
 
     [[nodiscard]] bool equalsIgnoreCase(
@@ -201,63 +213,72 @@ public:
     // Operators
     // -------------------------------------------------------------------------
 
-    friend bool operator==(const String& lhs, const String& rhs) noexcept;
+    friend bool operator==(
+        const String& lhs,
+        const String& rhs) noexcept;
 
-    friend bool operator==(const String& lhs, const char* rhs) noexcept;
+    friend bool operator==(
+        const String& lhs,
+        const char* rhs) noexcept;
 
-    friend bool operator==(const char* lhs, const String& rhs) noexcept;
+    friend bool operator==(
+        const char* lhs,
+        const String& rhs) noexcept;
 
-    friend bool operator!=(const String& lhs, const String& rhs) noexcept;
+    friend bool operator!=(
+        const String& lhs,
+        const String& rhs) noexcept;
 
-    friend bool operator!=(const String& lhs, const char* rhs) noexcept;
+    friend bool operator!=(
+        const String& lhs,
+        const char* rhs) noexcept;
 
-    friend bool operator!=(const char* lhs, const String& rhs) noexcept;
+    friend bool operator!=(
+        const char* lhs,
+        const String& rhs) noexcept;
 
-    friend bool operator==(const String& lhs, std::string_view rhs) noexcept;
+    friend bool operator==(
+        const String& lhs,
+        std::string_view rhs) noexcept;
 
-    friend bool operator==(std::string_view lhs, const String& rhs) noexcept;
+    friend bool operator==(
+        std::string_view lhs,
+        const String& rhs) noexcept;
 
-    friend bool operator!=(const String& lhs, std::string_view rhs) noexcept;
+    friend bool operator!=(
+        const String& lhs,
+        std::string_view rhs) noexcept;
 
-    friend bool operator!=(std::string_view lhs, const String& rhs) noexcept;
+    friend bool operator!=(
+        std::string_view lhs,
+        const String& rhs) noexcept;
 
-    friend String operator+(const String& lhs, const String& rhs);
+    friend String operator+(
+        const String& lhs,
+        const String& rhs);
 
-    friend String operator+(const String& lhs, std::string_view rhs);
+    friend String operator+(
+        const String& lhs,
+        std::string_view rhs);
 
-    friend String operator+(std::string_view lhs, const String& rhs);
+    friend String operator+(
+        std::string_view lhs,
+        const String& rhs);
 
-    friend String operator+(const String& lhs, const char* rhs);
+    friend String operator+(
+        const String& lhs,
+        const char* rhs);
 
-    friend String operator+(const char* lhs, const String& rhs);
+    friend String operator+(
+        const char* lhs,
+        const String& rhs);
 
-    friend std::ostream& operator<<(std::ostream& stream, const String& string);
+    friend std::ostream& operator<<(
+        std::ostream& stream,
+        const String& string);
 
 private:
     std::string data_;
-
-    // -------------------------------------------------------------------------
-    // UTF-8 helpers
-    // -------------------------------------------------------------------------
-
-    [[nodiscard]] static bool isUtf8ContinuationByte(
-        unsigned char byte) noexcept;
-
-    [[nodiscard]] static size_type sequenceLength(
-        unsigned char first_byte) noexcept;
-
-    [[nodiscard]] static bool decodeCodePoint(
-        std::string_view data,
-        size_type byte_index,
-        char32_t& code_point,
-        size_type& sequence_length) noexcept;
-
-    [[nodiscard]] static size_type codePointCount(
-        std::string_view data) noexcept;
-
-    [[nodiscard]] static size_type byteOffsetForCodePoint(
-        std::string_view data,
-        size_type code_point_index) noexcept;
 
     [[nodiscard]] size_type codePointIndexFromByteIndex(
         size_type byte_index) const noexcept;

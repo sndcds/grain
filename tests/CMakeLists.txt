@@ -4,7 +4,9 @@ add_executable(
         GrainTests
         Core/ObjectBaseTests.cpp
         Containers/ListTests.cpp
+        Geometry/Vec2Tests.cpp
         String/StringTests.cpp
+        String/StringUtf8Tests.cpp
 )
 
 target_link_libraries(

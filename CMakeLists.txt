@@ -139,6 +139,7 @@ target_sources(
         src/Core/ObjectBase.cpp
         src/Geometry/Vec2.cpp
         src/String/String.cpp
+        src/String/StringUtf8.cpp
         src/UI/View.cpp
 
         PUBLIC
@@ -151,6 +152,7 @@ target_sources(
         include/grain/Geometry/Vec2.hpp
         include/grain/Geometry/Rect.hpp
         include/grain/String/String.hpp
+        include/grain/String/StringUtf8.hpp
         include/grain/Containers/List.hpp
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
