@@ -6,6 +6,7 @@ add_executable(
         Containers/ListTests.cpp
         Geometry/Vec2Tests.cpp
         Geometry/RectTests.cpp
+        Geometry/RectLayoutTests.cpp
         String/StringTests.cpp
         String/StringUtf8Tests.cpp
 )

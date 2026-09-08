@@ -149,6 +149,7 @@ target_sources(
         FILES
         include/Grain.hpp
         include/grain/Core/ObjectBase.hpp
+        include/grain/Geometry/Layout.hpp
         include/grain/Geometry/Vec2.hpp
         include/grain/Geometry/Rect.hpp
         include/grain/String/String.hpp

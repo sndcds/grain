@@ -8,7 +8,7 @@ class TestView : public Grain::View {
 public:
     void draw(Grain::GraphicContext& gc) override {
         gc.setFillColor(Grain::Color::redColor());
-        gc.fillRect({100.0, 100.0, 200.0, 300.0});
+        gc.fillRect({20.0, 20.0, 800.0 - 40.0, 600.0 - 40.0});
     }
 };
 
@@ -57,25 +57,9 @@ void stringExample() {
 
 int main() {
 
-    stringExample();
-
-    struct Point {
-        int32_t a, b, c;
-        double d;
-    };
-
-    Grain::ObjectBase object;
-    Grain::List<Point> points;
-
-    std::cout << "Object ID: " << object.id() << '\n';
-
-    points.push_back(Point());
-    points.push_back(Point());
-    points.push_back(Point());
-
-    std::cout << "Points size: " << points.size() << '\n';
-
     auto& app = Grain::App::instance();
+
+    stringExample();
 
     auto* window = app.createWindow("Grain", 800, 600);
     auto view = std::make_unique<TestView>();
@@ -83,7 +67,7 @@ int main() {
     window->setRootView(std::move(view));
 
     {
-        auto* window2 = app.createWindow("Grain2", 900, 700);
+        auto* window2 = app.createWindow("Grain2", 800, 600);
         auto view2 = std::make_unique<TestView>();
         view2->setBounds({0.0, 0.0, 800.0, 600.0});
         window2->setRootView(std::move(view2));
