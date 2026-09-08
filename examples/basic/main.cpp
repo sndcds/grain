@@ -86,7 +86,7 @@ int main() {
         auto* window2 = app.createWindow("Grain2", 900, 700);
         auto view2 = std::make_unique<TestView>();
         view2->setBounds({0.0, 0.0, 800.0, 600.0});
-        window2->setRootView(std::move(view));
+        window2->setRootView(std::move(view2));
     }
 
     app.run();

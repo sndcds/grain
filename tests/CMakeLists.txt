@@ -5,6 +5,7 @@ add_executable(
         Core/ObjectBaseTests.cpp
         Containers/ListTests.cpp
         Geometry/Vec2Tests.cpp
+        Geometry/RectTests.cpp
         String/StringTests.cpp
         String/StringUtf8Tests.cpp
 )

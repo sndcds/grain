@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include "Grain.hpp"
-#include "grain/String/String.hpp"
-// #include "grain/String/CSVString.hpp"
+#include <grain/String/String.hpp>
+// #include <grain/String/CSVString.hpp>
 
 #include <algorithm>
 #include <cmath>
