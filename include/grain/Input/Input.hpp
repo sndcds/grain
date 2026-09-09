@@ -57,22 +57,22 @@ private:
         MouseButton button
         ) noexcept;
 
-    bool keysDown_[KeyCount]{};
-    bool keysPressed_[KeyCount]{};
-    bool keysReleased_[KeyCount]{};
+    bool keys_down_[KeyCount]{};
+    bool keys_pressed_[KeyCount]{};
+    bool keys_released_[KeyCount]{};
 
-    bool mouseButtonsDown_[MouseButtonCount]{};
-    bool mouseButtonsPressed_[MouseButtonCount]{};
-    bool mouseButtonsReleased_[MouseButtonCount]{};
+    bool mouse_buttons_down_[MouseButtonCount]{};
+    bool mouse_buttons_pressed_[MouseButtonCount]{};
+    bool mouse_buttons_released_[MouseButtonCount]{};
 
-    double mouseX_ = 0.0;
-    double mouseY_ = 0.0;
+    double mouse_x_ = 0.0;
+    double mouse_y_ = 0.0;
 
-    double mouseDeltaX_ = 0.0;
-    double mouseDeltaY_ = 0.0;
+    double mouse_delta_x_ = 0.0;
+    double mouse_delta_y_ = 0.0;
 
-    double wheelDeltaX_ = 0.0;
-    double wheelDeltaY_ = 0.0;
+    double wheel_delta_x_ = 0.0;
+    double wheel_delta_y_ = 0.0;
 };
 
 } // namespace Grain
