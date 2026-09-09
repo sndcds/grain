@@ -17,8 +17,8 @@
 @end
 
 @implementation GrainRootView {
-    Grain::View* grainView_;
-    Grain::EventHandler eventHandler_;
+    Grain::View* grain_view_;
+    Grain::EventHandler event_handler_;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame
@@ -28,8 +28,8 @@
     self = [super initWithFrame:frame];
 
     if (self) {
-        grainView_ = grainView;
-        eventHandler_ = std::move(eventHandler);
+        grain_view_ = grainView;
+        event_handler_ = std::move(eventHandler);
 
         self.wantsLayer = NO;
     }
@@ -67,8 +67,8 @@
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
 
-    if (eventHandler_) {
-        eventHandler_(grainEvent);
+    if (event_handler_) {
+        event_handler_(grainEvent);
     }
 }
 
@@ -85,8 +85,8 @@
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
 
-    if (eventHandler_) {
-        eventHandler_(grainEvent);
+    if (event_handler_) {
+        event_handler_(grainEvent);
     }
 }
 
@@ -101,11 +101,11 @@
     grainEvent.type = Grain::EventType::MouseMove;
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
-    grainEvent.delta_x = event.deltaX;
-    grainEvent.delta_y = event.deltaY;
+    grainEvent.delta_x = event.delta_x;
+    grainEvent.delta_y = event.delta_y;
 
-    if (eventHandler_) {
-        eventHandler_(grainEvent);
+    if (event_handler_) {
+        event_handler_(grainEvent);
     }
 }
 
@@ -120,11 +120,11 @@
     grainEvent.type = Grain::EventType::MouseMove;
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
-    grainEvent.delta_x = event.deltaX;
-    grainEvent.delta_y = event.deltaY;
+    grainEvent.delta_x = event.delta_x;
+    grainEvent.delta_y = event.delta_y;
 
-    if (eventHandler_) {
-        eventHandler_(grainEvent);
+    if (event_handler_) {
+        event_handler_(grainEvent);
     }
 }
 
@@ -132,7 +132,7 @@
 {
     (void)dirtyRect;
 
-    if (grainView_ == nullptr) {
+    if (grain_view_ == nullptr) {
         return;
     }
 
@@ -145,7 +145,7 @@
 
     Grain::CoreGraphicContext graphicsContext(context);
 
-    grainView_->draw(graphicsContext);
+    grain_view_->draw(graphicsContext);
 }
 
 @end
