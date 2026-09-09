@@ -1,8 +1,9 @@
 #pragma once
 
+#include <grain/Input/Event.hpp>
+
 #include <memory>
 #include <string_view>
-#include <cstdint>
 
 namespace Grain {
 
@@ -12,8 +13,6 @@ class View;
 namespace Platform {
 class Window;
 }
-
-using WindowId = std::uint64_t;
 
 class Window {
 public:

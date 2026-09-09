@@ -14,6 +14,7 @@ namespace Grain::Platform {
 class X11Window final : public Window {
 public:
     X11Window(
+        WindowId id,
         Display* display,
         std::string_view title,
         int width,
@@ -29,6 +30,11 @@ public:
         ) override;
 
     [[nodiscard]]
+    WindowId id() const noexcept {
+        return window_id_;
+    }
+
+    [[nodiscard]]
     ::Window nativeWindow() const noexcept {
         return window_;
     }
@@ -41,6 +47,7 @@ public:
         );
 
 private:
+    WindowId window_id_;
     Display* display_ = nullptr;
     ::Window window_ = 0;
 

@@ -31,8 +31,8 @@ CocoaWindow::CocoaWindow(
     int height,
     EventHandler eventHandler
 )
-    : window_id_(id)
-    : impl_(std::make_unique<Impl>())
+    : window_id_(id),
+      impl_(std::make_unique<Impl>())
 {
     impl_->event_handler = std::move(eventHandler);
 
@@ -72,6 +72,7 @@ CocoaWindow::CocoaWindow(
     }
 
     [impl_->window setTitle:ns_title];
+    [impl_->window setAcceptsMouseMovedEvents:YES];
     [impl_->window center];
 }
 
@@ -119,7 +120,7 @@ void CocoaWindow::setRootView(
     impl_->native_root_view =
         createGrainRootView(
             impl_->root_view,
-            impl_->id_,
+            window_id_,
             impl_->event_handler
         );
 

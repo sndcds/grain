@@ -50,7 +50,9 @@ void X11App::run() {
         return;
     }
 
-    while (true) {
+    running_ = true;
+
+    while (running_) {
 
         XEvent event{};
 
@@ -89,19 +91,31 @@ void X11App::run() {
 
             break;
 
-        case ConfigureNotify:
+        case ConfigureNotify: {
 
             target->resize(
                 event.xconfigure.width,
                 event.xconfigure.height
                 );
 
+            Grain::Event grain_event;
+            grain_event.type = EventType::WindowResize;
+            grain_event.window_id = target->id();
+            grain_event.width = event.xconfigure.width;
+            grain_event.height = event.xconfigure.height;
+            emitEvent(grain_event);
+
             break;
+        }
 
         default:
             break;
         }
     }
+}
+
+void X11App::quit() {
+    running_ = false;
 }
 
 } // namespace Grain::Platform

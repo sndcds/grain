@@ -12,23 +12,27 @@
 
 - (instancetype)initWithFrame:(NSRect)frame
                     grainView:(Grain::View*)grainView
+                     windowId:(Grain::WindowId)windowId
                  eventHandler:(Grain::EventHandler)eventHandler;
 
 @end
 
 @implementation GrainRootView {
     Grain::View* grain_view_;
+    Grain::WindowId window_id_;
     Grain::EventHandler event_handler_;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame
                     grainView:(Grain::View*)grainView
+                     windowId:(Grain::WindowId)windowId
                   eventHandler:(Grain::EventHandler)eventHandler
 {
     self = [super initWithFrame:frame];
 
     if (self) {
         grain_view_ = grainView;
+        window_id_ = windowId;
         event_handler_ = std::move(eventHandler);
 
         self.wantsLayer = NO;
@@ -65,7 +69,7 @@
 
     Grain::Event grain_event;
     grain_event.type = type;
-    grain_event.window_id = windowId_;
+    grain_event.window_id = window_id_;
     grain_event.mouse_button = button;
     grain_event.mouse_x = position.x;
     grain_event.mouse_y = position.y;
@@ -84,20 +88,9 @@
 
 - (void)mouseUp:(NSEvent*)event
 {
-    NSPoint position =
-        [self convertPoint:event.locationInWindow
-                  fromView:nil];
-
-    Grain::Event grainEvent;
-
-    grainEvent.type = Grain::EventType::MouseButtonUp;
-    grainEvent.mouse_button = Grain::MouseButton::Left;
-    grainEvent.mouse_x = position.x;
-    grainEvent.mouse_y = position.y;
-
-    if (event_handler_) {
-        event_handler_(grainEvent);
-    }
+    [self emitMouseButtonEvent:event
+                          type:Grain::EventType::MouseButtonUp
+                        button:Grain::MouseButton::Left];
 }
 
 - (void)mouseDragged:(NSEvent*)event
@@ -109,6 +102,7 @@
     Grain::Event grainEvent;
 
     grainEvent.type = Grain::EventType::MouseMove;
+    grainEvent.window_id = window_id_;
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
     grainEvent.delta_x = event.deltaX;
@@ -128,6 +122,7 @@
     Grain::Event grainEvent;
 
     grainEvent.type = Grain::EventType::MouseMove;
+    grainEvent.window_id = window_id_;
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
     grainEvent.delta_x = event.deltaX;
@@ -165,6 +160,7 @@ namespace Grain {
 
 NSView* createGrainRootView(
     View* grainView,
+    WindowId windowId,
     EventHandler eventHandler
 )
 {
@@ -175,6 +171,7 @@ NSView* createGrainRootView(
     return [[GrainRootView alloc]
         initWithFrame:NSZeroRect
         grainView:grainView
+        windowId:windowId
         eventHandler:std::move(eventHandler)];
 }
 

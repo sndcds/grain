@@ -35,6 +35,11 @@ Window::Window(
 Window::~Window() = default;
 
 
+WindowId Window::id() const noexcept {
+    return impl_->id;
+}
+
+
 void Window::show() {
     if (impl_ == nullptr ||
         impl_->platform_window == nullptr) {

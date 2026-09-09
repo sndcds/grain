@@ -13,12 +13,14 @@
 namespace Grain::Platform {
 
 X11Window::X11Window(
+    WindowId id,
     Display* display,
     std::string_view title,
     int width,
     int height
     )
-    : display_(display) {
+    : window_id_(id),
+      display_(display) {
 
     if (display_ == nullptr) {
         return;
@@ -198,6 +200,7 @@ std::unique_ptr<Window> X11App::createWindow(
 
     auto window =
         std::make_unique<X11Window>(
+            id,
             display(),
             title,
             width,

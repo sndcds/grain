@@ -26,7 +26,7 @@ public:
         ) override;
 
 private:
-    WindowId id_;
+    WindowId window_id_;
 
     class Impl;
 

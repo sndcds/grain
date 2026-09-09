@@ -27,6 +27,8 @@ public:
 
     void run() override;
 
+    void quit() override;
+
     [[nodiscard]]
     Display* display() const noexcept {
         return display_;
@@ -40,6 +42,7 @@ private:
     Display* display_ = nullptr;
 
     std::vector<X11Window*> windows_;
+    bool running_ = false;
 };
 
 } // namespace Grain::Platform

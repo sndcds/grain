@@ -31,7 +31,7 @@ int Input::mouseButtonIndex(MouseButton button) noexcept {
 void Input::beginFrame() noexcept {
     for (int index = 0; index < KeyCount; ++index) {
         keys_pressed_[index] = false;
-        keys_pressed_[index] = false;
+        keys_released_[index] = false;
     }
 
     for (int index = 0; index < MouseButtonCount; ++index) {
