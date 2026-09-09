@@ -101,8 +101,8 @@
     grainEvent.type = Grain::EventType::MouseMove;
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
-    grainEvent.delta_x = event.delta_x;
-    grainEvent.delta_y = event.delta_y;
+    grainEvent.delta_x = event.deltaX;
+    grainEvent.delta_y = event.deltaY;
 
     if (event_handler_) {
         event_handler_(grainEvent);
@@ -120,8 +120,8 @@
     grainEvent.type = Grain::EventType::MouseMove;
     grainEvent.mouse_x = position.x;
     grainEvent.mouse_y = position.y;
-    grainEvent.delta_x = event.delta_x;
-    grainEvent.delta_y = event.delta_y;
+    grainEvent.delta_x = event.deltaX;
+    grainEvent.delta_y = event.deltaY;
 
     if (event_handler_) {
         event_handler_(grainEvent);
