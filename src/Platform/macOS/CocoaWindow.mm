@@ -117,6 +117,7 @@ void CocoaWindow::setRootView(
     impl_->native_root_view =
         createGrainRootView(
             impl_->root_view,
+            impl_->id_,
             impl_->event_handler
         );
 

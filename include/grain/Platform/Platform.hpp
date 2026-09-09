@@ -20,6 +20,7 @@ public:
     App& operator=(App&&) = delete;
 
     Window* createWindow(
+        WindowId id,
         std::string_view title,
         int width,
         int height

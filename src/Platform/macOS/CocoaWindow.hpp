@@ -10,6 +10,7 @@ namespace Grain::Platform {
 class CocoaWindow final : public Window {
 public:
     CocoaWindow(
+        WindowId id,
         std::string_view title,
         int width,
         int height,
@@ -25,6 +26,8 @@ public:
         ) override;
 
 private:
+    WindowId id_;
+
     class Impl;
 
     std::unique_ptr<Impl> impl_;

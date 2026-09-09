@@ -65,7 +65,7 @@
 
     Grain::Event grain_event;
     grain_event.type = type;
-    // grain_event.window_id = windowId_;
+    grain_event.window_id = windowId_;
     grain_event.mouse_button = button;
     grain_event.mouse_x = position.x;
     grain_event.mouse_y = position.y;

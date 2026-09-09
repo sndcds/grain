@@ -12,6 +12,7 @@ class View;
 
 NSView* createGrainRootView(
     View* grainView,
+    Grain::WindowId window_id_,
     EventHandler eventHandler
 );
 
