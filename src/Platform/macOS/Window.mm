@@ -14,6 +14,7 @@ namespace Grain::Platform {
 class CocoaWindow final : public Window {
 public:
     CocoaWindow(
+        WindowId id,
         std::string_view title,
         int width,
         int height

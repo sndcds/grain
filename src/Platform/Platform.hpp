@@ -48,6 +48,7 @@ public:
     virtual ~App() = default;
 
     virtual std::unique_ptr<Window> createWindow(
+        WindowId id,
         std::string_view title,
         int width,
         int height

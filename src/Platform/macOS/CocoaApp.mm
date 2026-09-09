@@ -37,6 +37,7 @@ std::unique_ptr<Window> CocoaApp::createWindow(
 )
 {
     return std::make_unique<CocoaWindow>(
+        id,
         title,
         width,
         height,

@@ -25,11 +25,13 @@ public:
 
 
 CocoaWindow::CocoaWindow(
+    WindowId id,
     std::string_view title,
     int width,
     int height,
     EventHandler eventHandler
 )
+    : window_id_(id)
     : impl_(std::make_unique<Impl>())
 {
     impl_->event_handler = std::move(eventHandler);

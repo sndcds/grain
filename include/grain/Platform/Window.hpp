@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string_view>
+#include <cstdint>
 
 namespace Grain {
 
@@ -26,9 +27,7 @@ public:
 
     ~Window();
 
-    WindowId id() const noexcept {
-        return id_;
-    }
+    WindowId id() const noexcept;
 
     void show();
 
@@ -37,8 +36,6 @@ public:
         );
 
 private:
-    WindowId id_ = 0;
-
     class Impl;
 
     explicit Window(

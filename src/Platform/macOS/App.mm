@@ -12,6 +12,7 @@ namespace Grain::Platform {
 class CocoaWindow final : public Window {
 public:
     CocoaWindow(
+        WindowId id,
         std::string_view title,
         int width,
         int height
@@ -26,6 +27,7 @@ public:
     ) override;
 
 private:
+    WindowId window_id_ = 0;
     NSWindow* window_ = nil;
 
     Grain::View* root_view_ = nullptr;
