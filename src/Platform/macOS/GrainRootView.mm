@@ -55,21 +55,31 @@
     return YES;
 }
 
-- (void)mouseDown:(NSEvent*)event
+- (void)emitMouseButtonEvent:(NSEvent*)event
+                        type:(Grain::EventType)type
+                      button:(Grain::MouseButton)button
 {
-    NSPoint position =
+    const NSPoint position =
         [self convertPoint:event.locationInWindow
                   fromView:nil];
 
-    Grain::Event grainEvent;
-    grainEvent.type = Grain::EventType::MouseButtonDown;
-    grainEvent.mouse_button = Grain::MouseButton::Left;
-    grainEvent.mouse_x = position.x;
-    grainEvent.mouse_y = position.y;
+    Grain::Event grain_event;
+    grain_event.type = type;
+    // grain_event.window_id = windowId_;
+    grain_event.mouse_button = button;
+    grain_event.mouse_x = position.x;
+    grain_event.mouse_y = position.y;
 
     if (event_handler_) {
-        event_handler_(grainEvent);
+        event_handler_(grain_event);
     }
+}
+
+- (void)mouseDown:(NSEvent*)event
+{
+    [self emitMouseButtonEvent:event
+                          type:Grain::EventType::MouseButtonDown
+                        button:Grain::MouseButton::Left];
 }
 
 - (void)mouseUp:(NSEvent*)event

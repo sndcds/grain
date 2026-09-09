@@ -9,6 +9,7 @@ add_executable(
         Geometry/RectLayoutTests.cpp
         String/StringTests.cpp
         String/StringUtf8Tests.cpp
+        Input/InputTests.cpp
 )
 
 target_link_libraries(

@@ -10,8 +10,6 @@ namespace Grain {
 
 class View;
 
-using EventHandler = std::function<void(const Event&)>;
-
 NSView* createGrainRootView(
     View* grainView,
     EventHandler eventHandler

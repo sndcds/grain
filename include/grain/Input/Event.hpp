@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 
 namespace Grain {
 
@@ -177,5 +178,7 @@ struct Event {
     int width = 0;
     int height = 0;
 };
+
+using EventHandler = std::function<void(const Event&)>;
 
 } // namespace Grain

@@ -12,6 +12,8 @@ namespace Platform {
 class Window;
 }
 
+using WindowId = std::uint64_t;
+
 class Window {
 public:
     Window(const Window&) = delete;
@@ -24,6 +26,10 @@ public:
 
     ~Window();
 
+    WindowId id() const noexcept {
+        return id_;
+    }
+
     void show();
 
     void setRootView(
@@ -31,6 +37,8 @@ public:
         );
 
 private:
+    WindowId id_ = 0;
+
     class Impl;
 
     explicit Window(
@@ -38,8 +46,9 @@ private:
         );
 
     static std::unique_ptr<Window> create(
+        WindowId id,
         std::unique_ptr<Platform::Window> platform_window
-        );
+    );
 
     std::unique_ptr<Impl> impl_;
 

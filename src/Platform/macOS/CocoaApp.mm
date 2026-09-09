@@ -30,6 +30,7 @@ CocoaApp::~CocoaApp() = default;
 
 
 std::unique_ptr<Window> CocoaApp::createWindow(
+    WindowId id,
     std::string_view title,
     int width,
     int height

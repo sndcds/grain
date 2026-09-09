@@ -16,6 +16,8 @@ public:
 
     Input input;
 
+    WindowId next_window_id = 1;
+
     bool running = false;
 
     Impl()
@@ -51,8 +53,11 @@ Window* App::createWindow(
         return nullptr;
     }
 
+    const WindowId window_id = impl_->next_window_id++;
+
     auto platform_window =
         impl_->platform_app->createWindow(
+            window_id,
             title,
             width,
             height
@@ -64,6 +69,7 @@ Window* App::createWindow(
 
     auto window =
         Window::create(
+            window_id,
             std::move(platform_window)
             );
 
@@ -73,9 +79,7 @@ Window* App::createWindow(
 
     Window* result = window.get();
 
-    impl_->windows.push_back(
-        std::move(window)
-        );
+    impl_->windows.push_back(std::move(window));
 
     result->show();
 

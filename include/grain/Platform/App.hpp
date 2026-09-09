@@ -44,6 +44,8 @@ private:
 
     class Impl;
     std::unique_ptr<Impl> impl_;
+
+    WindowId next_window_id = 1;
 };
 
 } // namespace Grain

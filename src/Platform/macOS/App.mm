@@ -41,6 +41,7 @@ public:
     ~CocoaApp() override = default;
 
     std::unique_ptr<Window> createWindow(
+        WindowId id,
         std::string_view title,
         int width,
         int height
@@ -65,6 +66,7 @@ CocoaApp::CocoaApp()
 
 
 std::unique_ptr<Window> CocoaApp::createWindow(
+    WindowId id,
     std::string_view title,
     int width,
     int height

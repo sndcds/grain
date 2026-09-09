@@ -9,8 +9,6 @@ namespace Grain::Platform {
 
 class CocoaWindow final : public Window {
 public:
-    using EventHandler = std::function<void(const Event&)>;
-
     CocoaWindow(
         std::string_view title,
         int width,

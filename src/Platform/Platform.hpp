@@ -37,8 +37,6 @@ protected:
 
 class App {
 public:
-    using EventHandler = std::function<void(const Event&)>;
-
     App(const App&) = delete;
 
     App& operator=(const App&) = delete;

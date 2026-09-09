@@ -190,6 +190,7 @@ void X11Window::resize(
 }
 
 std::unique_ptr<Window> X11App::createWindow(
+    WindowId id,
     std::string_view title,
     int width,
     int height
