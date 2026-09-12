@@ -3,8 +3,14 @@
 #include <grain/Core/ObjectBase.hpp>
 #include <grain/Containers/List.hpp>
 #include <grain/Geometry/Layout.hpp>
-#include <grain/Geometry/Vec2.hpp>
+#include <grain/Math/Scalar.hpp>
+#include <grain/Math/Vec2.hpp>
+#include <grain/Math/Vec3.hpp>
+#include <grain/Math/Mat3.hpp>
+#include <grain/Math/Quadrilateral.hpp>
+#include <grain/Geometry/Line.hpp>
 #include <grain/Geometry/Rect.hpp>
+#include <grain/Geometry/RemapRect.hpp>
 #include <grain/String/String.hpp>
 #include <grain/Input/Event.hpp>
 #include <grain/Input/Input.hpp>

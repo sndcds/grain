@@ -1,6 +1,6 @@
 #pragma once
 
-#include <grain/Geometry/Vec2.hpp>
+#include <grain/Math/Vec2.hpp>
 
 #include <algorithm>
 #include <cmath>

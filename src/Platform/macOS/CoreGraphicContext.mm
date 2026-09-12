@@ -17,6 +17,7 @@ void CoreGraphicContext::save()
         return;
     }
 
+    GraphicContext::save();
     CGContextSaveGState(context_);
 }
 
@@ -26,10 +27,11 @@ void CoreGraphicContext::restore()
         return;
     }
 
+    GraphicContext::restore();
     CGContextRestoreGState(context_);
 }
 
-void CoreGraphicContext::setFillColor(Color color)
+void CoreGraphicContext::setFillColor(const Color& color)
 {
     if (context_ == nullptr) {
         return;
@@ -44,7 +46,7 @@ void CoreGraphicContext::setFillColor(Color color)
     );
 }
 
-void CoreGraphicContext::setStrokeColor(Color color)
+void CoreGraphicContext::setStrokeColor(const Color& color)
 {
     if (context_ == nullptr) {
         return;
@@ -141,6 +143,22 @@ void CoreGraphicContext::rotate(
     if (context_ == nullptr) {
         return;
     }
+
+    CGContextRotateCTM(
+        context_,
+        radians
+    );
+}
+
+void CoreGraphicContext::rotateDegrees(
+    double degrees
+)
+{
+    if (context_ == nullptr) {
+        return;
+    }
+
+    const double radians = degrees * std::numbers::pi / 180.0;
 
     CGContextRotateCTM(
         context_,

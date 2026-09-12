@@ -5,7 +5,7 @@
 //  https://grain.one
 //
 
-#include "grain/Geometry/Vec2.hpp"
+#include "../../include/grain/Math/Vec2.hpp"
 // #include "grain/File/File.hpp"
 
 namespace Grain {

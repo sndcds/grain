@@ -2,7 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <Grain.hpp>
-#include <grain/Geometry/Vec2.hpp>
+#include <grain/Math/Vec2.hpp>
 
 #include <cstdint>
 #include <numbers>
@@ -457,7 +457,7 @@ TEST_CASE("Vec2 rotation", "[Vec2]")
     {
         Vec2d v{1.0, 0.0};
 
-        v.rotate(90.0);
+        v.rotateDegrees(90.0);
 
         REQUIRE(v.x == Catch::Approx(0.0).margin(epsilon));
         REQUIRE(v.y == Catch::Approx(1.0).margin(epsilon));
@@ -467,7 +467,7 @@ TEST_CASE("Vec2 rotation", "[Vec2]")
     {
         Vec2d v{1.0, 0.0};
 
-        v.rotate(180.0);
+        v.rotateDegrees(180.0);
 
         REQUIRE(v.x == Catch::Approx(-1.0).margin(epsilon));
         REQUIRE(v.y == Catch::Approx(0.0).margin(epsilon));
@@ -477,32 +477,10 @@ TEST_CASE("Vec2 rotation", "[Vec2]")
     {
         Vec2d v{1.0, 0.0};
 
-        v.rotateRad(std::numbers::pi / 2.0);
+        v.rotate(std::numbers::pi / 2.0);
 
         REQUIRE(v.x == Catch::Approx(0.0).margin(epsilon));
         REQUIRE(v.y == Catch::Approx(1.0).margin(epsilon));
-    }
-
-    SECTION("rotated does not modify original")
-    {
-        const Vec2d v{1.0, 0.0};
-
-        const Vec2d result = v.rotated(90.0);
-
-        REQUIRE(v == Vec2d{1.0, 0.0});
-        REQUIRE(result.x == Catch::Approx(0.0).margin(epsilon));
-        REQUIRE(result.y == Catch::Approx(1.0).margin(epsilon));
-    }
-
-    SECTION("rotatedRad does not modify original")
-    {
-        const Vec2d v{1.0, 0.0};
-
-        const Vec2d result = v.rotatedRad(std::numbers::pi / 2.0);
-
-        REQUIRE(v == Vec2d{1.0, 0.0});
-        REQUIRE(result.x == Catch::Approx(0.0).margin(epsilon));
-        REQUIRE(result.y == Catch::Approx(1.0).margin(epsilon));
     }
 }
 

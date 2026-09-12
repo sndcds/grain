@@ -32,7 +32,7 @@ TEST_CASE("Cocoa: mouse events retain their root view window ID", "[Window][Inpu
 
         REQUIRE(events.size() == 8);
         for (std::size_t i = 0; i < events.size(); ++i) {
-            REQUIRE(events[i].window_id == (i < 4 ? second_id : first_id));
+            REQUIRE(events[i].windowId == (i < 4 ? second_id : first_id));
         }
         for (std::size_t offset : {0u, 4u}) {
             REQUIRE(events[offset].type == Grain::EventType::MouseButtonDown);

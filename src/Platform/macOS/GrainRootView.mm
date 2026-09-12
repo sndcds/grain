@@ -18,9 +18,9 @@
 @end
 
 @implementation GrainRootView {
-    Grain::View* grain_view_;
-    Grain::WindowId window_id_;
-    Grain::EventHandler event_handler_;
+    Grain::View* grainView_;
+    Grain::WindowId windowId_;
+    Grain::EventHandler eventHandler_;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame
@@ -31,9 +31,9 @@
     self = [super initWithFrame:frame];
 
     if (self) {
-        grain_view_ = grainView;
-        window_id_ = windowId;
-        event_handler_ = std::move(eventHandler);
+        grainView_ = grainView;
+        windowId_ = windowId;
+        eventHandler_ = std::move(eventHandler);
 
         self.wantsLayer = NO;
     }
@@ -69,13 +69,13 @@
 
     Grain::Event grain_event;
     grain_event.type = type;
-    grain_event.window_id = window_id_;
-    grain_event.mouse_button = button;
-    grain_event.mouse_x = position.x;
-    grain_event.mouse_y = position.y;
+    grain_event.windowId = windowId_;
+    grain_event.mouseButton = button;
+    grain_event.mouseX = position.x;
+    grain_event.mouseY = position.y;
 
-    if (event_handler_) {
-        event_handler_(grain_event);
+    if (eventHandler_) {
+        eventHandler_(grain_event);
     }
 }
 
@@ -102,14 +102,14 @@
     Grain::Event grainEvent;
 
     grainEvent.type = Grain::EventType::MouseMove;
-    grainEvent.window_id = window_id_;
-    grainEvent.mouse_x = position.x;
-    grainEvent.mouse_y = position.y;
-    grainEvent.delta_x = event.deltaX;
-    grainEvent.delta_y = event.deltaY;
+    grainEvent.windowId = windowId_;
+    grainEvent.mouseX = position.x;
+    grainEvent.mouseY = position.y;
+    grainEvent.deltaX = event.deltaX;
+    grainEvent.deltaY = event.deltaY;
 
-    if (event_handler_) {
-        event_handler_(grainEvent);
+    if (eventHandler_) {
+        eventHandler_(grainEvent);
     }
 }
 
@@ -122,14 +122,14 @@
     Grain::Event grainEvent;
 
     grainEvent.type = Grain::EventType::MouseMove;
-    grainEvent.window_id = window_id_;
-    grainEvent.mouse_x = position.x;
-    grainEvent.mouse_y = position.y;
-    grainEvent.delta_x = event.deltaX;
-    grainEvent.delta_y = event.deltaY;
+    grainEvent.windowId = windowId_;
+    grainEvent.mouseX = position.x;
+    grainEvent.mouseY = position.y;
+    grainEvent.deltaX = event.deltaX;
+    grainEvent.deltaY = event.deltaY;
 
-    if (event_handler_) {
-        event_handler_(grainEvent);
+    if (eventHandler_) {
+        eventHandler_(grainEvent);
     }
 }
 
@@ -137,7 +137,7 @@
 {
     (void)dirtyRect;
 
-    if (grain_view_ == nullptr) {
+    if (grainView_ == nullptr) {
         return;
     }
 
@@ -150,7 +150,7 @@
 
     Grain::CoreGraphicContext graphicsContext(context);
 
-    grain_view_->draw(graphicsContext);
+    grainView_->draw(graphicsContext);
 }
 
 @end

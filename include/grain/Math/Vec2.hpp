@@ -166,7 +166,8 @@ public:
 
     [[nodiscard]] constexpr auto squaredDistance(
         const Vec2& other
-    ) const noexcept {
+    ) const noexcept
+    {
         const auto dx = x - other.x;
         const auto dy = y - other.y;
 
@@ -210,7 +211,8 @@ public:
 
     [[nodiscard]] constexpr Vec2 reflectedPoint(
         const Vec2& pivot
-    ) const noexcept {
+    ) const noexcept
+    {
         return pivot + (pivot - *this);
     }
 
@@ -250,7 +252,8 @@ public:
     [[nodiscard]] bool checkEqual(
         const Vec2& other,
         T threshold
-    ) const noexcept {
+    ) const noexcept
+    {
         return distance(other) <= static_cast<double>(threshold);
     }
 
@@ -278,6 +281,11 @@ public:
         y += value;
     }
 
+    constexpr void translate(Vec2 t) noexcept {
+        x += t.x;
+        y += t.y;
+    }
+
     constexpr void translate(T tx, T ty) noexcept {
         x += tx;
         y += ty;
@@ -301,11 +309,17 @@ public:
         y *= sy;
     }
 
-    void rotate(double angle) noexcept {
-        rotateRad(angle * std::numbers::pi / 180.0);
+    constexpr void scale(const Vec2<T>& pivot, T value) noexcept {
+        x = pivot.x + ((x - pivot.x) * value);
+        y = pivot.y + ((y - pivot.y) * value);
     }
 
-    void rotateRad(double radians) noexcept {
+    constexpr void scale(const Vec2<T>& pivot, T sx, T sy) noexcept {
+        x = pivot.x + ((x - pivot.x) * sx);
+        y = pivot.y + ((y - pivot.y) * sy);
+    }
+
+    void rotate(double radians) noexcept {
         const double c = std::cos(radians);
         const double s = std::sin(radians);
 
@@ -321,23 +335,30 @@ public:
         y = static_cast<T>(new_y);
     }
 
-    [[nodiscard]] Vec2 rotated(double angle) const noexcept {
-        Vec2 result = *this;
-        result.rotate(angle);
-        return result;
+    void rotateDegrees(double degrees) noexcept {
+        rotate(degrees * std::numbers::pi / 180.0);
     }
 
-    [[nodiscard]] Vec2 rotatedRad(double radians) const noexcept {
-        Vec2 result = *this;
-        result.rotateRad(radians);
-        return result;
+    void rotate(const Vec2& pivot, double radians) noexcept {
+        x -= pivot.x;
+        y -= pivot.y;
+
+        rotate(radians);
+
+        x += pivot.x;
+        y += pivot.y;
+    }
+
+    void rotateDegrees(const Vec2& pivot, double degrees) noexcept {
+        rotate(pivot, degrees * std::numbers::pi / 180.0);
     }
 
     void setLerp(
         const Vec2& a,
         const Vec2& b,
         double t
-    ) noexcept {
+    ) noexcept
+    {
         x = static_cast<T>(
             static_cast<double>(a.x) +
             t * (static_cast<double>(b.x) -
@@ -355,7 +376,8 @@ public:
         const Vec2& a,
         const Vec2& b,
         double t
-    ) noexcept {
+    ) noexcept
+    {
         Vec2 result;
         result.setLerp(a, b, t);
         return result;
@@ -365,7 +387,8 @@ public:
     bool setByCSV(
         const char* csv,
         char delimiter = ','
-    ) noexcept {
+    ) noexcept
+    {
         if (csv == nullptr) {
             return false;
         }
@@ -388,7 +411,8 @@ public:
     bool setByCSV(
         const String& csv,
         char delimiter = ','
-    ) noexcept {
+    ) noexcept
+    {
         return setByCSV(csv.utf8(), delimiter);
     }
 
@@ -402,7 +426,8 @@ template <typename T>
 [[nodiscard]] constexpr Vec2<T> operator*(
     T scalar,
     const Vec2<T>& vector
-) noexcept {
+) noexcept
+{
     return vector * scalar;
 }
 

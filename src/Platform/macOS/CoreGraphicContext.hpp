@@ -16,9 +16,9 @@ public:
 
     void restore() override;
 
-    void setFillColor(Color color) override;
+    void setFillColor(const Color& color) override;
 
-    void setStrokeColor(Color color) override;
+    void setStrokeColor(const Color& color) override;
 
     void setLineWidth(double width) override;
 
@@ -31,6 +31,8 @@ public:
     void scale(double x, double y) override;
 
     void rotate(double radians) override;
+
+    void rotateDegrees(double degrees) override;
 
 private:
     CGContextRef context_ = nullptr;

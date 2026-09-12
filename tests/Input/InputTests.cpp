@@ -112,7 +112,7 @@ TEST_CASE("Input: mouse button down", "[Input]") {
 
     Event event;
     event.type = EventType::MouseButtonDown;
-    event.mouse_button = MouseButton::Left;
+    event.mouseButton = MouseButton::Left;
 
     input.processEvent(event);
 
@@ -128,11 +128,11 @@ TEST_CASE("Input: mouse button up", "[Input]") {
 
     Event buttonDown;
     buttonDown.type = EventType::MouseButtonDown;
-    buttonDown.mouse_button = MouseButton::Left;
+    buttonDown.mouseButton = MouseButton::Left;
 
     Event buttonUp;
     buttonUp.type = EventType::MouseButtonUp;
-    buttonUp.mouse_button = MouseButton::Left;
+    buttonUp.mouseButton = MouseButton::Left;
 
     input.processEvent(buttonDown);
     input.beginFrame();
@@ -157,7 +157,7 @@ TEST_CASE("Input: beginFrame clears transient mouse state", "[Input]") {
 
     Event event;
     event.type = EventType::MouseButtonDown;
-    event.mouse_button = MouseButton::Left;
+    event.mouseButton = MouseButton::Left;
 
     input.processEvent(event);
 

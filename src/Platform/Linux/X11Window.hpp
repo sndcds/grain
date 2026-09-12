@@ -31,7 +31,7 @@ public:
 
     [[nodiscard]]
     WindowId id() const noexcept {
-        return window_id_;
+        return windowId_;
     }
 
     [[nodiscard]]
@@ -47,7 +47,7 @@ public:
         );
 
 private:
-    WindowId window_id_;
+    WindowId windowId_;
     Display* display_ = nullptr;
     ::Window window_ = 0;
 

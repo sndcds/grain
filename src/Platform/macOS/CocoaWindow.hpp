@@ -14,7 +14,7 @@ public:
         std::string_view title,
         int width,
         int height,
-        EventHandler event_handler
+        EventHandler eventHandler
         );
 
     ~CocoaWindow() override;
@@ -26,7 +26,7 @@ public:
         ) override;
 
 private:
-    WindowId window_id_;
+    WindowId windowId_;
 
     class Impl;
 

@@ -1,7 +1,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include <grain/Geometry/Vec2.hpp>
+#include <grain/Math/Vec2.hpp>
 #include <grain/Geometry/Rect.hpp>
 
 #include <cstdint>

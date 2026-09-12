@@ -55,7 +55,7 @@ public:
         ) = 0;
 
     void setEventHandler(EventHandler handler) {
-        event_handler_ = std::move(handler);
+        eventHandler_ = std::move(handler);
     }
 
     virtual void run() = 0;
@@ -66,13 +66,13 @@ protected:
     App() = default;
 
     void emitEvent(const Event& event) {
-        if (event_handler_) {
-            event_handler_(event);
+        if (eventHandler_) {
+            eventHandler_(event);
         }
     }
 
 private:
-    EventHandler event_handler_;
+    EventHandler eventHandler_;
 };
 
 std::unique_ptr<App> createApp();

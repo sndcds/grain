@@ -30,19 +30,19 @@ int Input::mouseButtonIndex(MouseButton button) noexcept {
 
 void Input::beginFrame() noexcept {
     for (int index = 0; index < KeyCount; ++index) {
-        keys_pressed_[index] = false;
-        keys_released_[index] = false;
+        keysPressed_[index] = false;
+        keysReleased_[index] = false;
     }
 
     for (int index = 0; index < MouseButtonCount; ++index) {
-        mouse_buttons_pressed_[index] = false;
-        mouse_buttons_released_[index] = false;
+        mouseButtonsPressed_[index] = false;
+        mouseButtonsReleased_[index] = false;
     }
 
-    mouse_delta_x_ = 0.0;
-    mouse_delta_y_ = 0.0;
-    wheel_delta_x_ = 0.0;
-    wheel_delta_y_ = 0.0;
+    mouseDeltaX_ = 0.0;
+    mouseDeltaY_ = 0.0;
+    wheelDeltaX_ = 0.0;
+    wheelDeltaY_ = 0.0;
 }
 
 void Input::processEvent(const Event& event) noexcept {
@@ -54,11 +54,11 @@ void Input::processEvent(const Event& event) noexcept {
             break;
         }
 
-        if (!keys_down_[index]) {
-            keys_pressed_[index] = true;
+        if (!keysDown_[index]) {
+            keysPressed_[index] = true;
         }
 
-        keys_down_[index] = true;
+        keysDown_[index] = true;
         break;
     }
 
@@ -69,55 +69,55 @@ void Input::processEvent(const Event& event) noexcept {
             break;
         }
 
-        if (keys_down_[index]) {
-            keys_released_[index] = true;
+        if (keysDown_[index]) {
+            keysReleased_[index] = true;
         }
 
-        keys_down_[index] = false;
+        keysDown_[index] = false;
         break;
     }
 
     case EventType::MouseMove:
-        mouse_delta_x_ += event.delta_x;
-        mouse_delta_y_ += event.delta_y;
+        mouseDeltaX_ += event.deltaX;
+        mouseDeltaY_ += event.deltaY;
 
-        mouse_x_ = event.mouse_x;
-        mouse_y_ = event.mouse_y;
+        mouseX_ = event.mouseX;
+        mouseY_ = event.mouseY;
         break;
 
     case EventType::MouseButtonDown: {
-        const int index = mouseButtonIndex(event.mouse_button);
+        const int index = mouseButtonIndex(event.mouseButton);
 
         if (index < 0) {
             break;
         }
 
-        if (!mouse_buttons_down_[index]) {
-            mouse_buttons_pressed_[index] = true;
+        if (!mouseButtonsDown_[index]) {
+            mouseButtonsPressed_[index] = true;
         }
 
-        mouse_buttons_down_[index] = true;
+        mouseButtonsDown_[index] = true;
         break;
     }
 
     case EventType::MouseButtonUp: {
-        const int index = mouseButtonIndex(event.mouse_button);
+        const int index = mouseButtonIndex(event.mouseButton);
 
         if (index < 0) {
             break;
         }
 
-        if (mouse_buttons_down_[index]) {
-            mouse_buttons_released_[index] = true;
+        if (mouseButtonsDown_[index]) {
+            mouseButtonsReleased_[index] = true;
         }
 
-        mouse_buttons_down_[index] = false;
+        mouseButtonsDown_[index] = false;
         break;
     }
 
     case EventType::MouseWheel:
-        wheel_delta_x_ += event.wheel_x;
-        wheel_delta_y_ += event.wheel_y;
+        wheelDeltaX_ += event.wheelX;
+        wheelDeltaY_ += event.wheelY;
         break;
 
     default:
@@ -128,45 +128,45 @@ void Input::processEvent(const Event& event) noexcept {
 bool Input::isKeyDown(Key key) const noexcept {
     const int index = keyIndex(key);
 
-    return index >= 0 && keys_down_[index];
+    return index >= 0 && keysDown_[index];
 }
 
 bool Input::wasKeyPressed(Key key) const noexcept {
     const int index = keyIndex(key);
 
-    return index >= 0 && keys_pressed_[index];
+    return index >= 0 && keysPressed_[index];
 }
 
 bool Input::wasKeyReleased(Key key) const noexcept {
     const int index = keyIndex(key);
 
-    return index >= 0 && keys_released_[index];
+    return index >= 0 && keysReleased_[index];
 }
 
 bool Input::isMouseButtonDown(MouseButton button) const noexcept {
     const int index = mouseButtonIndex(button);
 
-    return index >= 0 && mouse_buttons_down_[index];
+    return index >= 0 && mouseButtonsDown_[index];
 }
 
 bool Input::wasMouseButtonPressed(MouseButton button) const noexcept {
     const int index = mouseButtonIndex(button);
 
-    return index >= 0 && mouse_buttons_pressed_[index];
+    return index >= 0 && mouseButtonsPressed_[index];
 }
 
 bool Input::wasMouseButtonReleased(MouseButton button) const noexcept {
     const int index = mouseButtonIndex(button);
 
-    return index >= 0 && mouse_buttons_released_[index];
+    return index >= 0 && mouseButtonsReleased_[index];
 }
 
 Vec2d Input::mousePosition() const noexcept {
-    return Vec2d(mouse_x_, mouse_y_);
+    return Vec2d(mouseX_, mouseY_);
 }
 
 Vec2d Input::mouseDelta() const noexcept {
-    return Vec2d(mouse_delta_x_, mouse_delta_y_);
+    return Vec2d(mouseDeltaX_, mouseDeltaY_);
 }
 
 } // namespace Grain

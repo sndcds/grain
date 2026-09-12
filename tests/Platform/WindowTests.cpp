@@ -91,16 +91,16 @@ TEST_CASE("App: window identity and platform event delivery", "[Window][Input]")
     // Drive the installed callback while the real App::run() is active.
     platform_app->on_run = [&] {
         Grain::Event event;
-        event.window_id = platform_app->windows[0]->id;
+        event.windowId = platform_app->windows[0]->id;
         event.type = Grain::EventType::MouseMove;
-        event.mouse_x = 12.0;
-        event.mouse_y = 34.0;
+        event.mouseX = 12.0;
+        event.mouseY = 34.0;
         platform_app->emitEvent(event);
         REQUIRE(app.input().mousePosition().x == 12.0);
         REQUIRE(app.input().mousePosition().y == 34.0);
 
-        event.window_id = platform_app->windows[1]->id;
-        event.mouse_x = 56.0;
+        event.windowId = platform_app->windows[1]->id;
+        event.mouseX = 56.0;
         platform_app->emitEvent(event);
         REQUIRE(app.input().mousePosition().x == 56.0);
 

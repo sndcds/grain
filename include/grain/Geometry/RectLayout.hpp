@@ -6,7 +6,7 @@
 
 #include "grain/Geometry/Layout.hpp"
 #include "grain/Geometry/Rect.hpp"
-#include "grain/Geometry/Vec2.hpp"
+#include "../Math/Vec2.hpp"
 
 namespace Grain {
 
@@ -29,8 +29,8 @@ public:
 
         if (mode == FitMode::Center) {
             return {
-                destination.x + (destination.width - source.width) / T{2},
-                destination.y + (destination.height - source.height) / T{2},
+                destination.x + ((destination.width - source.width) / T{2}),
+                destination.y + ((destination.height - source.height) / T{2}),
                 source.width,
                 source.height
             };
@@ -60,8 +60,8 @@ public:
             static_cast<T>(static_cast<double>(source.height) * scale);
 
         return {
-            destination.x + (destination.width - width) / T{2},
-            destination.y + (destination.height - height) / T{2},
+            destination.x + ((destination.width - width) / T{2}),
+            destination.y + ((destination.height - height) / T{2}),
             width,
             height
         };
@@ -78,8 +78,8 @@ public:
         );
 
         return {
-            rect.x + (rect.width - size) / T{2},
-            rect.y + (rect.height - size) / T{2},
+            rect.x + ((rect.width - size) / T{2}),
+            rect.y + ((rect.height - size) / T{2}),
             size,
             size
         };
@@ -112,15 +112,15 @@ public:
     {
         const double x =
             static_cast<double>(container.x) +
-            horizontal *
-            (static_cast<double>(container.width) -
-             static_cast<double>(rect.width));
+            (horizontal *
+                (static_cast<double>(container.width) -
+                    static_cast<double>(rect.width)));
 
         const double y =
             static_cast<double>(container.y) +
-            vertical *
-            (static_cast<double>(container.height) -
-             static_cast<double>(rect.height));
+            (vertical *
+                (static_cast<double>(container.height) -
+                    static_cast<double>(rect.height)));
 
         return {
             static_cast<T>(x),
@@ -143,7 +143,7 @@ public:
             case Alignment::Left:
                 return {
                     rect.x,
-                    rect.y + rect.height / T{2}
+                    rect.y + (rect.height / T{2})
                 };
 
             case Alignment::BottomLeft:
@@ -154,19 +154,19 @@ public:
 
             case Alignment::Top:
                 return {
-                    rect.x + rect.width / T{2},
+                    rect.x + (rect.width / T{2}),
                     rect.y
                 };
 
             case Alignment::Center:
                 return {
-                    rect.x + rect.width / T{2},
-                    rect.y + rect.height / T{2}
+                    rect.x + (rect.width / T{2}),
+                    rect.y + (rect.height / T{2})
                 };
 
             case Alignment::Bottom:
                 return {
-                    rect.x + rect.width / T{2},
+                    rect.x + (rect.width / T{2}),
                     rect.y + rect.height
                 };
 
@@ -179,7 +179,7 @@ public:
             case Alignment::Right:
                 return {
                     rect.x + rect.width,
-                    rect.y + rect.height / T{2}
+                    rect.y + (rect.height / T{2})
                 };
 
             case Alignment::BottomRight:
@@ -294,8 +294,7 @@ public:
             case Alignment::Top:
             case Alignment::Center:
             case Alignment::Bottom:
-                x = container.x +
-                    (container.width - width) / T{2};
+                x = container.x + ((container.width - width) / T{2});
                 break;
 
             case Alignment::TopRight:
@@ -316,8 +315,7 @@ public:
             case Alignment::Left:
             case Alignment::Center:
             case Alignment::Right:
-                y = container.y +
-                    (container.height - height) / T{2};
+                y = container.y + ((container.height - height) / T{2});
                 break;
 
             case Alignment::BottomLeft:
@@ -434,8 +432,8 @@ public:
         }
 
         return {
-            rect.x + (rect.width - width) / T{2},
-            rect.y + (rect.height - height) / T{2},
+            rect.x + ((rect.width - width) / T{2}),
+            rect.y + ((rect.height - height) / T{2}),
             width,
             height
         };
@@ -578,7 +576,7 @@ public:
     ) noexcept
     {
         return {
-            rect.x + (rect.width - width) / T{2},
+            rect.x + ((rect.width - width) / T{2}),
             rect.y,
             width,
             rect.height
@@ -607,7 +605,7 @@ public:
     {
         return {
             rect.x,
-            rect.y + (rect.height - height) / T{2},
+            rect.y + ((rect.height - height) / T{2}),
             rect.width,
             height
         };
@@ -635,8 +633,8 @@ public:
     ) noexcept
     {
         return {
-            rect.x + (rect.width - width) / T{2},
-            rect.y + (rect.height - height) / T{2},
+            rect.x + ((rect.width - width) / T{2}),
+            rect.y + ((rect.height - height) / T{2}),
             width,
             height
         };
@@ -725,8 +723,8 @@ public:
         const T height = rect.height * factor;
 
         return {
-            rect.x + (rect.width - width) / T{2},
-            rect.y + (rect.height - height) / T{2},
+            rect.x + ((rect.width - width) / T{2}),
+            rect.y + ((rect.height - height) / T{2}),
             width,
             height
         };

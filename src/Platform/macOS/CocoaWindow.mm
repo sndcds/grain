@@ -20,7 +20,7 @@ public:
 
     NSView* native_root_view = nil;
 
-    Grain::EventHandler event_handler;
+    Grain::EventHandler eventHandler;
 };
 
 
@@ -31,10 +31,10 @@ CocoaWindow::CocoaWindow(
     int height,
     EventHandler eventHandler
 )
-    : window_id_(id),
+    : windowId_(id),
       impl_(std::make_unique<Impl>())
 {
-    impl_->event_handler = std::move(eventHandler);
+    impl_->eventHandler = std::move(eventHandler);
 
     NSString* ns_title =
         [
@@ -120,8 +120,8 @@ void CocoaWindow::setRootView(
     impl_->native_root_view =
         createGrainRootView(
             impl_->root_view,
-            window_id_,
-            impl_->event_handler
+            windowId_,
+            impl_->eventHandler
         );
 
     if (impl_->native_root_view == nil) {

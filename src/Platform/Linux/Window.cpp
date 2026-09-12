@@ -19,7 +19,7 @@ X11Window::X11Window(
     int width,
     int height
     )
-    : window_id_(id),
+    : windowId_(id),
       display_(display) {
 
     if (display_ == nullptr) {

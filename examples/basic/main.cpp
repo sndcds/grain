@@ -7,7 +7,8 @@
 class TestView : public Grain::View {
 public:
     void draw(Grain::GraphicContext& gc) override {
-        gc.setFillColor(Grain::Color::redColor());
+        gc.rotateDegrees(10);
+        gc.setFillColor({1, .8, .6, 1});
         gc.fillRect({20.0, 20.0, 800.0 - 40.0, 600.0 - 40.0});
     }
 };
@@ -56,6 +57,21 @@ void stringExample() {
 }
 
 int main() {
+
+    using namespace Grain;
+
+    const Quadrilateral q{
+        Vec2d{0.0, 0.0},
+        Vec2d{10.0, 0.0},
+        Vec2d{10.0, 20.0},
+        Vec2d{0.0, 20.0}
+    };
+
+    const Lined line = q.horizontalLine(0.25);
+
+    std::cout << line.p1() << "... 2.5, 5.0" << std::endl;
+    std::cout << line.p2() << "... 7.5, 5.0" << std::endl;
+
 
     auto& app = Grain::App::instance();
 

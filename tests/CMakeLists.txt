@@ -4,7 +4,11 @@ add_executable(
         GrainTests
         Core/ObjectBaseTests.cpp
         Containers/ListTests.cpp
-        Geometry/Vec2Tests.cpp
+        Math/Vec2Tests.cpp
+        Math/Vec3Tests.cpp
+        Math/Mat3Tests.cpp
+        Math/QuadrilateralTests.cpp
+        Geometry/LineTests.cpp
         Geometry/RectTests.cpp
         Geometry/RectLayoutTests.cpp
         String/StringTests.cpp

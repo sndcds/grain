@@ -141,10 +141,13 @@ target_sources(
         Grain
         PRIVATE
         src/Core/ObjectBase.cpp
-        src/Geometry/Vec2.cpp
-        src/Input/Input.cpp
+        src/Math/Vec2.cpp
+        src/Math/Quadrilateral.cpp
         src/String/String.cpp
         src/String/StringUtf8.cpp
+        src/Graphics/Color.cpp
+        src/Graphics/GraphicPathPoint.cpp
+        src/Input/Input.cpp
         src/UI/View.cpp
 
         PUBLIC
@@ -155,8 +158,14 @@ target_sources(
         include/Grain.hpp
         include/grain/Core/ObjectBase.hpp
         include/grain/Geometry/Layout.hpp
-        include/grain/Geometry/Vec2.hpp
+        include/grain/Math/Scalar.hpp
+        include/grain/Math/Vec2.hpp
+        include/grain/Math/Vec3.hpp
+        include/grain/Math/Mat3.hpp
+        include/grain/Math/Quadrilateral.hpp
         include/grain/Geometry/Rect.hpp
+        include/grain/Geometry/RemapRect.hpp
+        include/grain/Geometry/RectLayout.hpp
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
         include/grain/Containers/List.hpp
