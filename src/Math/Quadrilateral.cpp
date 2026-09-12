@@ -106,14 +106,14 @@ double Quadrilateral::area() const noexcept {
     const double side4 = points_[3].distance(points_[0]);
 
     const double m =
-        side2 * side2 +
-        side4 * side4 -
-        side1 * side1 -
-        side3 * side3;
+        (side2 * side2) +
+        (side4 * side4) -
+        (side1 * side1) -
+        (side3 * side3);
 
     const double value =
-        4.0 * diagonal1 * diagonal1 * diagonal2 * diagonal2 -
-        m * m;
+        (4.0 * diagonal1 * diagonal1 * diagonal2 * diagonal2) -
+        (m * m);
 
     return 0.25 * std::sqrt(std::max(0.0, value));
 }
@@ -261,7 +261,7 @@ Vec2d Quadrilateral::project(
 ) const noexcept {
     const double denominator =
         can_project_perspective_
-            ? g_ * u + h_ * v + 1.0
+            ? (g_ * u) + (h_ * v) + 1.0
             : 1.0;
 
     if (std::abs(denominator) <= std::numeric_limits<double>::epsilon()) {
@@ -272,8 +272,8 @@ Vec2d Quadrilateral::project(
     }
 
     return Vec2d(
-        (a_ * u + b_ * v) / denominator + points_[0].x,
-        (d_ * u + e_ * v) / denominator + points_[0].y
+        ((a_ * u + b_ * v) / denominator) + points_[0].x,
+        ((d_ * u + e_ * v) / denominator) + points_[0].y
     );
 }
 
@@ -300,16 +300,14 @@ bool Quadrilateral::map(
     const double gu = can_project_perspective_ ? g_ : 0.0;
     const double hv = can_project_perspective_ ? h_ : 0.0;
 
-    const double aa = dx * gu - a_;
-    const double ab = dx * hv - b_;
-    const double ba = dy * gu - d_;
-    const double bb = dy * hv - e_;
+    const double aa = (dx * gu) - a_;
+    const double ab = (dx * hv) - b_;
+    const double ba = (dy * gu) - d_;
+    const double bb = (dy * hv) - e_;
 
-    const double determinant =
-        aa * bb - ab * ba;
+    const double determinant = (aa * bb) - (ab * ba);
 
-    constexpr double epsilon =
-        std::numeric_limits<double>::epsilon();
+    constexpr double epsilon = std::numeric_limits<double>::epsilon();
 
     if (std::abs(determinant) <= epsilon) {
         return false;
@@ -396,9 +394,9 @@ Quadrilateral::bezierCirclePoints() const noexcept {
     constexpr double kappa = 0.551915024494;
 
     const double a = 0.0;
-    const double b = 0.5 - kappa / 2.0;
+    const double b = 0.5 - (kappa / 2.0);
     const double c = 0.5;
-    const double d = 0.5 + kappa / 2.0;
+    const double d = 0.5 + (kappa / 2.0);
     const double e = 1.0;
 
     return {
@@ -454,21 +452,15 @@ bool Quadrilateral::solvePerspective() noexcept {
     const double y3 = points_[2].y;
     const double y4 = points_[3].y;
 
-    const double t =
-        (x3 - x2) * (y3 - y4) -
-        (x3 - x4) * (y3 - y2);
+    const double t = ((x3 - x2) * (y3 - y4)) - ((x3 - x4) * (y3 - y2));
 
     if (std::abs(t) <= std::numeric_limits<double>::epsilon()) {
         return false;
     }
 
-    g_ =
-        ((x3 - x1) * (y3 - y4) -
-         (x3 - x4) * (y3 - y1)) / t;
+    g_ = ((x3 - x1) * (y3 - y4) - (x3 - x4) * (y3 - y1)) / t;
 
-    h_ =
-        ((x3 - x2) * (y3 - y1) -
-         (x3 - x1) * (y3 - y2)) / t;
+    h_ = ((x3 - x2) * (y3 - y1) - (x3 - x1) * (y3 - y2)) / t;
 
     a_ = g_ * (x2 - x1);
     d_ = g_ * (y2 - y1);
