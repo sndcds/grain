@@ -14,9 +14,9 @@ public:
 
     void restore() override;
 
-    void setFillColor(Grain::Color color) override;
+    void setFillColor(const Grain::Color& color) override;
 
-    void setStrokeColor(Grain::Color color) override;
+    void setStrokeColor(const Grain::Color& color) override;
 
     void setLineWidth(double width) override;
 

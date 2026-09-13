@@ -17,7 +17,7 @@ void CairoGraphicContext::restore() {
 }
 
 void CairoGraphicContext::setFillColor(
-    Grain::Color color
+    const Grain::Color& color
     ) {
     cairo_set_source_rgba(
         context_,
@@ -29,7 +29,7 @@ void CairoGraphicContext::setFillColor(
 }
 
 void CairoGraphicContext::setStrokeColor(
-    Grain::Color color
+    const Grain::Color& color
     ) {
     cairo_set_source_rgba(
         context_,
