@@ -105,7 +105,8 @@ struct Rect {
         requires std::is_convertible_v<U, T>
     constexpr Rect& operator=(
         const Rect<U>& other
-    ) noexcept {
+    ) noexcept
+    {
         x = static_cast<T>(other.x);
         y = static_cast<T>(other.y);
         width = static_cast<T>(other.width);
@@ -123,7 +124,7 @@ struct Rect {
 
     [[nodiscard]] constexpr bool operator!=(
         const Rect& other
-    ) const noexcept {
+    ) const noexcept{
         return !(*this == other);
     }
 
@@ -142,14 +143,15 @@ struct Rect {
     constexpr void setPosition(
         T new_x,
         T new_y
-    ) noexcept {
+    ) noexcept
+    {
         x = new_x;
         y = new_y;
     }
 
     constexpr void setPosition(
         const Vec2<T>& position
-    ) noexcept {
+    ) noexcept{
         x = position.x;
         y = position.y;
     }
@@ -157,14 +159,15 @@ struct Rect {
     constexpr void setSize(
         T new_width,
         T new_height
-    ) noexcept {
+    ) noexcept
+    {
         width = new_width;
         height = new_height;
     }
 
     constexpr void setSize(
         const Vec2<T>& new_size
-    ) noexcept {
+    ) noexcept{
         width = new_size.x;
         height = new_size.y;
     }
@@ -174,7 +177,8 @@ struct Rect {
         T new_y,
         T new_width,
         T new_height
-    ) noexcept {
+    ) noexcept
+    {
         x = new_x;
         y = new_y;
         width = new_width;
@@ -316,21 +320,23 @@ struct Rect {
     constexpr void translate(
         T tx,
         T ty
-    ) noexcept {
+    ) noexcept
+    {
         x += tx;
         y += ty;
     }
 
     constexpr void translate(
         const Vec2<T>& offset
-    ) noexcept {
+    ) noexcept{
         x += offset.x;
         y += offset.y;
     }
 
     constexpr void scale(
         T value
-    ) noexcept {
+    ) noexcept
+    {
         x *= value;
         y *= value;
         width *= value;
@@ -340,7 +346,8 @@ struct Rect {
     constexpr void scale(
         T sx,
         T sy
-    ) noexcept {
+    ) noexcept
+    {
         x *= sx;
         y *= sy;
         width *= sx;
@@ -349,7 +356,8 @@ struct Rect {
 
     constexpr void scaleSize(
         T value
-    ) noexcept {
+    ) noexcept
+    {
         width *= value;
         height *= value;
     }
@@ -357,14 +365,16 @@ struct Rect {
     constexpr void scaleSize(
         T sx,
         T sy
-    ) noexcept {
+    ) noexcept
+    {
         width *= sx;
         height *= sy;
     }
 
     constexpr void inset(
         T value
-    ) noexcept {
+    ) noexcept
+    {
         x += value;
         y += value;
         width -= value * T{2};
@@ -373,7 +383,8 @@ struct Rect {
 
     constexpr void expand(
         T value
-    ) noexcept {
+    ) noexcept
+    {
         x -= value;
         y -= value;
         width += value * T{2};
@@ -403,16 +414,36 @@ struct Rect {
 
     [[nodiscard]] constexpr bool contains(
         const Vec2<T>& point
-    ) const noexcept {
+    ) const noexcept
+    {
         return point.x >= x &&
                point.x < right() &&
                point.y >= y &&
                point.y < bottom();
     }
 
+    [[nodiscard]] bool contains(
+        const Vec2<T>& point,
+        T radius
+    ) const noexcept
+    {
+        const T dx =
+            point.x < x ? x - point.x :
+            point.x > right() ? point.x - right() :
+            T{0};
+
+        const T dy =
+            point.y < y ? y - point.y :
+            point.y > bottom() ? point.y - bottom() :
+            T{0};
+
+        return dx * dx + dy * dy <= radius * radius;
+    }
+
     [[nodiscard]] constexpr bool contains(
         const Rect& other
-    ) const noexcept {
+    ) const noexcept
+    {
         return other.x >= x &&
                other.right() <= right() &&
                other.y >= y &&
@@ -421,14 +452,16 @@ struct Rect {
 
     [[nodiscard]] constexpr bool containsX(
         T value
-    ) const noexcept {
+    ) const noexcept
+    {
         return value >= x &&
                value < right();
     }
 
     [[nodiscard]] constexpr bool containsY(
         T value
-    ) const noexcept {
+    ) const noexcept
+    {
         return value >= y &&
                value < bottom();
     }
@@ -439,7 +472,8 @@ struct Rect {
 
     [[nodiscard]] constexpr bool intersects(
         const Rect& other
-    ) const noexcept {
+    ) const noexcept
+    {
         return x < other.right() &&
                right() > other.x &&
                y < other.bottom() &&
@@ -448,7 +482,8 @@ struct Rect {
 
     [[nodiscard]] constexpr Rect intersection(
         const Rect& other
-    ) const noexcept {
+    ) const noexcept
+    {
         const T left = std::max(x, other.x);
         const T top = std::max(y, other.y);
         const T right_edge = std::min(right(), other.right());
@@ -469,7 +504,8 @@ struct Rect {
 
     constexpr void intersect(
         const Rect& other
-    ) noexcept {
+    ) noexcept
+    {
         *this = intersection(other);
     }
 
@@ -479,7 +515,8 @@ struct Rect {
 
     [[nodiscard]] constexpr Rect united(
         const Rect& other
-    ) const noexcept {
+    ) const noexcept
+    {
         const T left = std::min(x, other.x);
         const T top = std::min(y, other.y);
         const T right_edge = std::max(right(), other.right());
@@ -495,7 +532,8 @@ struct Rect {
 
     constexpr void unite(
         const Rect& other
-    ) noexcept {
+    ) noexcept
+    {
         *this = united(other);
     }
 
@@ -505,7 +543,8 @@ struct Rect {
 
     [[nodiscard]] constexpr Rect operator+(
         const Vec2<T>& offset
-    ) const noexcept {
+    ) const noexcept
+    {
         return {
             x + offset.x,
             y + offset.y,
@@ -516,7 +555,8 @@ struct Rect {
 
     [[nodiscard]] constexpr Rect operator-(
         const Vec2<T>& offset
-    ) const noexcept {
+    ) const noexcept
+    {
         return {
             x - offset.x,
             y - offset.y,
@@ -527,7 +567,8 @@ struct Rect {
 
     [[nodiscard]] constexpr Rect operator*(
         const Vec2<T>& scale
-    ) const noexcept {
+    ) const noexcept
+    {
         return {
             x * scale.x,
             y * scale.y,
@@ -538,7 +579,8 @@ struct Rect {
 
     constexpr Rect& operator+=(
         const Vec2<T>& offset
-    ) noexcept {
+    ) noexcept
+    {
         x += offset.x;
         y += offset.y;
         return *this;
@@ -546,7 +588,8 @@ struct Rect {
 
     constexpr Rect& operator-=(
         const Vec2<T>& offset
-    ) noexcept {
+    ) noexcept
+    {
         x -= offset.x;
         y -= offset.y;
         return *this;
@@ -554,7 +597,8 @@ struct Rect {
 
     constexpr Rect& operator*=(
         const Vec2<T>& scale
-    ) noexcept {
+    ) noexcept
+    {
         x *= scale.x;
         y *= scale.y;
         return *this;
@@ -562,7 +606,8 @@ struct Rect {
 
     constexpr Rect& operator+=(
         const Rect& other
-    ) noexcept {
+    ) noexcept
+    {
         unite(other);
         return *this;
     }

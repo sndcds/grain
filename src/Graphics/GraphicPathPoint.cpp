@@ -1,4 +1,4 @@
-#include "grain/Graphics/GraphichPathPoint.hpp"
+#include "grain/Graphics/GraphicPathPoint.hpp"
 #include "grain/Math/Quadrilateral.hpp"
 
 #include <cmath>

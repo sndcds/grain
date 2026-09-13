@@ -145,8 +145,11 @@ target_sources(
         src/Math/Quadrilateral.cpp
         src/String/String.cpp
         src/String/StringUtf8.cpp
+        src/Geometry/Bezier.cpp
         src/Graphics/Color.cpp
         src/Graphics/GraphicPathPoint.cpp
+        src/Graphics/GraphicPath.cpp
+
         src/Input/Input.cpp
         src/UI/View.cpp
 
@@ -166,6 +169,7 @@ target_sources(
         include/grain/Geometry/Rect.hpp
         include/grain/Geometry/RemapRect.hpp
         include/grain/Geometry/RectLayout.hpp
+        include/grain/Geometry/Bezier.hpp
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
         include/grain/Containers/List.hpp
@@ -174,7 +178,12 @@ target_sources(
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
         include/grain/UI/View.hpp
+        include/grain/Graphics/Color.hpp
+        include/grain/Graphics/Canvas.hpp
+        include/grain/Graphics/GraphicState.hpp
         include/grain/Graphics/GraphicContext.hpp
+        include/grain/Graphics/GraphicPathPoint.hpp
+        include/grain/Graphics/GraphicPath.hpp
 )
 
 # ---------------------------------------------------------------------------

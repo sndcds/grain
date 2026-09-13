@@ -17,4 +17,9 @@
 #include <grain/Platform/App.hpp>
 #include <grain/Platform/Window.hpp>
 #include <grain/UI/View.hpp>
+#include <grain/Graphics/Color.hpp>
+#include <grain/Graphics/Canvas.hpp>
+#include <grain/Graphics/GraphicState.hpp>
 #include <grain/Graphics/GraphicContext.hpp>
+#include <grain/Graphics/GraphicPathPoint.hpp>
+#include <grain/Graphics/GraphicPath.hpp>
