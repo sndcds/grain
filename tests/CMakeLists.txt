@@ -34,7 +34,7 @@ target_compile_features(
 
 if(APPLE)
     target_sources(GrainTests PRIVATE Platform/GrainRootViewTests.mm)
-elseif(UNIX)
+elseif(UNIX AND GRAIN_LINUX_BACKEND STREQUAL "X11")
     target_sources(GrainTests PRIVATE Platform/CairoGraphicContextTests.cpp)
 endif()
 
@@ -56,7 +56,16 @@ catch_discover_tests(GrainWindowTests)
 
 if(UNIX AND NOT APPLE)
     find_program(XVFB_RUN xvfb-run)
-    if(XVFB_RUN)
+    if(GRAIN_LINUX_BACKEND STREQUAL "GTK4")
+        add_executable(GrainGtk4Tests Platform/Gtk4WindowTests.cpp Platform/Gtk4GraphicContextTests.cpp)
+        target_link_libraries(GrainGtk4Tests PRIVATE Grain Catch2::Catch2WithMain)
+        if(XVFB_RUN)
+            add_test(NAME "GTK4: window lifecycle and rendering"
+                    COMMAND "${XVFB_RUN}" -a $<TARGET_FILE:GrainGtk4Tests>)
+            set_tests_properties("GTK4: window lifecycle and rendering" PROPERTIES
+                    TIMEOUT 20 ENVIRONMENT "GDK_BACKEND=x11;GSK_RENDERER=cairo;GTK_A11Y=none")
+        endif()
+    elseif(XVFB_RUN)
         add_executable(GrainX11Tests Platform/X11WindowTests.cpp)
         target_link_libraries(GrainX11Tests PRIVATE Grain Catch2::Catch2WithMain)
         add_test(NAME "X11: window event identity"

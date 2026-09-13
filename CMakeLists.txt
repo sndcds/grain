@@ -36,6 +36,9 @@ option(GRAIN_WARNINGS_AS_ERRORS
         OFF
 )
 
+set(GRAIN_LINUX_BACKEND "X11" CACHE STRING "Linux backend: X11 or GTK4")
+set_property(CACHE GRAIN_LINUX_BACKEND PROPERTY STRINGS X11 GTK4)
+
 # ---------------------------------------------------------------------------
 # C++ standard
 # ---------------------------------------------------------------------------
@@ -217,27 +220,35 @@ elseif(WIN32)
 
 elseif(UNIX AND NOT APPLE)
 
-    find_package(X11 REQUIRED)
     find_package(PkgConfig REQUIRED)
-
-    pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
 
     target_sources(
             Grain
             PRIVATE
             src/Platform/App.cpp
             src/Platform/Window.cpp
-            src/Platform/Linux/App.cpp
-            src/Platform/Linux/Window.cpp
-            src/Platform/Linux/CairoGraphicContext.cpp
     )
 
-    target_link_libraries(
-            Grain
-            PUBLIC
-            X11::X11
-            PkgConfig::CAIRO
-    )
+    if(GRAIN_LINUX_BACKEND STREQUAL "GTK4")
+        pkg_check_modules(GTK4 REQUIRED IMPORTED_TARGET gtk4>=4.14)
+        target_sources(Grain PRIVATE
+                src/Platform/LinuxGTK4/Gtk4App.cpp
+                src/Platform/LinuxGTK4/Gtk4Window.cpp
+                src/Platform/LinuxGTK4/Gtk4GraphicContext.cpp
+        )
+        target_link_libraries(Grain PUBLIC PkgConfig::GTK4)
+    elseif(GRAIN_LINUX_BACKEND STREQUAL "X11")
+        pkg_check_modules(CAIRO REQUIRED IMPORTED_TARGET cairo)
+        find_package(X11 REQUIRED)
+        target_sources(Grain PRIVATE
+                src/Platform/Linux/App.cpp
+                src/Platform/Linux/Window.cpp
+                src/Platform/Linux/CairoGraphicContext.cpp
+        )
+        target_link_libraries(Grain PUBLIC X11::X11 PkgConfig::CAIRO)
+    else()
+        message(FATAL_ERROR "Unknown GRAIN_LINUX_BACKEND '${GRAIN_LINUX_BACKEND}'; expected X11 or GTK4")
+    endif()
 
 endif()
 

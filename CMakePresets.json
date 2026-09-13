@@ -25,6 +25,23 @@
         "GRAIN_BUILD_EXAMPLES": "OFF",
         "GRAIN_ENABLE_SANITIZERS": "OFF"
       }
+    },
+    {
+      "name": "linux-gtk4",
+      "displayName": "Linux GTK4 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/linux-gtk4",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "GRAIN_LINUX_BACKEND": "GTK4",
+        "GRAIN_BUILD_TESTS": "ON",
+        "GRAIN_BUILD_EXAMPLES": "ON"
+      }
     }
   ],
 
@@ -36,6 +53,10 @@
     {
       "name": "macos-release",
       "configurePreset": "macos-release"
+    },
+    {
+      "name": "linux-gtk4",
+      "configurePreset": "linux-gtk4"
     }
   ],
 
@@ -43,6 +64,13 @@
     {
       "name": "macos-debug",
       "configurePreset": "macos-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-gtk4",
+      "configurePreset": "linux-gtk4",
       "output": {
         "outputOnFailure": true
       }
