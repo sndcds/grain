@@ -92,11 +92,20 @@ void GraphicPathPoint::translate(
 }
 
 void GraphicPathPoint::rotate(
+    double radians
+) noexcept
+{
+    left.rotate(anchor, radians);
+    right.rotate(anchor, radians);
+}
+
+
+void GraphicPathPoint::rotateDegrees(
     double degrees
 ) noexcept
 {
-    left.rotate(anchor, degrees);
-    right.rotate(anchor, degrees);
+    left.rotateDegrees(anchor, degrees);
+    right.rotateDegrees(anchor, degrees);
 }
 
 
@@ -109,15 +118,15 @@ void GraphicPathPoint::projectToQuadrilateral(
     const Mat3d* matrix
 ) noexcept
 {
+    anchor = quadrilateral.project(anchor);
+    left = quadrilateral.project(left);
+    right = quadrilateral.project(right);
+
     if (matrix != nullptr) {
         anchor = matrix->transform(anchor);
         left = matrix->transform(left);
         right = matrix->transform(right);
     }
-
-    quadrilateral.project(anchor);
-    quadrilateral.project(left);
-    quadrilateral.project(right);
 }
 
 } // namespace Grain

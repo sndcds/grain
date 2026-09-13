@@ -64,7 +64,8 @@ public:
         double y
     ) noexcept;
 
-    void rotate(double degrees) noexcept;
+    void rotate(double radians) noexcept;
+    void rotateDegrees(double degrees) noexcept;
 
 
     //--------------------------------------------------------------------------

@@ -60,21 +60,26 @@ int main() {
 
     using namespace Grain;
 
-    const Bezier bezier{
+    const Quadrilateral quadrilateral{
         Vec2d{0.0, 0.0},
-        Vec2d{10.0, 0.0},
-        Vec2d{10.0, 10.0},
-        Vec2d{20.0, 10.0}
+        Vec2d{100.0, 0.0},
+        Vec2d{100.0, 100.0},
+        Vec2d{0.0, 100.0}
     };
 
-    Bezier result;
+    const Mat3d matrix = Mat3d::translation(10.0, 20.0);
 
-    bool truncateOk = bezier.truncate(0.25, 0.75, result);
-    auto startPos = bezier.posOnCurve(0.25);
-    auto endPos = bezier.posOnCurve(0.75);
+    GraphicPathPoint point{
+        0.25, 0.25,
+        0.10, 0.25,
+        0.40, 0.25
+    };
 
-    std::cout << result.startPos() << " ... " << startPos << std::endl;
-    std::cout << result.endPos() << " ... " << endPos << std::endl;
+    point.projectToQuadrilateral(quadrilateral, &matrix);
+
+    std::cout << point.anchor << " ... " << Vec2d{35.0, 45.0} << std::endl;
+    std::cout << point.left << " ... " << Vec2d{20.0, 45.0} << std::endl;
+    std::cout << point.right << " ... " << Vec2d{50.0, 45.0} << std::endl;
 
 
     auto& app = Grain::App::instance();
