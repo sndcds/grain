@@ -16,6 +16,8 @@ GraphicPathPoint::GraphicPathPoint(
 {
 }
 
+constexpr double epsilon = 1e-12;
+
 GraphicPathPoint::GraphicPathPoint(
     double x,
     double y,
@@ -27,8 +29,8 @@ GraphicPathPoint::GraphicPathPoint(
     : anchor(x, y),
       left(lx, ly),
       right(rx, ry),
-      leftFlag(anchor.distance(left) > std::numeric_limits<float>::min()),
-      rightFlag(anchor.distance(right) > std::numeric_limits<float>::min())
+      leftFlag(anchor.distance(left) > epsilon),
+      rightFlag(anchor.distance(right) > epsilon)
 {
 }
 

@@ -434,7 +434,7 @@ void GraphicPath::addPointLeft(
         true,
         left,
         false,
-        {}
+        Vec2d()
     );
 
     mustUpdate_ = true;
@@ -469,7 +469,7 @@ void GraphicPath::addPointRight(
     points_.emplace_back(
         pos,
         false,
-        {},
+        Vec2d(),
         true,
         right
     );
@@ -703,9 +703,9 @@ void GraphicPath::addQuadraticBezier(
     );
 
     addBezier(
-        bezier.pos_[1],
-        bezier.pos_[2],
-        bezier.pos_[3]
+        bezier.controlPos1(),
+        bezier.controlPos2(),
+        bezier.endPos()
     );
 }
 
