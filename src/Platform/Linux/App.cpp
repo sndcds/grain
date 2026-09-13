@@ -100,7 +100,7 @@ void X11App::run() {
 
             Grain::Event grain_event;
             grain_event.type = EventType::WindowResize;
-            grain_event.window_id = target->id();
+            grain_event.windowId = target->id();
             grain_event.width = event.xconfigure.width;
             grain_event.height = event.xconfigure.height;
             emitEvent(grain_event);
