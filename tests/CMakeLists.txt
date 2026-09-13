@@ -34,6 +34,8 @@ target_compile_features(
 
 if(APPLE)
     target_sources(GrainTests PRIVATE Platform/GrainRootViewTests.mm)
+elseif(UNIX)
+    target_sources(GrainTests PRIVATE Platform/CairoGraphicContextTests.cpp)
 endif()
 
 include("${Catch2_SOURCE_DIR}/extras/Catch.cmake")
