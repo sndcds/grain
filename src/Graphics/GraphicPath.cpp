@@ -227,7 +227,7 @@ bool GraphicPath::bounds(
 bool GraphicPath::bezierAtIndex(
     int32_t segmentIndex,
     Bezier& outBezier
-) noexcept
+) const noexcept
 {
     const int32_t lastIndex = lastPointIndex();
 

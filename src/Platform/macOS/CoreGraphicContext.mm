@@ -1,4 +1,5 @@
 #include "CoreGraphicContext.hpp"
+#include "grain/Geometry/Bezier.hpp"
 
 #include <cmath>
 
@@ -11,28 +12,25 @@ CoreGraphicContext::CoreGraphicContext(
 {
 }
 
-void CoreGraphicContext::save()
-{
+void CoreGraphicContext::save() {
     if (context_ == nullptr) {
         return;
     }
 
-    GraphicContext::save();
+    // GraphicContext::save();
     CGContextSaveGState(context_);
 }
 
-void CoreGraphicContext::restore()
-{
+void CoreGraphicContext::restore() {
     if (context_ == nullptr) {
         return;
     }
 
-    GraphicContext::restore();
+    // GraphicContext::restore();
     CGContextRestoreGState(context_);
 }
 
-void CoreGraphicContext::setFillColor(const Color& color)
-{
+void CoreGraphicContext::setFillColor(const Color& color) {
     if (context_ == nullptr) {
         return;
     }
@@ -46,8 +44,7 @@ void CoreGraphicContext::setFillColor(const Color& color)
     );
 }
 
-void CoreGraphicContext::setStrokeColor(const Color& color)
-{
+void CoreGraphicContext::setStrokeColor(const Color& color) {
     if (context_ == nullptr) {
         return;
     }
@@ -61,8 +58,7 @@ void CoreGraphicContext::setStrokeColor(const Color& color)
     );
 }
 
-void CoreGraphicContext::setLineWidth(double width)
-{
+void CoreGraphicContext::setLineWidth(double width) {
     if (context_ == nullptr) {
         return;
     }
@@ -70,8 +66,57 @@ void CoreGraphicContext::setLineWidth(double width)
     CGContextSetLineWidth(context_, width);
 }
 
-void CoreGraphicContext::fillRect(const Rectd& rect)
-{
+
+
+void CoreGraphicContext::beginPath() noexcept {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextBeginPath(context_);
+}
+
+
+void CoreGraphicContext::moveTo(const Vec2d& point) noexcept {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextMoveToPoint(context_, point.x, point.y);
+    lastPoint_ = point;
+}
+
+
+void CoreGraphicContext::lineTo(const Vec2d& point) noexcept {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextAddLineToPoint(context_, point.x, point.y);
+    lastPoint_ = point;
+}
+
+
+void CoreGraphicContext::curveTo(const Vec2d& control1, const Vec2d& control2, const Vec2d& point) noexcept {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextAddCurveToPoint(context_, control1.x, control1.y, control2.x, control2.y, point.x, point.y);
+    lastPoint_ = point;
+}
+
+
+void CoreGraphicContext::closePath() noexcept {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextClosePath(context_);
+}
+
+
+void CoreGraphicContext::fillRect(const Rectd& rect) {
     if (context_ == nullptr) {
         return;
     }
@@ -87,8 +132,7 @@ void CoreGraphicContext::fillRect(const Rectd& rect)
     );
 }
 
-void CoreGraphicContext::strokeRect(const Rectd& rect)
-{
+void CoreGraphicContext::strokeRect(const Rectd& rect) {
     if (context_ == nullptr) {
         return;
     }
@@ -104,11 +148,24 @@ void CoreGraphicContext::strokeRect(const Rectd& rect)
     );
 }
 
-void CoreGraphicContext::translate(
-    double x,
-    double y
-)
-{
+
+void CoreGraphicContext::fillPath(const GraphicPath& path) {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    addPath(path);
+
+    CGContextFillPath(context_);
+}
+
+
+void CoreGraphicContext::strokePath(const GraphicPath& path) {
+
+}
+
+
+void CoreGraphicContext::translate(double x, double y) {
     if (context_ == nullptr) {
         return;
     }
@@ -120,11 +177,7 @@ void CoreGraphicContext::translate(
     );
 }
 
-void CoreGraphicContext::scale(
-    double x,
-    double y
-)
-{
+void CoreGraphicContext::scale(double x, double y) {
     if (context_ == nullptr) {
         return;
     }
@@ -136,10 +189,7 @@ void CoreGraphicContext::scale(
     );
 }
 
-void CoreGraphicContext::rotate(
-    double radians
-)
-{
+void CoreGraphicContext::rotate(double radians) {
     if (context_ == nullptr) {
         return;
     }
@@ -150,10 +200,7 @@ void CoreGraphicContext::rotate(
     );
 }
 
-void CoreGraphicContext::rotateDegrees(
-    double degrees
-)
-{
+void CoreGraphicContext::rotateDegrees(double degrees) {
     if (context_ == nullptr) {
         return;
     }

@@ -148,9 +148,9 @@
         return;
     }
 
-    Grain::CoreGraphicContext graphicsContext(context);
+    Grain::CoreGraphicContext graphicContext(context);
 
-    grainView_->draw(graphicsContext);
+    grainView_->draw(graphicContext);
 }
 
 @end

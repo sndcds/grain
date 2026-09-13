@@ -3,13 +3,41 @@
 #include <cstdint>
 #include <iostream>
 
+constexpr double k = 0.5522847498307936;
+
 
 class TestView : public Grain::View {
 public:
     void draw(Grain::GraphicContext& gc) override {
-        gc.rotateDegrees(10);
+        gc.rotateDegrees(0);
         gc.setFillColor({1, .8, .6, 1});
         gc.fillRect({20.0, 20.0, 800.0 - 40.0, 600.0 - 40.0});
+
+        gc.setStrokeColor({0, 0, 0, 1});
+
+        Grain::GraphicPath path;
+        path.addPoint({20.0, 0.0}, {20.0, -10.0}, {20.0, 10.0});
+        path.addPoint({0.0, 20.0}, {10.0, 20.0}, {-10.0, 20.0});
+        path.addPoint({-20.0, 0.0}, {-20.0, 10.0}, {-20.0, -10.0});
+        path.addPoint({0.0, 0.0}, {-10.0, -20.0}, {10.0, -20.0});
+        path.setClosed(true);
+
+        for (double y = 0; y < 1280; y += 45) {
+            for (double x = 0; x < 1920; x += 45) {
+                gc.save();
+
+                gc.translate(x + std::sin(y / 100) * 30, y);
+
+                gc.setFillColor({.2, .8, .4, 1});
+                gc.fillPath(path);
+
+                gc.setStrokeColor(Grain::Color::black());
+                gc.setLineWidth(3.0);
+                gc.strokePath(path);
+
+                gc.restore();
+            }
+        }
     }
 };
 

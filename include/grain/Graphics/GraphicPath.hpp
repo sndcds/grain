@@ -126,7 +126,7 @@ public:
     bool bezierAtIndex(
         int32_t segmentIndex,
         Bezier& outBezier
-    ) noexcept;
+    ) const noexcept;
 
     static bool bezierFromTwoPathPoints(
         const GraphicPathPoint* p1,
