@@ -66,13 +66,14 @@ int main() {
         Vec2d{10.0, 20.0},
         90.0,
         5.0,
+        180.0,
         10.0
     );
 
     const auto* point = path.pointPtrAtIndex(0);
 
     std::cout << point->left << " ... " << Vec2d{10.0, 15.0} << std::endl;
-    std::cout << point->right << " ... " << Vec2d{10.0, 30.0} << std::endl;
+    std::cout << point->right << " ... " << Vec2d{0.0, 20.0} << std::endl;
 
 
     auto& app = Grain::App::instance();

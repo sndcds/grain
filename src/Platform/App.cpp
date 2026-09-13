@@ -11,17 +11,17 @@ namespace Grain {
 
 class App::Impl {
 public:
-    std::unique_ptr<Platform::App> platform_app;
+    std::unique_ptr<Platform::App> platformApp;
     std::vector<std::unique_ptr<Window> > windows;
 
     Input input;
 
-    WindowId next_window_id = 1;
+    WindowId nextWindowId = 1;
 
     bool running = false;
 
     Impl()
-        : platform_app(Platform::createApp()) {
+        : platformApp(Platform::createApp()) {
     }
 };
 
@@ -33,8 +33,8 @@ App& App::instance() {
 App::App()
     : impl_(std::make_unique<Impl>()) {
 
-    if (impl_->platform_app != nullptr) {
-        impl_->platform_app->setEventHandler(
+    if (impl_->platformApp != nullptr) {
+        impl_->platformApp->setEventHandler(
             [this](const Event& event) {
                 processEvent(event);
             }
@@ -49,28 +49,28 @@ Window* App::createWindow(
     int width,
     int height
     ) {
-    if (impl_->platform_app == nullptr) {
+    if (impl_->platformApp == nullptr) {
         return nullptr;
     }
 
-    const WindowId window_id = impl_->next_window_id++;
+    const WindowId windowId = impl_->nextWindowId++;
 
-    auto platform_window =
-        impl_->platform_app->createWindow(
-            window_id,
+    auto platformWindow =
+        impl_->platformApp->createWindow(
+            windowId,
             title,
             width,
             height
             );
 
-    if (platform_window == nullptr) {
+    if (platformWindow == nullptr) {
         return nullptr;
     }
 
     auto window =
         Window::create(
-            window_id,
-            std::move(platform_window)
+            windowId,
+            std::move(platformWindow)
             );
 
     if (window == nullptr) {
@@ -96,7 +96,7 @@ const Input& App::input() const noexcept {
 
 void App::run() {
     if (impl_ == nullptr ||
-        impl_->platform_app == nullptr) {
+        impl_->platformApp == nullptr) {
         return;
     }
 
@@ -104,7 +104,7 @@ void App::run() {
 
     impl_->input.beginFrame();
 
-    impl_->platform_app->run();
+    impl_->platformApp->run();
 
     impl_->running = false;
 }
@@ -112,16 +112,16 @@ void App::run() {
 void App::quit() noexcept {
     impl_->running = false;
 
-    if (impl_->platform_app != nullptr) {
-        impl_->platform_app->quit();
+    if (impl_->platformApp != nullptr) {
+        impl_->platformApp->quit();
     }
 }
 
 void App::processEvent(const Event& event) {
     std::cout
         << "event type: " << static_cast<int>(event.type)
-        << ", window_id: " << static_cast<int>(event.windowId)
-        << ", mouse_button: " << static_cast<int>(event.mouseButton)
+        << ", windowId: " << static_cast<int>(event.windowId)
+        << ", mouseButton: " << static_cast<int>(event.mouseButton)
         << ", " << event.mouseX
         << ", " << event.mouseY
         << '\n';

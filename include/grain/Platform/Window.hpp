@@ -43,7 +43,7 @@ private:
 
     static std::unique_ptr<Window> create(
         WindowId id,
-        std::unique_ptr<Platform::Window> platform_window
+        std::unique_ptr<Platform::Window> platformWindow
     );
 
     std::unique_ptr<Impl> impl_;
