@@ -502,7 +502,7 @@ void GraphicPath::addPointRight(
 // Point by angle
 //------------------------------------------------------------------------------
 
-void GraphicPath::addPointByAngle(
+void GraphicPath::addPointByAngleDegrees(
     const Vec2d& pos,
     double angle,
     double leftLength,
@@ -510,10 +510,10 @@ void GraphicPath::addPointByAngle(
 ) noexcept
 {
     Vec2d left(-leftLength, 0.0);
-    left.rotate(angle);
+    left.rotateDegrees(angle);
 
     Vec2d right(rightLength, 0.0);
-    right.rotate(angle);
+    right.rotateDegrees(angle);
 
     addPoint(
         pos.x,
@@ -526,7 +526,7 @@ void GraphicPath::addPointByAngle(
 }
 
 
-void GraphicPath::addPointByAngle(
+void GraphicPath::addPointByAngleDegrees(
     double x,
     double y,
     double angle,
@@ -551,7 +551,7 @@ void GraphicPath::addPointByAngle(
 }
 
 
-void GraphicPath::addPointByAngle(
+void GraphicPath::addPointByAngleDegrees(
     const Vec2d& pos,
     double leftAngle,
     double leftLength,
@@ -576,7 +576,7 @@ void GraphicPath::addPointByAngle(
 }
 
 
-void GraphicPath::addPointByAngle(
+void GraphicPath::addPointByAngleDegrees(
     double x,
     double y,
     double leftAngle,

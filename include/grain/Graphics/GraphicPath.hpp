@@ -204,14 +204,14 @@ public:
         double ry
     ) noexcept;
 
-    void addPointByAngle(
+    void addPointByAngleDegrees(
         const Vec2d& pos,
         double angle,
         double leftLength,
         double rightLength
     ) noexcept;
 
-    void addPointByAngle(
+    void addPointByAngleDegrees(
         double x,
         double y,
         double angle,
@@ -219,7 +219,7 @@ public:
         double rightLength
     ) noexcept;
 
-    void addPointByAngle(
+    void addPointByAngleDegrees(
         const Vec2d& pos,
         double leftAngle,
         double leftLength,
@@ -227,7 +227,7 @@ public:
         double rightLength
     ) noexcept;
 
-    void addPointByAngle(
+    void addPointByAngleDegrees(
         double x,
         double y,
         double leftAngle,
