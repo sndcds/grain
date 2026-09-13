@@ -11,6 +11,7 @@ add_executable(
         Geometry/LineTests.cpp
         Geometry/RectTests.cpp
         Geometry/RectLayoutTests.cpp
+        Geometry/BezierTests.cpp
         String/StringTests.cpp
         String/StringUtf8Tests.cpp
         Input/InputTests.cpp

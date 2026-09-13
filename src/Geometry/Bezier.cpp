@@ -520,19 +520,19 @@ bool Bezier::truncate(
 
     split(end, first, second);
 
-    const double localEnd =
-        end > 0.0 ? (end - start) / end : 0.0;
+    const double localStart =
+        end > 0.0 ? start / end : 0.0;
 
     Bezier prefix;
+
     first.split(
-        localEnd,
+        localStart,
         prefix,
         result
     );
 
     return true;
 }
-
 
 void Bezier::buildVec2LUT(
     Vec2d* lut,

@@ -11,6 +11,7 @@
 #include <grain/Geometry/Line.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/RemapRect.hpp>
+#include <grain/Geometry/Bezier.hpp>
 #include <grain/String/String.hpp>
 #include <grain/Input/Event.hpp>
 #include <grain/Input/Input.hpp>

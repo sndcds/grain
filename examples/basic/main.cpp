@@ -60,17 +60,21 @@ int main() {
 
     using namespace Grain;
 
-    const Quadrilateral q{
+    const Bezier bezier{
         Vec2d{0.0, 0.0},
         Vec2d{10.0, 0.0},
-        Vec2d{10.0, 20.0},
-        Vec2d{0.0, 20.0}
+        Vec2d{10.0, 10.0},
+        Vec2d{20.0, 10.0}
     };
 
-    const Lined line = q.horizontalLine(0.25);
+    Bezier result;
 
-    std::cout << line.p1() << "... 2.5, 5.0" << std::endl;
-    std::cout << line.p2() << "... 7.5, 5.0" << std::endl;
+    bool truncateOk = bezier.truncate(0.25, 0.75, result);
+    auto startPos = bezier.posOnCurve(0.25);
+    auto endPos = bezier.posOnCurve(0.75);
+
+    std::cout << result.startPos() << " ... " << startPos << std::endl;
+    std::cout << result.endPos() << " ... " << endPos << std::endl;
 
 
     auto& app = Grain::App::instance();
