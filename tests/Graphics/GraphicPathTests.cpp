@@ -918,12 +918,12 @@ TEST_CASE(
 
     requirePoint(
         bezier.controlPos1(),
-        Vec2d{10.0, 0.0}
+        Vec2d{20.0 / 3.0, 0.0}
     );
 
     requirePoint(
         bezier.controlPos2(),
-        Vec2d{10.0, 0.0}
+        Vec2d{40.0 / 3.0, 0.0}
     );
 }
 
@@ -1391,7 +1391,7 @@ TEST_CASE(
         10.0, 20.0
     );
 
-    path.rotatePoint(0, 90.0);
+    path.rotatePointDegrees(0, 90.0);
 
     const auto* point =
         path.pointPtrAtIndex(0);
@@ -1427,8 +1427,8 @@ TEST_CASE(
         30.0, 25.0
     );
 
-    path.rotatePoint(-1, 90.0);
-    path.rotatePoint(1, 90.0);
+    path.rotatePointDegrees(-1, 90.0);
+    path.rotatePointDegrees(1, 90.0);
 
     const auto* point =
         path.pointPtrAtIndex(0);

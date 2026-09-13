@@ -560,10 +560,10 @@ void GraphicPath::addPointByAngleDegrees(
 ) noexcept
 {
     Vec2d left(-leftLength, 0.0);
-    left.rotate(leftAngle);
+    left.rotateDegrees(leftAngle);
 
     Vec2d right(rightLength, 0.0);
-    right.rotate(rightAngle);
+    right.rotateDegrees(rightAngle);
 
     addPoint(
         pos.x,
@@ -836,9 +836,9 @@ void GraphicPath::translatePoint(
 }
 
 
-void GraphicPath::rotatePoint(
+void GraphicPath::rotatePointDegrees(
     int32_t index,
-    double angle
+    double degrees
 ) noexcept
 {
     auto* point = pointPtrAtIndex(index);
@@ -847,7 +847,7 @@ void GraphicPath::rotatePoint(
         return;
     }
 
-    point->rotate(angle);
+    point->rotateDegrees(degrees);
     mustUpdate_ = true;
 }
 

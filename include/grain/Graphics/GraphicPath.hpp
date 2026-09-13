@@ -294,9 +294,9 @@ public:
         double ty
     ) noexcept;
 
-    void rotatePoint(
+    void rotatePointDegrees(
         int32_t index,
-        double angle
+        double degrees
     ) noexcept;
 
 

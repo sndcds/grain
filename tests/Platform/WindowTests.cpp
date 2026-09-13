@@ -13,7 +13,7 @@ namespace {
 
 class TestWindow final : public Grain::Platform::Window {
 public:
-    explicit TestWindow(Grain::WindowId window_id) : id(window_id) {}
+    explicit TestWindow(Grain::WindowId windowId) : id(windowId) {}
 
     void show() override { shown = true; }
     void setRootView(Grain::View*) override {}
@@ -30,8 +30,8 @@ public:
         int,
         int
     ) override {
-        requested_ids.push_back(id);
-        if (fail_creation) {
+        requestedIds.push_back(id);
+        if (failCreation) {
             return nullptr;
         }
         auto window = std::make_unique<TestWindow>(id);
@@ -39,19 +39,19 @@ public:
         return window;
     }
 
-    void run() override { on_run(); }
-    void quit() override { quit_called = true; }
+    void run() override { onRun(); }
+    void quit() override { quitCalled = true; }
 
     using Grain::Platform::App::emitEvent;
 
-    std::vector<Grain::WindowId> requested_ids;
+    std::vector<Grain::WindowId> requestedIds;
     std::vector<TestWindow*> windows;
-    std::function<void()> on_run;
-    bool fail_creation = false;
-    bool quit_called = false;
+    std::function<void()> onRun;
+    bool failCreation = false;
+    bool quitCalled = false;
 };
 
-TestApp* platform_app = nullptr;
+TestApp* platformApp = nullptr;
 
 } // namespace
 
@@ -59,7 +59,7 @@ namespace Grain::Platform {
 
 std::unique_ptr<App> createApp() {
     auto app = std::make_unique<TestApp>();
-    platform_app = app.get();
+    platformApp = app.get();
     return app;
 }
 
@@ -73,57 +73,57 @@ TEST_CASE("App: window identity and platform event delivery", "[Window][Input]")
     REQUIRE(second != nullptr);
     REQUIRE(first->id() != 0);
     REQUIRE(second->id() == first->id() + 1);
-    REQUIRE(platform_app->windows[0]->id == first->id());
-    REQUIRE(platform_app->windows[1]->id == second->id());
-    REQUIRE(platform_app->windows[0]->shown);
-    REQUIRE(platform_app->windows[1]->shown);
+    REQUIRE(platformApp->windows[0]->id == first->id());
+    REQUIRE(platformApp->windows[1]->id == second->id());
+    REQUIRE(platformApp->windows[0]->shown);
+    REQUIRE(platformApp->windows[1]->shown);
 
-    platform_app->fail_creation = true;
+    platformApp->failCreation = true;
     REQUIRE(app.createWindow("Failed", 100, 100) == nullptr);
-    platform_app->fail_creation = false;
+    platformApp->failCreation = false;
     auto* third = app.createWindow("Third", 100, 100);
     REQUIRE(third != nullptr);
     REQUIRE(third->id() == second->id() + 2);
-    REQUIRE(platform_app->requested_ids[2] == second->id() + 1);
-    REQUIRE(platform_app->requested_ids[3] == third->id());
-    REQUIRE(platform_app->windows[2]->id == third->id());
+    REQUIRE(platformApp->requestedIds[2] == second->id() + 1);
+    REQUIRE(platformApp->requestedIds[3] == third->id());
+    REQUIRE(platformApp->windows[2]->id == third->id());
 
     // Drive the installed callback while the real App::run() is active.
-    platform_app->on_run = [&] {
+    platformApp->onRun = [&] {
         Grain::Event event;
-        event.windowId = platform_app->windows[0]->id;
+        event.windowId = platformApp->windows[0]->id;
         event.type = Grain::EventType::MouseMove;
         event.mouseX = 12.0;
         event.mouseY = 34.0;
-        platform_app->emitEvent(event);
+        platformApp->emitEvent(event);
         REQUIRE(app.input().mousePosition().x == 12.0);
         REQUIRE(app.input().mousePosition().y == 34.0);
 
-        event.windowId = platform_app->windows[1]->id;
+        event.windowId = platformApp->windows[1]->id;
         event.mouseX = 56.0;
-        platform_app->emitEvent(event);
+        platformApp->emitEvent(event);
         REQUIRE(app.input().mousePosition().x == 56.0);
 
         event.type = Grain::EventType::MouseButtonDown;
-        platform_app->emitEvent(event);
+        platformApp->emitEvent(event);
         REQUIRE(app.input().isMouseButtonDown(Grain::MouseButton::Left));
         event.type = Grain::EventType::MouseButtonUp;
-        platform_app->emitEvent(event);
+        platformApp->emitEvent(event);
         REQUIRE_FALSE(app.input().isMouseButtonDown(Grain::MouseButton::Left));
 
         event.type = Grain::EventType::KeyDown;
         event.key = Grain::Key::A;
-        platform_app->emitEvent(event);
+        platformApp->emitEvent(event);
         REQUIRE(app.input().isKeyDown(Grain::Key::A));
         event.type = Grain::EventType::KeyUp;
-        platform_app->emitEvent(event);
+        platformApp->emitEvent(event);
         REQUIRE_FALSE(app.input().isKeyDown(Grain::Key::A));
 
         Grain::Event quit_event;
         quit_event.type = Grain::EventType::Quit; // Application-wide event.
-        platform_app->emitEvent(quit_event);
-        REQUIRE(platform_app->quit_called);
+        platformApp->emitEvent(quit_event);
+        REQUIRE(platformApp->quitCalled);
     };
     app.run();
-    platform_app->on_run = {};
+    platformApp->onRun = {};
 }

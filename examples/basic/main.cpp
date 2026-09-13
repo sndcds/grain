@@ -62,19 +62,20 @@ int main() {
 
     GraphicPath path;
 
-    path.addPointByAngleDegrees(
-        Vec2d{10.0, 20.0},
-        90.0,
-        5.0,
-        180.0,
-        10.0
+    path.addPoint(
+        10.0, 10.0,
+        20.0, 10.0,
+        10.0, 20.0
     );
 
-    const auto* point = path.pointPtrAtIndex(0);
+    path.rotatePointDegrees(0, 90.0);
 
-    std::cout << point->left << " ... " << Vec2d{10.0, 15.0} << std::endl;
-    std::cout << point->right << " ... " << Vec2d{0.0, 20.0} << std::endl;
+    const auto* point =
+        path.pointPtrAtIndex(0);
 
+    std::cout << "point->anchor,: " << point->anchor << " ... " << Vec2d{10.0, 10.0} << std::endl;
+    std::cout << "point->left,: " << point->left << " ... " << Vec2d{10.0, 20.0} << std::endl;
+    std::cout << "point->right,: " << point->anchor << " ... " << Vec2d{0.0, 10.0} << std::endl;
 
     auto& app = Grain::App::instance();
 
