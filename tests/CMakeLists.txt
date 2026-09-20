@@ -10,6 +10,13 @@ add_executable(
         Math/Vec3Tests.cpp
         Math/Mat3Tests.cpp
         Math/QuadrilateralTests.cpp
+        Math/CircleTests.cpp
+        Math/EasingTests.cpp
+        Math/FunctionsTests.cpp
+        Math/GeoTests.cpp
+        Math/OpticsTests.cpp
+        Math/QuantizationTests.cpp
+        Math/SphereTests.cpp
         Geometry/LineTests.cpp
         Geometry/RectTests.cpp
         Geometry/RectLayoutTests.cpp

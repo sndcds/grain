@@ -94,7 +94,7 @@ int32_t solveQuadratic(
 }
 
 
-int32_t solveCubic(
+inline int32_t solveCubic(
     const double a,
     const double b,
     const double c,
@@ -131,7 +131,8 @@ int32_t solveCubic(
     // with x = y - A / 3.
     const double A2 = A * A;
 
-    const double p = B - A2 / 3.0;
+    const double p =
+        B - A2 / 3.0;
 
     const double q =
         2.0 * A2 * A / 27.0
@@ -144,6 +145,7 @@ int32_t solveCubic(
 
     const double offset = A / 3.0;
 
+    // One distinct real root.
     if (discriminant > kEpsilon) {
         const double sqrtDiscriminant =
             std::sqrt(discriminant);
@@ -154,18 +156,25 @@ int32_t solveCubic(
         const double v =
             std::cbrt(-q / 2.0 - sqrtDiscriminant);
 
-        outValues[0] = u + v - offset;
+        outValues[0] =
+            u + v - offset;
+
         return 1;
     }
 
+    // Multiple real roots.
     if (std::abs(discriminant) <= kEpsilon) {
+        // Triple root.
         if (std::abs(p) <= kEpsilon &&
             std::abs(q) <= kEpsilon) {
+
             outValues[0] = -offset;
             return 1;
         }
 
-        const double u = std::cbrt(-q / 2.0);
+        // One simple root and one double root.
+        const double u =
+            std::cbrt(-q / 2.0);
 
         const double root1 =
             2.0 * u - offset;
@@ -185,7 +194,7 @@ int32_t solveCubic(
 
     // Three distinct real roots.
     //
-    // p must be negative in this case.
+    // Here discriminant < 0, which implies p < 0.
     const double radius =
         2.0 * std::sqrt(-p / 3.0);
 
@@ -194,7 +203,8 @@ int32_t solveCubic(
         * std::sqrt(-3.0 / p);
 
     // Protect acos() from small floating-point excursions.
-    cosine = std::clamp(cosine, -1.0, 1.0);
+    cosine =
+        std::clamp(cosine, -1.0, 1.0);
 
     const double theta =
         std::acos(cosine);
@@ -204,11 +214,15 @@ int32_t solveCubic(
         - offset;
 
     outValues[1] =
-        radius * std::cos((theta + kTwoPi) / 3.0)
+        radius * std::cos(
+            (theta + kTwoPi) / 3.0
+        )
         - offset;
 
     outValues[2] =
-        radius * std::cos((theta + 2.0 * kTwoPi) / 3.0)
+        radius * std::cos(
+            (theta + 2.0 * kTwoPi) / 3.0
+        )
         - offset;
 
     std::sort(
@@ -220,7 +234,7 @@ int32_t solveCubic(
 }
 
 
-int32_t solveCubicBezier(
+inline int32_t solveCubicBezier(
     const double p0,
     const double p1,
     const double p2,
@@ -244,7 +258,7 @@ int32_t solveCubicBezier(
      *
      * which gives:
      *
-     * A t³ + B t² + C t + D = 0
+     *     A t³ + B t² + C t + D = 0
      */
 
     const double a =
@@ -268,7 +282,13 @@ int32_t solveCubicBezier(
     double roots[3]{};
 
     const int32_t rootCount =
-        solveCubic(a, b, c, d, roots);
+        solveCubic(
+            a,
+            b,
+            c,
+            d,
+            roots
+        );
 
     int32_t count = 0;
 
