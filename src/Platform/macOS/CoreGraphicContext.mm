@@ -154,8 +154,6 @@ void CoreGraphicContext::fillPath(const GraphicPath& path) {
         return;
     }
 
-    addPath(path);
-
     CGContextFillPath(context_);
 }
 

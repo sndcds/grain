@@ -1,7 +1,7 @@
 #include "Gtk4Window.hpp"
 #include "Gtk4GraphicContext.hpp"
 
-#include <grain/UI/View.hpp>
+#include <../../../include/grain/Platform/View.hpp>
 
 #include <algorithm>
 #include <string>

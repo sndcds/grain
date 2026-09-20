@@ -10,7 +10,7 @@ namespace Grain::Platform {
 class CocoaWindow final : public Window {
 public:
     CocoaWindow(
-        WindowId id,
+        uint64_t id,
         std::string_view title,
         int width,
         int height,
@@ -21,12 +21,12 @@ public:
 
     void show() override;
 
-    void setRootView(
-        Grain::View* view
-        ) override;
+    void requestRedraw() override;
+
+    void setRootView(View* platformView) override;
 
 private:
-    WindowId windowId_;
+    uint64_t windowId_;
 
     class Impl;
 

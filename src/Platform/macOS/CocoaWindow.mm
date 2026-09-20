@@ -2,13 +2,12 @@
 
 #include "CocoaWindow.hpp"
 
-#include "GrainRootView.hpp"
-
-#include <grain/UI/View.hpp>
+#include <grain/Platform/View.hpp>
 
 #include <memory>
 #include <string>
 #include <string_view>
+
 
 namespace Grain::Platform {
 
@@ -16,24 +15,23 @@ class CocoaWindow::Impl {
 public:
     NSWindow* window = nil;
 
-    Grain::View* root_view = nullptr;
-
-    NSView* native_root_view = nil;
+    NSView* nativeRootView = nil;
 
     Grain::EventHandler eventHandler;
 };
 
 
 CocoaWindow::CocoaWindow(
-    WindowId id,
+    uint64_t id,
     std::string_view title,
     int width,
     int height,
     EventHandler eventHandler
-)
-    : windowId_(id),
-      impl_(std::make_unique<Impl>())
+    ) : windowId_(id),
+        impl_(std::make_unique<Impl>())
 {
+    std::cout << "CocoaWindow::CocoaWindow()" << std::endl;
+
     impl_->eventHandler = std::move(eventHandler);
 
     NSString* ns_title =
@@ -77,20 +75,21 @@ CocoaWindow::CocoaWindow(
 }
 
 
-CocoaWindow::~CocoaWindow()
-{
+CocoaWindow::~CocoaWindow() {
+    if (impl_ == nullptr) {
+        return;
+    }
+
+    impl_->nativeRootView = nil;
+
     if (impl_->window != nil) {
         [impl_->window close];
         impl_->window = nil;
     }
-
-    impl_->native_root_view = nil;
-    impl_->root_view = nullptr;
 }
 
 
-void CocoaWindow::show()
-{
+void CocoaWindow::show() {
     if (impl_->window == nil) {
         return;
     }
@@ -99,49 +98,50 @@ void CocoaWindow::show()
 }
 
 
+void CocoaWindow::requestRedraw() {
+    if (impl_ == nullptr ||
+        impl_->nativeRootView == nil) {
+        return;
+    }
+
+    std::cout << "CocoaWindow::requestRedraw()" << std::endl;
+    [impl_->nativeRootView setNeedsDisplay:YES];
+}
+
+
 void CocoaWindow::setRootView(
-    Grain::View* view
+    Grain::Platform::View* platformView
 )
 {
-    impl_->root_view = view;
+    std::cout << "CocoaWindow::setRootView(): "
+              << static_cast<const void*>(platformView)
+              << std::endl;
 
-    if (impl_->window == nil) {
+    if (impl_ == nullptr ||
+        impl_->window == nil) {
         return;
     }
 
     [impl_->window setContentView:nil];
+    impl_->nativeRootView = nil;
 
-    impl_->native_root_view = nil;
-
-    if (impl_->root_view == nullptr) {
+    if (platformView == nullptr) {
         return;
     }
 
-    impl_->native_root_view =
-        createGrainRootView(
-            impl_->root_view,
-            windowId_,
-            impl_->eventHandler
-        );
+    NSView* nativeView =
+        static_cast<NSView*>(platformView->nativeView());
 
-    if (impl_->native_root_view == nil) {
+    if (nativeView == nil) {
         return;
     }
 
-    [impl_->window
-        setContentView:impl_->native_root_view];
+    impl_->nativeRootView = nativeView;
 
-    NSView* content_view =
-        [impl_->window contentView];
+    [impl_->window setContentView:nativeView];
 
-    if (content_view != nil) {
-        impl_->native_root_view.frame =
-            content_view.bounds;
-
-        impl_->native_root_view.autoresizingMask =
-            NSViewWidthSizable |
-            NSViewHeightSizable;
-    }
+    [nativeView setAutoresizingMask:
+        NSViewWidthSizable | NSViewHeightSizable];
 }
 
 } // namespace Grain::Platform

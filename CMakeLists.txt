@@ -144,6 +144,16 @@ target_sources(
         Grain
         PRIVATE
         src/Core/ObjectBase.cpp
+        src/Math/Math.cpp
+        src/Math/Functions.cpp
+        src/Math/Interpolation.cpp
+        src/Math/Easing.cpp
+        src/Math/Polynomial.cpp
+        src/Math/Circle.cpp
+        src/Math/Sphere.cpp
+        src/Math/Geo.cpp
+        src/Math/Optics.cpp
+        src/Math/Quantization.cpp
         src/Math/Vec2.cpp
         src/Math/Quadrilateral.cpp
         src/String/String.cpp
@@ -152,9 +162,8 @@ target_sources(
         src/Graphics/Color.cpp
         src/Graphics/GraphicPathPoint.cpp
         src/Graphics/GraphicPath.cpp
-
         src/Input/Input.cpp
-        src/UI/View.cpp
+        src/Platform/View.cpp
 
         PUBLIC
         FILE_SET HEADERS
@@ -164,6 +173,17 @@ target_sources(
         include/Grain.hpp
         include/grain/Core/ObjectBase.hpp
         include/grain/Geometry/Layout.hpp
+        include/grain/Math/Math.hpp
+        include/grain/Math/Functions.hpp
+        include/grain/Math/Statistics.hpp
+        include/grain/Math/Interpolation.hpp
+        include/grain/Math/Easing.hpp
+        include/grain/Math/Polynomial.hpp
+        include/grain/Math/Circle.hpp
+        include/grain/Math/Sphere.hpp
+        include/grain/Math/Geo.hpp
+        include/grain/Math/Optics.hpp
+        include/grain/Math/Quantization.hpp
         include/grain/Math/Scalar.hpp
         include/grain/Math/Vec2.hpp
         include/grain/Math/Vec3.hpp
@@ -180,7 +200,7 @@ target_sources(
         include/grain/Input/Event.hpp
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
-        include/grain/UI/View.hpp
+        include/grain/Platform/View.hpp
         include/grain/Graphics/Color.hpp
         include/grain/Graphics/Canvas.hpp
         include/grain/Graphics/GraphicState.hpp
@@ -205,8 +225,9 @@ if(APPLE)
 
             src/Platform/macOS/CocoaApp.mm
             src/Platform/macOS/CocoaWindow.mm
-            src/Platform/macOS/GrainRootView.mm
+            src/Platform/macOS/CocoaView.mm
             src/Platform/macOS/CoreGraphicContext.mm
+            src/Platform/macOS/GrainRootView.mm
     )
 
     target_link_libraries(

@@ -2,9 +2,12 @@
 
 #include "CocoaApp.hpp"
 #include "CocoaWindow.hpp"
+#include "CocoaView.hpp"
 
 #include <memory>
 #include <string_view>
+#include <iostream>
+
 
 namespace Grain::Platform {
 
@@ -28,14 +31,14 @@ CocoaApp::CocoaApp()
 
 CocoaApp::~CocoaApp() = default;
 
-
 std::unique_ptr<Window> CocoaApp::createWindow(
-    WindowId id,
+    uint64_t id,
     std::string_view title,
     int width,
     int height
 )
 {
+    std::cout << "CocoaApp::createWindow()" << std::endl;
     return std::make_unique<CocoaWindow>(
         id,
         title,
@@ -48,8 +51,7 @@ std::unique_ptr<Window> CocoaApp::createWindow(
 }
 
 
-void CocoaApp::run()
-{
+void CocoaApp::run() {
     if (impl_->application == nil) {
         return;
     }
@@ -61,8 +63,7 @@ void CocoaApp::run()
 }
 
 
-void CocoaApp::quit()
-{
+void CocoaApp::quit() {
     if (impl_->application == nil) {
         return;
     }
@@ -71,8 +72,7 @@ void CocoaApp::quit()
 }
 
 
-std::unique_ptr<App> createApp()
-{
+std::unique_ptr<App> createApp() {
     return std::make_unique<CocoaApp>();
 }
 

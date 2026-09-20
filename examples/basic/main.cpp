@@ -3,15 +3,18 @@
 #include <cstdint>
 #include <iostream>
 
-constexpr double k = 0.5522847498307936;
-
 
 class TestView : public Grain::View {
 public:
+    double mx_{};
+    double my_{};
+
     void draw(Grain::GraphicContext& gc) override {
+        constexpr double k = 0.5522847498307936;
+
         gc.rotateDegrees(0);
-        gc.setFillColor({1, .8, .6, 1});
-        gc.fillRect({20.0, 20.0, 800.0 - 40.0, 600.0 - 40.0});
+        gc.setFillColor({0, 0, 0, 1});
+        gc.fillRect({0, 0, 2000, 1300});
 
         gc.setStrokeColor({0, 0, 0, 1});
 
@@ -22,13 +25,15 @@ public:
         path.addPoint({0.0, 0.0}, {-10.0, -20.0}, {10.0, -20.0});
         path.setClosed(true);
 
-        for (double y = 0; y < 1280; y += 45) {
-            for (double x = 0; x < 1920; x += 45) {
+        for (double y = 0; y < 1280; y += 50) {
+            for (double x = 0; x < 1920; x += 50) {
                 gc.save();
 
-                gc.translate(x + std::sin(y / 100) * 30, y);
+                gc.translate(x + std::sin(y / 100) * my_, y + std::sin(x / 100) * mx_);
+                gc.scale(3, 3);
+                gc.addPath(path);
 
-                gc.setFillColor({.2, .8, .4, 1});
+                gc.setFillColor({.2, .8, .4, .1});
                 gc.fillPath(path);
 
                 gc.setStrokeColor(Grain::Color::black());
@@ -38,6 +43,15 @@ public:
                 gc.restore();
             }
         }
+    }
+
+    void handleEvent(const Grain::Event& event) override {
+        if (event.type == Grain::EventType::KeyDown) {
+            std::cout << "Key" << std::endl;
+        }
+        mx_ = event.mouseX;
+        my_ = event.mouseY;
+        requestRedraw();
     }
 };
 
@@ -84,44 +98,19 @@ void stringExample() {
     }
 }
 
+
+using namespace Grain;
+
 int main() {
 
-    using namespace Grain;
-
-    GraphicPath path;
-
-    path.addPoint(
-        10.0, 10.0,
-        20.0, 10.0,
-        10.0, 20.0
-    );
-
-    path.rotatePointDegrees(0, 90.0);
-
-    const auto* point =
-        path.pointPtrAtIndex(0);
-
-    std::cout << "point->anchor,: " << point->anchor << " ... " << Vec2d{10.0, 10.0} << std::endl;
-    std::cout << "point->left,: " << point->left << " ... " << Vec2d{10.0, 20.0} << std::endl;
-    std::cout << "point->right,: " << point->anchor << " ... " << Vec2d{0.0, 10.0} << std::endl;
-
-    auto& app = Grain::App::instance();
-
-    stringExample();
-
-    auto* window = app.createWindow("Grain", 800, 600);
+    auto& app = App::instance();
+    auto window = app.createWindow("Grain", 400,  400);
     auto view = std::make_unique<TestView>();
-    view->setBounds({0.0, 0.0, 800.0, 600.0});
     window->setRootView(std::move(view));
-
-    {
-        auto* window2 = app.createWindow("Grain2", 800, 600);
-        auto view2 = std::make_unique<TestView>();
-        view2->setBounds({0.0, 0.0, 800.0, 600.0});
-        window2->setRootView(std::move(view2));
-    }
 
     app.run();
 
+
+    stringExample();
     return 0;
 }

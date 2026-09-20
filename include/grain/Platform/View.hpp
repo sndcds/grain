@@ -1,25 +1,29 @@
 #pragma once
 
-#include <grain/Core/ObjectBase.hpp>
 #include <grain/Graphics/GraphicContext.hpp>
+#include <grain/Input/Event.hpp>
+
+#include <memory>
 
 namespace Grain {
 
-class View : public ObjectBase {
+class Window;
+
+namespace Platform {
+class View;
+}
+
+class View {
 public:
-    using Coordinate = double;
-
-    View() = default;
-
-    ~View() override = default;
+    View();
 
     View(const View&) = delete;
-
     View& operator=(const View&) = delete;
 
     View(View&&) = delete;
-
     View& operator=(View&&) = delete;
+
+    virtual ~View();
 
     [[nodiscard]]
     const Rectd& bounds() const noexcept {
@@ -36,10 +40,23 @@ public:
     }
 
     virtual void draw(GraphicContext& context);
+    virtual void handleEvent(const Event& event);
+    virtual void requestRedraw();
 
 private:
+    class Impl;
+
+    std::unique_ptr<Impl> impl_;
+
+    void attach();
+
+    [[nodiscard]]
+    Platform::View* platformView() noexcept;
+
     Rectd bounds_{};
     View* parent_ = nullptr;
+
+    friend class Window;
 };
 
 } // namespace Grain

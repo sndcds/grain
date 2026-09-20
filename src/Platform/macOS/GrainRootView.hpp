@@ -2,18 +2,15 @@
 
 #import <AppKit/AppKit.h>
 
-#include <functional>
-
 #include <grain/Input/Event.hpp>
+
+#include <cstdint>
+
 
 namespace Grain {
 
 class View;
 
-NSView* createGrainRootView(
-    View* grainView,
-    WindowId windowId,
-    EventHandler eventHandler
-);
+NSView* createGrainRootView(View* grainView);
 
 } // namespace Grain

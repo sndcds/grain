@@ -3,6 +3,17 @@
 #include <grain/Core/ObjectBase.hpp>
 #include <grain/Containers/List.hpp>
 #include <grain/Geometry/Layout.hpp>
+#include <grain/Math/Math.hpp>
+#include <grain/Math/Functions.hpp>
+#include <grain/Math/Statistics.hpp>
+#include <grain/Math/Interpolation.hpp>
+#include <grain/Math/Easing.hpp>
+#include <grain/Math/Polynomial.hpp>
+#include <grain/Math/Circle.hpp>
+#include <grain/Math/Sphere.hpp>
+#include <grain/Math/Geo.hpp>
+#include <grain/Math/Optics.hpp>
+#include <grain/Math/Quantization.hpp>
 #include <grain/Math/Scalar.hpp>
 #include <grain/Math/Vec2.hpp>
 #include <grain/Math/Vec3.hpp>
@@ -17,7 +28,7 @@
 #include <grain/Input/Input.hpp>
 #include <grain/Platform/App.hpp>
 #include <grain/Platform/Window.hpp>
-#include <grain/UI/View.hpp>
+#include <grain/Platform/View.hpp>
 #include <grain/Graphics/Color.hpp>
 #include <grain/Graphics/Canvas.hpp>
 #include <grain/Graphics/GraphicState.hpp>

@@ -5,8 +5,6 @@
 
 namespace Grain {
 
-using WindowId = std::uint64_t;
-
 enum class EventType {
     None,
 
@@ -106,6 +104,7 @@ enum class Key {
 };
 
 enum class MouseButton {
+    None,
     Left,
     Right,
     Middle,
@@ -150,7 +149,7 @@ constexpr bool hasModifier(
 struct Event {
     EventType type = EventType::None;
 
-    WindowId windowId = 0;
+    uint64_t windowId = 0;
 
     // Keyboard
     Key key = Key::Unknown;

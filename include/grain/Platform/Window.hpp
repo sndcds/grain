@@ -3,9 +3,13 @@
 #include <grain/Input/Event.hpp>
 
 #include <memory>
-#include <string_view>
+
 
 namespace Grain {
+
+//------------------------------------------------------------------------------
+//  Forward declarations.
+//------------------------------------------------------------------------------
 
 class App;
 class View;
@@ -13,6 +17,13 @@ class View;
 namespace Platform {
 class Window;
 }
+
+
+//------------------------------------------------------------------------------
+//  Grain::Window
+//
+//  The portable public/window abstraction.
+//------------------------------------------------------------------------------
 
 class Window {
 public:
@@ -26,25 +37,23 @@ public:
 
     ~Window();
 
-    WindowId id() const noexcept;
+    uint64_t id() const noexcept;
 
     void show();
 
-    void setRootView(
-        std::unique_ptr<View> view
-        );
+    void requestRedraw();
+
+    void setRootView(std::unique_ptr<View> view);
 
 private:
     class Impl;
 
-    explicit Window(
-        std::unique_ptr<Impl> impl
-        );
+    explicit Window(std::unique_ptr<Impl> impl);
 
     static std::unique_ptr<Window> create(
-        WindowId id,
+        uint64_t id,
         std::unique_ptr<Platform::Window> platformWindow
-    );
+        );
 
     std::unique_ptr<Impl> impl_;
 

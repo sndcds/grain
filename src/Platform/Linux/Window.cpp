@@ -2,7 +2,7 @@
 #include "X11Window.hpp"
 
 #include "CairoGraphicContext.hpp"
-#include <grain/UI/View.hpp>
+#include <../../../include/grain/Platform/View.hpp>
 
 #include <cairo/cairo-xlib.h>
 

@@ -13,6 +13,8 @@ class View;
 
 namespace Platform {
 
+class View;
+
 class Window {
 public:
     Window(const Window&) = delete;
@@ -27,13 +29,28 @@ public:
 
     virtual void show() = 0;
 
-    virtual void setRootView(
-        View* view
-        ) = 0;
+    virtual void requestRedraw() = 0;
+
+    virtual void setRootView(Grain::Platform::View* platformView) = 0;
 
 protected:
     Window() = default;
 };
+
+
+class View {
+public:
+    virtual ~View() = default;
+
+    virtual void requestRedraw() = 0;
+
+    [[nodiscard]]
+    virtual void* nativeView() noexcept = 0;
+};
+
+
+std::unique_ptr<View> createView(Grain::View* view);
+
 
 class App {
 public:
@@ -48,7 +65,7 @@ public:
     virtual ~App() = default;
 
     virtual std::unique_ptr<Window> createWindow(
-        WindowId id,
+        uint64_t id,
         std::string_view title,
         int width,
         int height

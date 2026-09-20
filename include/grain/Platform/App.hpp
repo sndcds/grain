@@ -27,6 +27,8 @@ public:
         int height
         );
 
+    // View* addView(std::unique_ptr<View> view);
+
     Input& input() noexcept;
 
     const Input& input() const noexcept;
@@ -38,11 +40,12 @@ public:
 private:
     App();
 
-    ~App();
+    ~App() = default;
 
     void processEvent(const Event& event);
 
     class Impl;
+
     std::unique_ptr<Impl> impl_;
 };
 

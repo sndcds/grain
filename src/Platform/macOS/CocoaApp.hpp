@@ -5,6 +5,7 @@
 #include <memory>
 #include <string_view>
 
+
 namespace Grain::Platform {
 
 class CocoaApp final : public App {
@@ -14,13 +15,14 @@ public:
     ~CocoaApp() override;
 
     std::unique_ptr<Window> createWindow(
-        WindowId id,
+        uint64_t id,
         std::string_view title,
         int width,
         int height
         ) override;
 
     void run() override;
+
     void quit() override;
 
 private:

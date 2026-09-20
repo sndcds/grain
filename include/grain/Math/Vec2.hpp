@@ -258,9 +258,9 @@ public:
     }
 
     // Modification
-    constexpr void set(T x, T y) noexcept {
-        this->x = x;
-        this->y = y;
+    constexpr void set(T newX, T newY) noexcept {
+        this->x = newX;
+        this->y = newY;
     }
 
     constexpr void zero() noexcept {
