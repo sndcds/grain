@@ -162,6 +162,7 @@ target_sources(
         src/Graphics/Color.cpp
         src/Graphics/GraphicPathPoint.cpp
         src/Graphics/GraphicPath.cpp
+        src/Graphics/Font.cpp
         src/Input/Input.cpp
         src/Platform/View.cpp
 
@@ -172,7 +173,6 @@ target_sources(
         FILES
         include/Grain.hpp
         include/grain/Core/ObjectBase.hpp
-        include/grain/Geometry/Layout.hpp
         include/grain/Math/Math.hpp
         include/grain/Math/Functions.hpp
         include/grain/Math/Statistics.hpp
@@ -189,10 +189,12 @@ target_sources(
         include/grain/Math/Vec3.hpp
         include/grain/Math/Mat3.hpp
         include/grain/Math/Quadrilateral.hpp
+        include/grain/Geometry/Size.hpp
         include/grain/Geometry/Rect.hpp
         include/grain/Geometry/RemapRect.hpp
         include/grain/Geometry/RectLayout.hpp
         include/grain/Geometry/Bezier.hpp
+        include/grain/Geometry/Layout.hpp
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
         include/grain/Containers/List.hpp
@@ -207,6 +209,7 @@ target_sources(
         include/grain/Graphics/GraphicContext.hpp
         include/grain/Graphics/GraphicPathPoint.hpp
         include/grain/Graphics/GraphicPath.hpp
+        include/grain/Graphics/Font.hpp
 )
 
 # ---------------------------------------------------------------------------
@@ -227,6 +230,7 @@ if(APPLE)
             src/Platform/macOS/CocoaWindow.mm
             src/Platform/macOS/CocoaView.mm
             src/Platform/macOS/CoreGraphicContext.mm
+            src/Platform/macOS/CocoaFont.mm
             src/Platform/macOS/GrainRootView.mm
     )
 

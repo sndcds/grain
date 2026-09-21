@@ -3,14 +3,24 @@
 #include <cstdint>
 #include <iostream>
 
+void drawButton(Grain::GraphicContext& gc, const Grain::String& text, const Grain::Vec2d& pos, const Grain::Font& font) {
+    gc.setFillColor({1, 1, 1, 1});
+    gc.fillRect({pos.x, pos.y, 180, 32});
+    gc.setStrokeColor({0, 0.2, 0.5, 1});
+    gc.strokeRect({pos.x, pos.y, 180, 32});
+    gc.drawText("Hello", {pos.x + 10, pos.y + 15}, &font, {1, 0, 0, 0.2});
+}
+
 
 class TestView : public Grain::View {
 public:
     double mx_{};
     double my_{};
 
+
     void draw(Grain::GraphicContext& gc) override {
         constexpr double k = 0.5522847498307936;
+        /*
 
         gc.rotateDegrees(0);
         gc.setFillColor({0, 0, 0, 1});
@@ -40,6 +50,17 @@ public:
                 gc.setLineWidth(3.0);
                 gc.strokePath(path);
 
+                gc.restore();
+            }
+        }
+        */
+
+        Grain::Font font("ThisFontDefinitelyDoesNotExist_12345", 18.0f);
+        for (double y = 0; y < 1280; y += 20) {
+            for (double x = 0; x < 1920; x += 80) {
+                gc.save();
+                gc.translate(x + std::sin(y / 100) * my_, y + std::sin(x / 100) * mx_);
+                drawButton(gc, "Compile", {x, y}, font);
                 gc.restore();
             }
         }
@@ -107,6 +128,11 @@ int main() {
     auto window = app.createWindow("Grain", 400,  400);
     auto view = std::make_unique<TestView>();
     window->setRootView(std::move(view));
+
+    Font font("ThisFontDefinitelyDoesNotExist_12345", 24.0f);
+    std::cout << "font fontName: " << font.fontNameUtf8() << '\n';
+    std::cout << "font displayName: " << font.displayNameUtf8() << '\n';
+    std::cout << "font size: " << font.size() << '\n';
 
     app.run();
 

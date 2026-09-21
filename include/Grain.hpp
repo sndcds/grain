@@ -19,6 +19,7 @@
 #include <grain/Math/Vec3.hpp>
 #include <grain/Math/Mat3.hpp>
 #include <grain/Math/Quadrilateral.hpp>
+#include <grain/Geometry/Size.hpp>
 #include <grain/Geometry/Line.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/RemapRect.hpp>
@@ -35,3 +36,4 @@
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Graphics/GraphicPathPoint.hpp>
 #include <grain/Graphics/GraphicPath.hpp>
+#include <grain/Graphics/Font.hpp>

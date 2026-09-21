@@ -36,6 +36,8 @@ public:
 
     void strokePath(const GraphicPath& path) override;
 
+    void drawText(const String& text, const Vec2d& pos, const Font* font, const Color& color) override;
+
     void translate(double x, double y) override;
 
     void scale(double x, double y) override;
@@ -43,6 +45,15 @@ public:
     void rotate(double radians) override;
 
     void rotateDegrees(double degrees) override;
+
+
+    //--------------------------------------------------------------------------
+    //  Helper
+    //--------------------------------------------------------------------------
+
+    void setTextMatrix(double a, double b, double c, double d, double tx, double ty);
+
+    static CGColorRef createCGColor(const Grain::Color& color);
 
 private:
     CGContextRef context_ = nullptr;

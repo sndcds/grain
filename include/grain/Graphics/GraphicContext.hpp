@@ -3,6 +3,7 @@
 #include <iostream>
 #include <grain/Graphics/GraphicState.hpp>
 #include <grain/Graphics/Color.hpp>
+#include <grain/Graphics/Font.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Graphics/GraphicPath.hpp>
 
@@ -139,6 +140,8 @@ public:
     virtual void fillPath(const GraphicPath& path) = 0;
 
     virtual void strokePath(const GraphicPath& path) = 0;
+
+    virtual void drawText(const String& text, const Vec2d& pos, const Font* font, const Color& color) = 0;
 
 
     //--------------------------------------------------------------------------

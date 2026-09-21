@@ -1,5 +1,6 @@
 #include "CoreGraphicContext.hpp"
 #include "grain/Geometry/Bezier.hpp"
+#include <CoreText/CoreText.h>
 
 #include <cmath>
 
@@ -162,6 +163,40 @@ void CoreGraphicContext::strokePath(const GraphicPath& path) {
 
 }
 
+void CoreGraphicContext::drawText(const String& text, const Vec2d& pos, const Font* font, const Color& color) {
+    if (!font) {
+        return;
+    }
+
+    setTextMatrix(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
+
+    CGColorRef cgTextColor = createCGColor(color);
+
+    CFStringRef keys[] = { kCTFontAttributeName, kCTForegroundColorAttributeName };
+    CFTypeRef values[] = { font->nativeHandle(), cgTextColor };
+
+    CFDictionaryRef cf_str_attr =
+            CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
+                               (const void**)&values, sizeof(keys) / sizeof(keys[0]),
+                               &kCFTypeDictionaryKeyCallBacks,
+                               &kCFTypeDictionaryValueCallBacks);
+
+
+    CFStringRef cf_str = CFStringCreateWithCString(NULL, text.utf8(), kCFStringEncodingUTF8);
+    CFAttributedStringRef cf_attr_str = CFAttributedStringCreate(kCFAllocatorDefault, cf_str, cf_str_attr);
+
+    CTLineRef line = CTLineCreateWithAttributedString(cf_attr_str);
+
+    CGContextSetTextPosition(context_, pos.x, pos.y);
+    CTLineDraw(line, context_);
+
+    CFRelease(cf_str);
+    CFRelease(cf_str_attr);
+    CFRelease(cf_attr_str);
+    CFRelease(line);
+    CGColorRelease(cgTextColor);
+}
+
 
 void CoreGraphicContext::translate(double x, double y) {
     if (context_ == nullptr) {
@@ -209,6 +244,42 @@ void CoreGraphicContext::rotateDegrees(double degrees) {
         context_,
         radians
     );
+}
+
+
+//------------------------------------------------------------------------------
+//  Helper
+//------------------------------------------------------------------------------
+
+void CoreGraphicContext::setTextMatrix(double a, double b, double c, double d, double tx, double ty) {
+    // d = -d;
+    CGContextSetTextMatrix(context_, CGAffineTransformMake(a, b, c, d, tx, ty));
+}
+
+
+CGColorRef CoreGraphicContext::createCGColor(const Grain::Color& color) {
+    const CGFloat components[] = {
+        static_cast<CGFloat>(color.red),
+        static_cast<CGFloat>(color.green),
+        static_cast<CGFloat>(color.blue),
+        static_cast<CGFloat>(color.alpha)
+    };
+
+    CGColorSpaceRef color_space =
+        CGColorSpaceCreateDeviceRGB();
+
+    if (color_space == nullptr) {
+        return nullptr;
+    }
+
+    CGColorRef cg_color =
+        CGColorCreate(
+            color_space,
+            components);
+
+    CGColorSpaceRelease(color_space);
+
+    return cg_color;
 }
 
 } // namespace Grain

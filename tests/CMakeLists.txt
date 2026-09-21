@@ -17,6 +17,8 @@ add_executable(
         Math/OpticsTests.cpp
         Math/QuantizationTests.cpp
         Math/SphereTests.cpp
+        Math/PolynomialTests.cpp
+        Geometry/SizeTests.cpp
         Geometry/LineTests.cpp
         Geometry/RectTests.cpp
         Geometry/RectLayoutTests.cpp
@@ -24,6 +26,7 @@ add_executable(
         Geometry/BezierTests.cpp
         Graphics/GraphicPathPointTests.cpp
         Graphics/GraphicPathTests.cpp
+        Graphics/FontTests.cpp
         String/StringTests.cpp
         String/StringUtf8Tests.cpp
         Input/InputTests.cpp

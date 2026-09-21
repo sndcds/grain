@@ -94,7 +94,7 @@ int32_t solveQuadratic(
 }
 
 
-inline int32_t solveCubic(
+int32_t solveCubic(
     const double a,
     const double b,
     const double c,
@@ -234,7 +234,7 @@ inline int32_t solveCubic(
 }
 
 
-inline int32_t solveCubicBezier(
+int32_t solveCubicBezier(
     const double p0,
     const double p1,
     const double p2,
