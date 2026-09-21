@@ -3,12 +3,19 @@
 #include <cstdint>
 #include <iostream>
 
-void drawButton(Grain::GraphicContext& gc, const Grain::String& text, const Grain::Vec2d& pos, const Grain::Font& font) {
+void drawButton(Grain::GraphicContext& gc, const Grain::String& text, const Grain::Rectd& bounds, const Grain::Font& font) {
+    double radius = 14;
     gc.setFillColor({1, 1, 1, 1});
-    gc.fillRect({pos.x, pos.y, 180, 32});
-    gc.setStrokeColor({0, 0.2, 0.5, 1});
-    gc.strokeRect({pos.x, pos.y, 180, 32});
-    gc.drawText("Hello", {pos.x + 10, pos.y + 15}, &font, {1, 0, 0, 0.2});
+    gc.addRoundRectPath(bounds, radius);
+    gc.fillPath();
+    // gc.setStrokeSize(1);
+    auto b = bounds;
+    b.inset(0.5);
+    gc.addRoundRectPath(b, radius);
+    gc.setStrokeColor({0, 0, 0, 1});
+    gc.strokePath();
+    // gc.strokeRect({bounds.x + 0.5, bounds.y + 0.5, bounds.width - 1, bounds.height - 1});
+    gc.drawTextInRect(text, bounds, Grain::Alignment::Center, &font, {0, 0, 0, 1});
 }
 
 
@@ -16,7 +23,6 @@ class TestView : public Grain::View {
 public:
     double mx_{};
     double my_{};
-
 
     void draw(Grain::GraphicContext& gc) override {
         constexpr double k = 0.5522847498307936;
@@ -55,12 +61,12 @@ public:
         }
         */
 
-        Grain::Font font("ThisFontDefinitelyDoesNotExist_12345", 18.0f);
-        for (double y = 0; y < 1280; y += 20) {
-            for (double x = 0; x < 1920; x += 80) {
+        Grain::Font font("Jetbrains", 28.0f);
+        for (double y = 0; y < 1280; y += 200) {
+            for (double x = 0; x < 1920; x += 300) {
                 gc.save();
-                gc.translate(x + std::sin(y / 100) * my_, y + std::sin(x / 100) * mx_);
-                drawButton(gc, "Compile", {x, y}, font);
+                gc.translate(std::sin(y / 100) * my_, std::sin(x / 100) * mx_);
+                drawButton(gc, "Compile", {x, y, 160, 34}, font);
                 gc.restore();
             }
         }

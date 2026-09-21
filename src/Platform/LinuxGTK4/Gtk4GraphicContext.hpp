@@ -23,8 +23,7 @@ public:
 
     void fillRect(const Rectd& rect) override;
     void strokeRect(const Rectd& rect) override;
-    void fillPath(const GraphicPath& path) override;
-    void strokePath(const GraphicPath& path) override;
+    void strokePath() override;
 
 private:
     void rectangle(const Rectd& rect) noexcept;

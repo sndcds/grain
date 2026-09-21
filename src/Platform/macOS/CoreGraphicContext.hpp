@@ -3,6 +3,8 @@
 #include <CoreGraphics/CoreGraphics.h>
 
 #include <grain/Graphics/GraphicContext.hpp>
+#include <grain/Geometry/Layout.hpp>
+
 
 namespace Grain {
 
@@ -28,15 +30,26 @@ public:
     void curveTo(const Vec2d& control1, const Vec2d& control2, const Vec2d& point) noexcept override;
     void closePath() noexcept  override;
 
+    void fillPath() override;
+
     void fillRect(const Rectd& rect) override;
+
+    void strokePath() override;
 
     void strokeRect(const Rectd& rect) override;
 
-    void fillPath(const GraphicPath& path) override;
+    void drawText(
+        const String& text,
+        const Vec2d& pos,
+        const Font* font,
+        const Color& color) override;
 
-    void strokePath(const GraphicPath& path) override;
-
-    void drawText(const String& text, const Vec2d& pos, const Font* font, const Color& color) override;
+    double drawTextInRect(
+        const String& text,
+        const Rectd& rect,
+        Alignment alignment,
+        const Font* font,
+        const Color& color) override;
 
     void translate(double x, double y) override;
 
