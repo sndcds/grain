@@ -24,9 +24,8 @@ public:
     double mx_{};
     double my_{};
 
-    void draw(Grain::GraphicContext& gc) override {
+    void drawContent(Grain::GraphicContext& gc) override {
         constexpr double k = 0.5522847498307936;
-        /*
 
         gc.rotateDegrees(0);
         gc.setFillColor({0, 0, 0, 1});
@@ -50,26 +49,30 @@ public:
                 gc.addPath(path);
 
                 gc.setFillColor({.2, .8, .4, .1});
-                gc.fillPath(path);
+                gc.fillPath();
 
                 gc.setStrokeColor(Grain::Color::black());
                 gc.setLineWidth(3.0);
-                gc.strokePath(path);
+                gc.strokePath();
 
                 gc.restore();
             }
         }
-        */
 
-        Grain::Font font("Jetbrains", 28.0f);
+        static Grain::Font* font{};
+        if (!font) {
+            font = new Grain::Font("Jetbrains", 28.0f);
+        }
+
         for (double y = 0; y < 1280; y += 200) {
             for (double x = 0; x < 1920; x += 300) {
                 gc.save();
                 gc.translate(std::sin(y / 100) * my_, std::sin(x / 100) * mx_);
-                drawButton(gc, "Compile", {x, y, 160, 34}, font);
+                drawButton(gc, "Compile", {x, y, 160, 34}, *font);
                 gc.restore();
             }
         }
+
     }
 
     void handleEvent(const Grain::Event& event) override {
@@ -133,7 +136,20 @@ int main() {
     auto& app = App::instance();
     auto window = app.createWindow("Grain", 400,  400);
     auto view = std::make_unique<TestView>();
+
+    for (double y = 0; y < 1280; y += 50) {
+        for (double x = 0; x < 1920; x += 160) {
+            auto& button = view->addComponent<Button>("Hello");
+            button.setBounds({x, y, 150.0, 40.0});
+            button.setAction([&] {
+                // Button clicked
+            });
+        }
+    }
+
     window->setRootView(std::move(view));
+
+
 
     Font font("ThisFontDefinitelyDoesNotExist_12345", 24.0f);
     std::cout << "font fontName: " << font.fontNameUtf8() << '\n';

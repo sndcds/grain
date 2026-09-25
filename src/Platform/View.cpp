@@ -5,8 +5,6 @@
 #include <memory>
 
 namespace Grain {
-
-
 class View::Impl {
 public:
     std::unique_ptr<Platform::View> platformView;
@@ -42,18 +40,33 @@ Platform::View* View::platformView() noexcept {
 }
 
 
-void View::draw(GraphicContext& context) {
-    (void)context;
+void View::draw(GraphicContext& gc) {
+    drawContent(gc);
+    drawComponents(gc);
+}
+
+
+void View::drawContent(GraphicContext& gc) {
+    (void)gc;
 }
 
 
 void View::handleEvent(const Event& event) {
+
+    for (auto it = components_.rbegin();
+        it != components_.rend();
+        ++it) {
+        if ((*it)->visible() &&
+            (*it)->handleEvent(event)) {
+        }
+    }
+
     (void)event;
 }
 
 
 void View::requestRedraw() {
-    if (impl_ == nullptr) {
+    if (impl_->platformView == nullptr) {
         return;
     }
 

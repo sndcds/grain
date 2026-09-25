@@ -1,6 +1,7 @@
 #pragma once
 
 #include <grain/Platform/Font.hpp>
+#include "CFObject.hpp"
 
 #include <CoreText/CoreText.h>
 
@@ -16,7 +17,7 @@ public:
         const String& name,
         float size) noexcept;
 
-    ~CocoaFont() noexcept override;
+    ~CocoaFont() noexcept = default;
 
     CocoaFont(const CocoaFont&) = delete;
     CocoaFont& operator=(const CocoaFont&) = delete;
@@ -32,6 +33,8 @@ public:
 
     [[nodiscard]]
     bool isValid() const noexcept override;
+
+    void resetMetrics() noexcept;
 
     void set(
         const String& name,
@@ -94,7 +97,8 @@ public:
         double& out_cursor_x) const noexcept override;
 
     void* nativeHandle() const noexcept override {
-        return (void*)(ct_font_);
+        return const_cast<void*>(
+            static_cast<const void*>(ct_font_.get()));
     }
 
 private:
@@ -123,7 +127,7 @@ private:
 
     Rectd bounding_box_{};
 
-    CTFontRef ct_font_ = nullptr;
+    CFObject<CTFontRef> ct_font_;
 };
 
 } // namespace Grain::Platform

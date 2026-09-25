@@ -3,9 +3,6 @@
 #include "CocoaView.hpp"
 #include "GrainRootView.hpp"
 
-#include <iostream>
-
-
 namespace Grain::Platform {
 
 class CocoaView::Impl {
@@ -16,24 +13,14 @@ public:
 CocoaView::CocoaView(Grain::View* view)
     : impl_(std::make_unique<Impl>())
 {
-    std::cout << "CocoaView::CocoaView()" << std::endl;
     if (view == nullptr) {
         return;
     }
 
-    impl_->nativeView =
-        Grain::createGrainRootView(view);
+    impl_->nativeView = Grain::createGrainRootView(view);
 }
 
-
-CocoaView::~CocoaView() {
-    if (impl_ == nullptr) {
-        return;
-    }
-
-    impl_->nativeView = nil;
-}
-
+CocoaView::~CocoaView() = default;
 
 void CocoaView::requestRedraw() {
     if (impl_ == nullptr ||
@@ -44,15 +31,13 @@ void CocoaView::requestRedraw() {
     [impl_->nativeView setNeedsDisplay:YES];
 }
 
-
 void* CocoaView::nativeView() noexcept {
     if (impl_ == nullptr) {
         return nullptr;
     }
 
-    return impl_->nativeView;
+    return static_cast<void*>(impl_->nativeView);
 }
-
 
 std::unique_ptr<View> createView(Grain::View* grainView) {
     return std::make_unique<CocoaView>(grainView);

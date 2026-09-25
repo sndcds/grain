@@ -1,4 +1,5 @@
 #include "CoreGraphicContext.hpp"
+#include "CFObject.hpp"
 #include "grain/Geometry/Bezier.hpp"
 #include <CoreText/CoreText.h>
 
@@ -163,43 +164,94 @@ void CoreGraphicContext::strokePath() {
     }
 }
 
+
 void CoreGraphicContext::drawText(
     const String& text,
     const Vec2d& pos,
     const Font* font,
     const Color& color
 ) {
-    if (!font) {
+    if (context_ == nullptr || font == nullptr) {
         return;
     }
 
     setTextMatrix(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
 
-    CGColorRef cgTextColor = createCGColor(color);
+    CFObject<CGColorRef> cgTextColor(createCGColor(color));
 
-    CFStringRef keys[] = { kCTFontAttributeName, kCTForegroundColorAttributeName };
-    CFTypeRef values[] = { font->nativeHandle(), cgTextColor };
+    if (!cgTextColor) {
+        return;
+    }
 
-    CFDictionaryRef cfStrAttr =
-            CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
-                               (const void**)&values, sizeof(keys) / sizeof(keys[0]),
-                               &kCFTypeDictionaryKeyCallBacks,
-                               &kCFTypeDictionaryValueCallBacks);
+    CFStringRef keys[] = {
+        kCTFontAttributeName,
+        kCTForegroundColorAttributeName
+    };
 
+    CFTypeRef values[] = {
+        font->nativeHandle(),
+        cgTextColor.get()
+    };
 
-    CFStringRef cfStr = CFStringCreateWithCString(NULL, text.utf8(), kCFStringEncodingUTF8);
-    CFAttributedStringRef cfAttrStr = CFAttributedStringCreate(kCFAllocatorDefault, cfStr, cfStrAttr);
+    CFObject<CFDictionaryRef> attributes(
+        CFDictionaryCreate(
+            kCFAllocatorDefault,
+            reinterpret_cast<const void**>(keys),
+            reinterpret_cast<const void**>(values),
+            2,
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks
+        )
+    );
 
-    CTLineRef line = CTLineCreateWithAttributedString(cfAttrStr);
+    if (!attributes) {
+        return;
+    }
 
-    CGContextSetTextPosition(context_, pos.x, pos.y);
-    CTLineDraw(line, context_);
+    CFObject<CFStringRef> cfString(
+        CFStringCreateWithCString(
+            kCFAllocatorDefault,
+            text.utf8(),
+            kCFStringEncodingUTF8
+        )
+    );
 
-    CFRelease(cfStr);
-    CFRelease(cfStrAttr);
-    CFRelease(cfAttrStr);
-    CFRelease(line);
-    CGColorRelease(cgTextColor);
+    if (!cfString) {
+        return;
+    }
+
+    CFObject<CFAttributedStringRef> attributedString(
+        CFAttributedStringCreate(
+            kCFAllocatorDefault,
+            cfString.get(),
+            attributes.get()
+        )
+    );
+
+    if (!attributedString) {
+        return;
+    }
+
+    CFObject<CTLineRef> line(
+        CTLineCreateWithAttributedString(
+            attributedString.get()
+        )
+    );
+
+    if (!line) {
+        return;
+    }
+
+    CGContextSetTextPosition(
+        context_,
+        pos.x,
+        pos.y
+    );
+
+    CTLineDraw(
+        line.get(),
+        context_
+    );
 }
 
 
@@ -209,87 +261,158 @@ double CoreGraphicContext::drawTextInRect(
     Alignment alignment,
     const Font* font,
     const Color& color
-){
-        if (!font) {
-            return 0.0;
-        }
-
-        setTextMatrix(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
-
-        CGColorRef cgTextColor = createCGColor(color);
-
-        CFStringRef keys[] = { kCTFontAttributeName, kCTForegroundColorAttributeName };
-        CFTypeRef values[] = { font->nativeHandle(), cgTextColor };
-
-        CFDictionaryRef cf_str_attr =
-                CFDictionaryCreate(
-                        kCFAllocatorDefault,
-                        (const void**)&keys,
-                        (const void**)&values,
-                        2, // sizeof(keys) / sizeof(keys[0]),
-                        &kCFTypeDictionaryKeyCallBacks,
-                        &kCFTypeDictionaryValueCallBacks);
-
-        CFStringRef cf_str = CFStringCreateWithCString(NULL, text.utf8(), kCFStringEncodingUTF8);
-        CFAttributedStringRef cf_attr_str = CFAttributedStringCreate(kCFAllocatorDefault, cf_str, cf_str_attr);
-
-        CTLineRef line = CTLineCreateWithAttributedString(cf_attr_str);
-
-        CGFloat ascent, descent, leading;
-        double textWidth = CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-        double textX, textY;
-
-        // Horizontal alignment
-        switch (alignment) {
-            case Alignment::Center:
-            case Alignment::Top:
-            case Alignment::Bottom:
-                textX = rect.x + rect.width / 2 - textWidth / 2;
-                break;
-
-            case Alignment::Right:
-            case Alignment::TopRight:
-            case Alignment::BottomRight:
-                textX = rect.x + rect.width - textWidth;
-                break;
-
-            default:
-                textX = rect.x;
-                break;
-        }
-
-        // Vertical alignment
-        switch (alignment) {
-            case Alignment::Center:
-            case Alignment::Left:
-            case Alignment::Right:
-                textY = rect.y + rect.height / 2 + (ascent - descent) / 2;
-                break;
-
-            case Alignment::BottomLeft:
-            case Alignment::Bottom:
-            case Alignment::BottomRight:
-                textY = rect.y + descent;
-                break;
-
-            default:
-                textY = rect.y + rect.height - ascent;
-                break;
-        }
-
-        CGContextSetTextPosition(context_, textX, textY);
-        CTLineDraw(line, context_);
-
-        CGRect lineBounds = CTLineGetImageBounds(line, context_);
-
-        CFRelease(cf_str);
-        CFRelease(cf_str_attr);
-        CFRelease(cf_attr_str);
-        CFRelease(line);
-        CGColorRelease(cgTextColor);
-
-        return lineBounds.size.width;
+) {
+    if (context_ == nullptr || font == nullptr) {
+        return 0.0;
     }
+
+    setTextMatrix(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
+
+    CFObject<CGColorRef> cgTextColor(createCGColor(color));
+
+    if (!cgTextColor) {
+        return 0.0;
+    }
+
+    CFStringRef keys[] = {
+        kCTFontAttributeName,
+        kCTForegroundColorAttributeName
+    };
+
+    CFTypeRef values[] = {
+        font->nativeHandle(),
+        cgTextColor.get()
+    };
+
+    CFObject<CFDictionaryRef> attributes(
+        CFDictionaryCreate(
+            kCFAllocatorDefault,
+            reinterpret_cast<const void**>(keys),
+            reinterpret_cast<const void**>(values),
+            2,
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks
+        )
+    );
+
+    if (!attributes) {
+        return 0.0;
+    }
+
+    CFObject<CFStringRef> cfString(
+        CFStringCreateWithCString(
+            kCFAllocatorDefault,
+            text.utf8(),
+            kCFStringEncodingUTF8
+        )
+    );
+
+    if (!cfString) {
+        return 0.0;
+    }
+
+    CFObject<CFAttributedStringRef> attributedString(
+        CFAttributedStringCreate(
+            kCFAllocatorDefault,
+            cfString.get(),
+            attributes.get()
+        )
+    );
+
+    if (!attributedString) {
+        return 0.0;
+    }
+
+    CFObject<CTLineRef> line(
+        CTLineCreateWithAttributedString(
+            attributedString.get()
+        )
+    );
+
+    if (!line) {
+        return 0.0;
+    }
+
+    CGFloat ascent;
+    CGFloat descent;
+    CGFloat leading;
+
+    const double textWidth = CTLineGetTypographicBounds(
+        line.get(),
+        &ascent,
+        &descent,
+        &leading
+    );
+
+    double textX;
+    double textY;
+
+    // Horizontal alignment
+    switch (alignment) {
+        case Alignment::Center:
+        case Alignment::Top:
+        case Alignment::Bottom:
+            textX =
+                rect.x +
+                rect.width / 2.0 -
+                textWidth / 2.0;
+            break;
+
+        case Alignment::Right:
+        case Alignment::TopRight:
+        case Alignment::BottomRight:
+            textX =
+                rect.x +
+                rect.width -
+                textWidth;
+            break;
+
+        default:
+            textX = rect.x;
+            break;
+    }
+
+    // Vertical alignment
+    switch (alignment) {
+        case Alignment::Center:
+        case Alignment::Left:
+        case Alignment::Right:
+            textY =
+                rect.y +
+                rect.height / 2.0 +
+                (ascent - descent) / 2.0;
+            break;
+
+        case Alignment::BottomLeft:
+        case Alignment::Bottom:
+        case Alignment::BottomRight:
+            textY = rect.y + descent;
+            break;
+
+        default:
+            textY = rect.y + rect.height - ascent;
+            break;
+    }
+
+    CGContextSetTextPosition(
+        context_,
+        textX,
+        textY
+    );
+
+    CTLineDraw(
+        line.get(),
+        context_
+    );
+
+    const CGRect lineBounds =
+        CTLineGetImageBounds(
+            line.get(),
+            context_
+        );
+
+    return lineBounds.size.width;
+}
 
 
 void CoreGraphicContext::translate(double x, double y) {

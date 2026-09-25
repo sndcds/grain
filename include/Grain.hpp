@@ -37,3 +37,5 @@
 #include <grain/Graphics/GraphicPathPoint.hpp>
 #include <grain/Graphics/GraphicPath.hpp>
 #include <grain/Graphics/Font.hpp>
+#include <grain/UI/Component.hpp>
+#include <grain/UI/Button.hpp>
