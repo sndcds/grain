@@ -23,18 +23,20 @@ public:
     void setAction(Action action);
     void click();
 
-    void setEnabled(bool enabled) noexcept;
-    [[nodiscard]] bool enabled() const noexcept;
+    bool handleEvent(const Event& event) override {
+        if (event.type == Grain::EventType::MouseButtonDown) {
+            if (bounds_.contains(Vec2(event.mouseX, event.mouseY))) {
+                std::cout << "Button::handleEvent" << std::endl;
+                click();
+            }
+        }
+        return false;
+    }
 
-    void setPressed(bool pressed) noexcept;
-    [[nodiscard]] bool pressed() const noexcept;
 
 private:
     std::string title_;
     Action action_;
-
-    bool enabled_ = true;
-    bool pressed_ = false;
 };
 
 }

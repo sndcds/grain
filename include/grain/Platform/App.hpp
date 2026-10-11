@@ -21,6 +21,8 @@ public:
 
     App& operator=(App&&) = delete;
 
+    bool setIcon(const std::string& path);
+
     Window* createWindow(
         std::string_view title,
         int width,

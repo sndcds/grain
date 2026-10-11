@@ -221,7 +221,11 @@ target_sources(
 
         src/Platform/View.cpp
 
+        src/UI/Component.cpp
         src/UI/Button.cpp
+
+        src/Animation/Animation.cpp
+        src/Animation/AnimationDriver.cpp
 
 
         PUBLIC
@@ -280,6 +284,9 @@ target_sources(
 
         include/grain/UI/Component.hpp
         include/grain/UI/Button.hpp
+
+        include/grain/Animation/Animation.hpp
+        include/grain/Animation/AnimationDriver.hpp
 )
 
 # ------------------------------------------------------------------------------
@@ -296,13 +303,13 @@ if(APPLE)
 
             src/Platform/App.cpp
             src/Platform/Window.cpp
-
             src/Platform/macOS/CocoaApp.mm
             src/Platform/macOS/CocoaWindow.mm
             src/Platform/macOS/CocoaView.mm
             src/Platform/macOS/CoreGraphicContext.mm
             src/Platform/macOS/CocoaFont.mm
             src/Platform/macOS/GrainRootView.mm
+            src/Platform/macOS/MacOSAnimationDriver.mm
     )
 
     target_link_libraries(
@@ -310,6 +317,7 @@ if(APPLE)
             PUBLIC
             "-framework AppKit"
             "-framework CoreGraphics"
+            "-framework CoreVideo"
     )
 
 elseif(WIN32)

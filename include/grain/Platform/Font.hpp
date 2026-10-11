@@ -90,6 +90,12 @@ public:
 };
 
 [[nodiscard]]
+std::vector<String> availableFontNames() noexcept;
+
+[[nodiscard]]
+std::vector<String> availableFontFamilies() noexcept;
+
+[[nodiscard]]
 std::unique_ptr<Font> createFont(
     const String& name,
     float size) noexcept;

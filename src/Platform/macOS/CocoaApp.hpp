@@ -14,6 +14,8 @@ public:
 
     ~CocoaApp() override;
 
+    bool setIcon(const std::string& path) override;
+
     std::unique_ptr<Window> createWindow(
         uint64_t id,
         std::string_view title,

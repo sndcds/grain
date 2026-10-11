@@ -1,5 +1,7 @@
 #pragma once
 
+#include "grain/Platform/View.hpp"
+
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Input/Event.hpp>
@@ -41,6 +43,13 @@ public:
         }
     }
 
+
+    [[nodiscard]] bool enabled() const noexcept;
+    void setEnabled(bool enabled) noexcept;
+
+    [[nodiscard]] bool pressed() const noexcept;
+    void setPressed(bool pressed) noexcept;
+
     [[nodiscard]] bool visible() const noexcept {
         return visible_;
     }
@@ -55,16 +64,18 @@ public:
     virtual void draw(GraphicContext& gc) = 0;
 
     virtual bool handleEvent(const Event& event) {
+        std::cout << "Component::handleEvent" << std::endl;
         return false;
     }
 
 protected:
-    void invalidate() noexcept {
-        std::cout << "invalidate called" << std::endl;
-    }
+    void invalidate() noexcept;
 
     Rectd bounds_{};
     View* view_ = nullptr;
+
+    bool enabled_ = true;
+    bool pressed_ = false;
     bool visible_ = true;
 };
 

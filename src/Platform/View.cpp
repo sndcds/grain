@@ -10,7 +10,6 @@ public:
     std::unique_ptr<Platform::View> platformView;
 };
 
-
 View::View()
     : impl_(std::make_unique<Impl>())
 {
@@ -37,6 +36,16 @@ Platform::View* View::platformView() noexcept {
     }
 
     return impl_->platformView.get();
+}
+
+
+void View::drawComponents(GraphicContext& gc) {
+    for (auto& component : components_) {
+        if (component->visible()) {
+            component->draw(gc);
+
+        }
+    }
 }
 
 

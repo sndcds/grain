@@ -12,10 +12,28 @@ Button::Button(View* view, std::string title)
 }
 
 void Button::draw(GraphicContext& gc) {
-    std::cout << "draw button\n";
+    static Font* font;
+    if (!font) {
+        font = new Grain::Font("SFPro-Regular", 15.0f);
+    }
 
-    gc.setFillColor({1, 0, 0, 0.4});
-    gc.fillRect(bounds_);
+    auto b = bounds_;
+    b.inset(.5);
+    double radius = bounds_.height / 2.5;
+    gc.setFillColor({1, 1, 1, 1});
+    gc.addRoundRectPath(b, radius);
+    gc.fillPath();
+    // gc.setStrokeSize(1);
+    // gc.addRoundRectPath(b, radius);
+    gc.setStrokeColor({0, 0, 0, 1});
+    // gc.strokePath();
+
+    gc.drawTextInRect(
+        "kulturbytes",
+        bounds_,
+        Grain::Alignment::Center,
+        font,
+        {0, 0, 0, 1});
 }
 
 void Button::setTitle(std::string title) {
@@ -35,34 +53,6 @@ void Button::click() {
     if (enabled_ && action_) {
         action_();
     }
-}
-
-void Button::setEnabled(bool enabled) noexcept {
-    if (enabled_ == enabled) {
-        return;
-    }
-
-    enabled_ = enabled;
-
-    if (view()) {
-        view()->requestRedraw();
-    }
-}
-
-bool Button::enabled() const noexcept {
-    return enabled_;
-}
-
-void Button::setPressed(bool pressed) noexcept {
-    pressed_ = pressed;
-
-    if (view()) {
-        view()->requestRedraw();
-    }
-}
-
-bool Button::pressed() const noexcept {
-    return pressed_;
 }
 
 }

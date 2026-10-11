@@ -5,10 +5,13 @@
 #include <grain/UI/Component.hpp>
 
 #include <memory>
+#include <utility>
+#include <vector>
 
 namespace Grain {
 
 class Window;
+class Component;
 
 namespace Platform {
 class View;
@@ -55,13 +58,7 @@ public:
         return result;
     }
 
-    void drawComponents(GraphicContext& gc) {
-        for (auto& component : components_) {
-            if (component->visible()) {
-                component->draw(gc);
-            }
-        }
-    }
+    void drawComponents(GraphicContext& gc);
 
     virtual void draw(GraphicContext& context);
     virtual void drawContent(GraphicContext& gc);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <grain/Input/Event.hpp>
+#include <grain/String/String.hpp>
 
 #include <functional>
 #include <memory>
@@ -12,6 +13,7 @@ namespace Grain {
 class View;
 
 namespace Platform {
+
 
 class View;
 
@@ -63,6 +65,9 @@ public:
     App& operator=(App&&) = delete;
 
     virtual ~App() = default;
+
+    virtual bool setIcon(const std::string& path) = 0;
+
 
     virtual std::unique_ptr<Window> createWindow(
         uint64_t id,

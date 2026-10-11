@@ -485,6 +485,117 @@ int32_t CocoaFont::charIndexAtX(
 }
 
 
+std::vector<String> availableFontNames() noexcept {
+    std::vector<String> result;
+
+    CFObject<CTFontCollectionRef> collection(
+        CTFontCollectionCreateFromAvailableFonts(nullptr));
+
+    if (!collection) {
+        return result;
+    }
+
+    CFObject<CFArrayRef> descriptors(
+        CTFontCollectionCreateMatchingFontDescriptors(
+            collection.get()));
+
+    if (!descriptors) {
+        return result;
+    }
+
+    const CFIndex count = CFArrayGetCount(descriptors.get());
+
+    result.reserve(static_cast<std::size_t>(count));
+
+    for (CFIndex i = 0; i < count; ++i) {
+        auto descriptor =
+            static_cast<CTFontDescriptorRef>(
+                const_cast<void*>(
+                    CFArrayGetValueAtIndex(descriptors.get(), i)));
+
+        if (!descriptor) {
+            continue;
+        }
+
+        CFObject<CFStringRef> name(
+            static_cast<CFStringRef>(
+                CTFontDescriptorCopyAttribute(
+                    descriptor,
+                    kCTFontNameAttribute)));
+
+        if (!name) {
+            continue;
+        }
+
+        // Assuming String has a constructor from UTF-8.
+        char buffer[1024];
+
+        if (CFStringGetCString(
+                name.get(),
+                buffer,
+                sizeof(buffer),
+                kCFStringEncodingUTF8)) {
+            result.emplace_back(buffer);
+        }
+    }
+
+    return result;
+}
+
+
+std::vector<String> availableFontFamilies() noexcept {
+    std::vector<String> result;
+
+    CFObject<CTFontCollectionRef> collection(
+        CTFontCollectionCreateFromAvailableFonts(nullptr));
+
+    if (!collection) {
+        return result;
+    }
+
+    CFObject<CFArrayRef> descriptors(
+        CTFontCollectionCreateMatchingFontDescriptors(
+            collection.get()));
+
+    if (!descriptors) {
+        return result;
+    }
+
+    const CFIndex count = CFArrayGetCount(descriptors.get());
+
+    result.reserve(static_cast<std::size_t>(count));
+
+    for (CFIndex i = 0; i < count; ++i) {
+        auto descriptor =
+            static_cast<CTFontDescriptorRef>(
+                const_cast<void*>(
+                    CFArrayGetValueAtIndex(descriptors.get(), i)));
+
+        CFObject<CFStringRef> family(
+            static_cast<CFStringRef>(
+                CTFontDescriptorCopyAttribute(
+                    descriptor,
+                    kCTFontFamilyNameAttribute)));
+
+        if (!family) {
+            continue;
+        }
+
+        char buffer[1024];
+
+        if (CFStringGetCString(
+                family.get(),
+                buffer,
+                sizeof(buffer),
+                kCFStringEncodingUTF8)) {
+            result.emplace_back(buffer);
+        }
+    }
+
+    return result;
+}
+
+
 std::unique_ptr<Font> createFont(
     const String& name,
     float size) noexcept

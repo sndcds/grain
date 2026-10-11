@@ -30,6 +30,7 @@
 #include <grain/Platform/App.hpp>
 #include <grain/Platform/Window.hpp>
 #include <grain/Platform/View.hpp>
+#include <grain/Platform/Font.hpp>
 #include <grain/Graphics/Color.hpp>
 #include <grain/Graphics/Canvas.hpp>
 #include <grain/Graphics/GraphicState.hpp>
@@ -39,3 +40,5 @@
 #include <grain/Graphics/Font.hpp>
 #include <grain/UI/Component.hpp>
 #include <grain/UI/Button.hpp>
+#include <grain/Animation/Animation.hpp>
+#include <grain/Animation/AnimationDriver.hpp>

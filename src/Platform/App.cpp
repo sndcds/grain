@@ -29,7 +29,6 @@ public:
 
 App& App::instance() {
     static App app;
-    std::cout << "App::instance()" << std::endl;
     return app;
 }
 
@@ -37,7 +36,6 @@ App& App::instance() {
 App::App()
     : impl_(std::make_unique<Impl>())
 {
-    std::cout << "App::App()" << std::endl;
     if (impl_->platformApp != nullptr) {
         impl_->platformApp->setEventHandler(
             [this](const Event& event) {
@@ -45,6 +43,15 @@ App::App()
             }
         );
     }
+}
+
+
+bool App::setIcon(const std::string& path) {
+    if (impl_ == nullptr || impl_->platformApp == nullptr) {
+        return false;
+    }
+
+    return impl_->platformApp->setIcon(path);
 }
 
 
