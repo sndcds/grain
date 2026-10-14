@@ -59,21 +59,21 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 @interface GrainRootView : NSView
 
 - (instancetype)initWithFrame:(NSRect)frame
-                    grainView:(Grain::View*)grainView;
+                   grain_view:(Grain::View*)grain_view;
 
 @end
 
 @implementation GrainRootView {
-    Grain::View* grainView_;
+    Grain::View* grain_view_;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame
-                    grainView:(Grain::View*)grainView
+                   grain_view:(Grain::View*)grain_view
 {
     self = [super initWithFrame:frame];
 
     if (self) {
-        grainView_ = grainView;
+        grain_view_ = grain_view;
         self.wantsLayer = NO;
     }
 
@@ -89,7 +89,7 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 - (void)drawRect:(NSRect)dirtyRect {
     (void)dirtyRect;
 
-    if (grainView_ == nullptr) {
+    if (grain_view_ == nullptr) {
         return;
     }
 
@@ -102,7 +102,7 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 
     Grain::CoreGraphicContext graphicContext(context);
 
-    grainView_->draw(graphicContext);
+    grain_view_->draw(graphicContext);
 }
 
 
@@ -114,7 +114,7 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
                   type:(Grain::EventType)type
                 button:(Grain::MouseButton)button
 {
-    if (grainView_ == nullptr) {
+    if (grain_view_ == nullptr) {
         return;
     }
 
@@ -122,19 +122,19 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
         [self convertPoint:event.locationInWindow
                   fromView:nil];
 
-    Grain::Event grainEvent;
+    Grain::Event grain_event;
 
-    grainEvent.type = type;
-    grainEvent.mouseX = point.x;
-    grainEvent.mouseY = point.y;
+    grain_event.type_ = type;
+    grain_event.mouse_pos_.x = point.x;
+    grain_event.mouse_pos_.y = point.y;
 
-    grainEvent.deltaX = event.deltaX;
-    grainEvent.deltaY = event.deltaY;
+    grain_event.mouse_delta_.x = event.deltaX;
+    grain_event.mouse_delta_.y = event.deltaY;
 
-    grainEvent.mouseButton = button;
-    grainEvent.modifiers = Grain::keyModifiersFromEvent(event);
+    grain_event.mouse_button_ = button;
+    grain_event.modifiers_ = Grain::keyModifiersFromEvent(event);
 
-    grainView_->handleEvent(grainEvent);
+    grain_view_->handleEvent(grain_event);
 }
 
 
@@ -142,43 +142,37 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 //  Mouse button events.
 //------------------------------------------------------------------------------
 
-- (void)mouseDown:(NSEvent*)event
-{
+- (void)mouseDown:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseButtonDown
                   button:Grain::MouseButton::Left];
 }
 
-- (void)mouseUp:(NSEvent*)event
-{
+- (void)mouseUp:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseButtonUp
                   button:Grain::MouseButton::Left];
 }
 
-- (void)rightMouseDown:(NSEvent*)event
-{
+- (void)rightMouseDown:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseButtonDown
                   button:Grain::MouseButton::Right];
 }
 
-- (void)rightMouseUp:(NSEvent*)event
-{
+- (void)rightMouseUp:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseButtonUp
                   button:Grain::MouseButton::Right];
 }
 
-- (void)otherMouseDown:(NSEvent*)event
-{
+- (void)otherMouseDown:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseButtonDown
                   button:Grain::mouseButtonFromEvent(event)];
 }
 
-- (void)otherMouseUp:(NSEvent*)event
-{
+- (void)otherMouseUp:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseButtonUp
                   button:Grain::mouseButtonFromEvent(event)];
@@ -189,8 +183,7 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 //  Mouse movement.
 //------------------------------------------------------------------------------
 
-- (void)mouseMoved:(NSEvent*)event
-{
+- (void)mouseMoved:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseMove
                   button:Grain::MouseButton::None];
@@ -201,22 +194,19 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 //  Mouse dragging.
 //------------------------------------------------------------------------------
 
-- (void)mouseDragged:(NSEvent*)event
-{
+- (void)mouseDragged:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseMove
                   button:Grain::MouseButton::Left];
 }
 
-- (void)rightMouseDragged:(NSEvent*)event
-{
+- (void)rightMouseDragged:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseMove
                   button:Grain::MouseButton::Right];
 }
 
-- (void)otherMouseDragged:(NSEvent*)event
-{
+- (void)otherMouseDragged:(NSEvent*)event {
     [self emitMouseEvent:event
                     type:Grain::EventType::MouseMove
                   button:Grain::mouseButtonFromEvent(event)];
@@ -227,22 +217,21 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 //  Keaboard.
 //------------------------------------------------------------------------------
 
-- (void)keyDown:(NSEvent*)event
-{
-    if (grainView_ == nullptr) {
+- (void)keyDown:(NSEvent*)event {
+    if (grain_view_ == nullptr) {
         return;
     }
 
-    Grain::Event grainEvent;
+    Grain::Event grain_event;
 
-    grainEvent.type = Grain::EventType::KeyDown;
-    grainEvent.modifiers =
+    grain_event.type_ = Grain::EventType::KeyDown;
+    grain_event.modifiers_ =
         Grain::keyModifiersFromEvent(event);
 
     // Translate the Cocoa key information here.
-    // grainEvent.key = ...
+    // grain_event.key = ...
 
-    grainView_->handleEvent(grainEvent);
+    grain_view_->handleEvent(grain_event);
 }
 
 
@@ -250,13 +239,11 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 //  First responder.
 //------------------------------------------------------------------------------
 
-- (BOOL)acceptsFirstResponder
-{
+- (BOOL)acceptsFirstResponder {
     return YES;
 }
 
-- (BOOL)acceptsFirstMouse:(NSEvent*)event
-{
+- (BOOL)acceptsFirstMouse:(NSEvent*)event {
     (void)event;
     return YES;
 }
@@ -268,14 +255,14 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 
 namespace Grain {
 
-NSView* createGrainRootView(View* grainView) {
-    if (grainView == nullptr) {
+NSView* createGrainRootView(View* grain_view) {
+    if (grain_view == nullptr) {
         return nil;
     }
 
     return [[GrainRootView alloc]
         initWithFrame:NSZeroRect
-            grainView:grainView];
+            grain_view:grain_view];
 }
 
 } // namespace Grain

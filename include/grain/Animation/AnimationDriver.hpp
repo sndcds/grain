@@ -7,7 +7,7 @@
 
 namespace Grain {
 
-class MacOSAnimationDriver;
+class CocoaAnimationDriver;
 
 class AnimationDriver {
 public:

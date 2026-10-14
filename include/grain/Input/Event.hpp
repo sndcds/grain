@@ -1,5 +1,7 @@
 #pragma once
 
+#include <grain/Math/Vec2.hpp>
+
 #include <cstdint>
 #include <functional>
 
@@ -147,35 +149,26 @@ constexpr bool hasModifier(
 }
 
 struct Event {
-    EventType type = EventType::None;
+    EventType type_ = EventType::None;
 
-    uint64_t windowId = 0;
+    uint64_t window_id_ = 0;
 
     // Keyboard
-    Key key = Key::Unknown;
-    KeyModifiers modifiers = KeyModifiers::None;
+    Key key_ = Key::Unknown;
+    KeyModifiers modifiers_ = KeyModifiers::None;
 
-    // Text input.
-    char32_t character = U'\0';
+    // Text input
+    char32_t character_ = U'\0';
 
-    // Mouse position.
-    double mouseX = 0.0;
-    double mouseY = 0.0;
-
-    // Mouse movement.
-    double deltaX = 0.0;
-    double deltaY = 0.0;
-
-    // Mouse button.
-    MouseButton mouseButton = MouseButton::Left;
-
-    // Mouse wheel.
-    double wheelX = 0.0;
-    double wheelY = 0.0;
+    // Mouse
+    Vec2d mouse_pos_{};
+    Vec2d mouse_delta_{};
+    Vec2d mouse_wheel_{};
+    MouseButton mouse_button_ = MouseButton::Left;
 
     // Window dimensions.
-    int width = 0;
-    int height = 0;
+    int width_ = 0;
+    int height_ = 0;
 };
 
 using EventHandler = std::function<void(const Event&)>;

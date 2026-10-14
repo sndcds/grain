@@ -1,6 +1,6 @@
 #include <grain/Animation/AnimationDriver.hpp>
 
-#include "../../src/Platform/macOS/MacOSAnimationDriver.hpp"
+#include "../../src/Platform/macOS/CocoaAnimationDriver.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -11,7 +11,7 @@ namespace Grain {
 class AnimationDriver::Impl {
 public:
     std::vector<std::unique_ptr<Animation>> animations;
-    std::unique_ptr<MacOSAnimationDriver> platformDriver;
+    std::unique_ptr<CocoaAnimationDriver> platformDriver;
 };
 
 AnimationDriver& AnimationDriver::instance() {
@@ -23,7 +23,7 @@ AnimationDriver::AnimationDriver()
     : impl_(std::make_unique<Impl>())
 {
     impl_->platformDriver =
-        std::make_unique<MacOSAnimationDriver>(
+        std::make_unique<CocoaAnimationDriver>(
             [this]() {
                 tick();
             });

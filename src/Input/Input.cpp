@@ -39,16 +39,14 @@ void Input::beginFrame() noexcept {
         mouseButtonsReleased_[index] = false;
     }
 
-    mouseDeltaX_ = 0.0;
-    mouseDeltaY_ = 0.0;
-    wheelDeltaX_ = 0.0;
-    wheelDeltaY_ = 0.0;
+    mouse_delta_ = {0.0, 0.0};
+    mouse_wheel_delta_ = {0.0, 0.0};
 }
 
 void Input::processEvent(const Event& event) noexcept {
-    switch (event.type) {
+    switch (event.type_) {
     case EventType::KeyDown: {
-        const int index = keyIndex(event.key);
+        const int index = keyIndex(event.key_);
 
         if (index < 0) {
             break;
@@ -63,7 +61,7 @@ void Input::processEvent(const Event& event) noexcept {
     }
 
     case EventType::KeyUp: {
-        const int index = keyIndex(event.key);
+        const int index = keyIndex(event.key_);
 
         if (index < 0) {
             break;
@@ -78,15 +76,12 @@ void Input::processEvent(const Event& event) noexcept {
     }
 
     case EventType::MouseMove:
-        mouseDeltaX_ += event.deltaX;
-        mouseDeltaY_ += event.deltaY;
-
-        mouseX_ = event.mouseX;
-        mouseY_ = event.mouseY;
+        mouse_delta_ += event.mouse_delta_;
+        mouse_pos_ = event.mouse_pos_;
         break;
 
     case EventType::MouseButtonDown: {
-        const int index = mouseButtonIndex(event.mouseButton);
+        const int index = mouseButtonIndex(event.mouse_button_);
 
         if (index < 0) {
             break;
@@ -101,7 +96,7 @@ void Input::processEvent(const Event& event) noexcept {
     }
 
     case EventType::MouseButtonUp: {
-        const int index = mouseButtonIndex(event.mouseButton);
+        const int index = mouseButtonIndex(event.mouse_button_);
 
         if (index < 0) {
             break;
@@ -116,8 +111,7 @@ void Input::processEvent(const Event& event) noexcept {
     }
 
     case EventType::MouseWheel:
-        wheelDeltaX_ += event.wheelX;
-        wheelDeltaY_ += event.wheelY;
+        mouse_wheel_delta_ += event.mouse_wheel_;
         break;
 
     default:
@@ -162,11 +156,11 @@ bool Input::wasMouseButtonReleased(MouseButton button) const noexcept {
 }
 
 Vec2d Input::mousePosition() const noexcept {
-    return Vec2d(mouseX_, mouseY_);
+    return mouse_pos_;
 }
 
 Vec2d Input::mouseDelta() const noexcept {
-    return Vec2d(mouseDeltaX_, mouseDeltaY_);
+    return mouse_delta_;
 }
 
 } // namespace Grain

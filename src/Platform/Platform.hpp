@@ -12,7 +12,19 @@ namespace Grain {
 
 class View;
 
+
 namespace Platform {
+
+class View {
+public:
+    virtual ~View() = default;
+
+    virtual void requestRedraw() = 0;
+
+    [[nodiscard]]
+    virtual void* nativeView() noexcept = 0;
+    virtual Vec2d mousePos() const noexcept = 0;
+};
 
 
 class View;
@@ -37,17 +49,6 @@ public:
 
 protected:
     Window() = default;
-};
-
-
-class View {
-public:
-    virtual ~View() = default;
-
-    virtual void requestRedraw() = 0;
-
-    [[nodiscard]]
-    virtual void* nativeView() noexcept = 0;
 };
 
 

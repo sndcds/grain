@@ -3,38 +3,79 @@
 #include "grain/Platform/View.hpp"
 
 namespace Grain {
-
-void Component::setEnabled(bool enabled) noexcept {
-    if (enabled_ == enabled) {
-        return;
-    }
-
-    enabled_ = enabled;
-
-    if (view_) {
-        view_->requestRedraw();
-    }
+bool Component::contains(const Vec2d& point) const noexcept {
+    const auto& rect = bounds();
+    return rect.contains(point);
 }
+
 
 bool Component::enabled() const noexcept {
     return enabled_;
 }
 
-void Component::setPressed(bool pressed) noexcept {
-    pressed_ = pressed;
 
-    if (view_) {
-        view_->requestRedraw();
+void Component::setEnabled(bool enabled) noexcept {
+    if (enabled_ != enabled) {
+        enabled_ = enabled;
+        invalidate();
     }
 }
+
+
+bool Component::hovered() const noexcept {
+    return hovered_;
+}
+
+
+void Component::setHovered(bool hovered) noexcept {
+    if (hovered_ != hovered) {
+        hovered_ = hovered;
+        invalidate();
+    }
+}
+
+
+void Component::setFocused(bool focused) noexcept {
+    if (focused_ != focused) {
+        focused_ = focused;
+        invalidate();
+    }
+}
+
+bool Component::focused() const noexcept {
+    return focused_;
+}
+
 
 bool Component::pressed() const noexcept {
     return pressed_;
 }
 
 
+void Component::setPressed(bool pressed) noexcept {
+    if (pressed_ != pressed) {
+        pressed_ = pressed;
+        invalidate();
+    }
+}
+
+
+bool Component::visible() const noexcept {
+    return visible_;
+}
+
+void Component::setVisible(bool visible) noexcept {
+    if (visible_ != visible) {
+        visible_ = visible;
+        invalidate();
+    }
+}
+
+
 void Component::invalidate() noexcept {
-    view_->requestRedraw();
+    if (view_) {
+        view_->requestRedraw();
+    }
 }
 
 }

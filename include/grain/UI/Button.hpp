@@ -23,15 +23,7 @@ public:
     void setAction(Action action);
     void click();
 
-    bool handleEvent(const Event& event) override {
-        if (event.type == Grain::EventType::MouseButtonDown) {
-            if (bounds_.contains(Vec2(event.mouseX, event.mouseY))) {
-                std::cout << "Button::handleEvent" << std::endl;
-                click();
-            }
-        }
-        return false;
-    }
+    bool handleEvent(const Event& event) override;
 
 
 private:

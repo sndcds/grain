@@ -43,28 +43,28 @@ public:
         }
     }
 
+    virtual bool contains(const Vec2d& pos) const noexcept;
+
 
     [[nodiscard]] bool enabled() const noexcept;
     void setEnabled(bool enabled) noexcept;
 
+    [[nodiscard]] bool hovered() const noexcept;
+    void setHovered(bool hovered) noexcept;
+
+    [[nodiscard]] bool focused() const noexcept;
+    void setFocused(bool hovered) noexcept;
+
     [[nodiscard]] bool pressed() const noexcept;
     void setPressed(bool pressed) noexcept;
 
-    [[nodiscard]] bool visible() const noexcept {
-        return visible_;
-    }
-
-    void setVisible(bool visible) noexcept {
-        if (visible_ != visible) {
-            visible_ = visible;
-            invalidate();
-        }
-    }
+    [[nodiscard]] bool visible() const noexcept;
+    void setVisible(bool visible) noexcept;
 
     virtual void draw(GraphicContext& gc) = 0;
 
     virtual bool handleEvent(const Event& event) {
-        std::cout << "Component::handleEvent" << std::endl;
+        (void)event;
         return false;
     }
 
@@ -75,6 +75,8 @@ protected:
     View* view_ = nullptr;
 
     bool enabled_ = true;
+    bool hovered_ = false;
+    bool focused_ = false;
     bool pressed_ = false;
     bool visible_ = true;
 };

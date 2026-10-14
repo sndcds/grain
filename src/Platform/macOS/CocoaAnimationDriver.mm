@@ -1,4 +1,4 @@
-#include "MacOSAnimationDriver.hpp"
+#include "CocoaAnimationDriver.hpp"
 
 #include <CoreVideo/CoreVideo.h>
 #include <dispatch/dispatch.h>
@@ -9,10 +9,9 @@ namespace Grain {
 
 namespace {
 
-void runOnMainThread(void* context)
-{
+void runOnMainThread(void* context) {
     auto* source =
-        static_cast<MacOSAnimationDriver*>(context);
+        static_cast<CocoaAnimationDriver*>(context);
 
     if (source != nullptr) {
         source->runMainThreadTick();
@@ -28,7 +27,7 @@ CVReturn displayLinkCallback(
     void* context)
 {
     auto* source =
-        static_cast<MacOSAnimationDriver*>(context);
+        static_cast<CocoaAnimationDriver*>(context);
 
     if (source != nullptr) {
         source->scheduleTick();
@@ -39,7 +38,7 @@ CVReturn displayLinkCallback(
 
 } // namespace
 
-MacOSAnimationDriver::MacOSAnimationDriver(
+CocoaAnimationDriver::CocoaAnimationDriver(
     std::function<void()> tickCallback)
     : tickCallback_(std::move(tickCallback))
 {
@@ -53,8 +52,7 @@ MacOSAnimationDriver::MacOSAnimationDriver(
     }
 }
 
-MacOSAnimationDriver::~MacOSAnimationDriver()
-{
+CocoaAnimationDriver::~CocoaAnimationDriver() {
     stop();
 
     if (displayLink_ != nullptr) {
@@ -63,8 +61,7 @@ MacOSAnimationDriver::~MacOSAnimationDriver()
     }
 }
 
-void MacOSAnimationDriver::start()
-{
+void CocoaAnimationDriver::start() {
     if (displayLink_ == nullptr || running_) {
         return;
     }
@@ -74,8 +71,7 @@ void MacOSAnimationDriver::start()
     }
 }
 
-void MacOSAnimationDriver::stop()
-{
+void CocoaAnimationDriver::stop() {
     if (displayLink_ == nullptr || !running_) {
         return;
     }
@@ -85,13 +81,11 @@ void MacOSAnimationDriver::stop()
     running_ = false;
 }
 
-bool MacOSAnimationDriver::isRunning() const noexcept
-{
+bool CocoaAnimationDriver::isRunning() const noexcept {
     return running_;
 }
 
-void MacOSAnimationDriver::scheduleTick()
-{
+void CocoaAnimationDriver::scheduleTick() {
     if (!running_) {
         return;
     }
@@ -111,8 +105,7 @@ void MacOSAnimationDriver::scheduleTick()
         runOnMainThread);
 }
 
-void MacOSAnimationDriver::runMainThreadTick()
-{
+void CocoaAnimationDriver::runMainThreadTick() {
     if (running_ && tickCallback_) {
         tickCallback_();
     }

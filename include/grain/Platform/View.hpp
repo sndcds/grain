@@ -17,14 +17,17 @@ namespace Platform {
 class View;
 }
 
+
 class View {
 public:
     View();
 
     View(const View&) = delete;
+
     View& operator=(const View&) = delete;
 
     View(View&&) = delete;
+
     View& operator=(View&&) = delete;
 
     virtual ~View();
@@ -43,12 +46,12 @@ public:
         return parent_;
     }
 
-    template<typename T, typename... Args>
+    template <typename T, typename... Args>
     T& addComponent(Args&&... args) {
         auto component = std::make_unique<T>(
             this,
             std::forward<Args>(args)...
-        );
+            );
 
         T& result = *component;
         components_.push_back(std::move(component));
@@ -61,9 +64,18 @@ public:
     void drawComponents(GraphicContext& gc);
 
     virtual void draw(GraphicContext& context);
+
     virtual void drawContent(GraphicContext& gc);
+
     virtual void handleEvent(const Event& event);
+
     virtual void requestRedraw();
+
+    [[nodiscard]]
+    const Vec2d mousePos() noexcept {
+        return queryMousePos();
+    }
+
 
 private:
     class Impl;
@@ -75,10 +87,24 @@ private:
     [[nodiscard]]
     Platform::View* platformView() noexcept;
 
+    void updateHoveredComponent(Component* component);
+
+    void updateFocusedComponent(Component* component);
+
+    Component* hitTest(const Vec2d& pos) noexcept;
+
+    [[nodiscard]]
+    Vec2d queryMousePos() const noexcept;
+
     Rectd bounds_{};
     View* parent_ = nullptr;
+    Vec2d mouse_pos_{};
 
-    std::vector<std::unique_ptr<Component>> components_;
+    std::vector<std::unique_ptr<Component> > components_;
+
+    // Interaction states
+    Component* hovered_component_ = nullptr;
+    Component* focused_component_ = nullptr;
 
     friend class Window;
 };

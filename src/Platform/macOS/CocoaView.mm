@@ -10,6 +10,7 @@ public:
     NSView* nativeView = nil;
 };
 
+
 CocoaView::CocoaView(Grain::View* view)
     : impl_(std::make_unique<Impl>())
 {
@@ -20,7 +21,9 @@ CocoaView::CocoaView(Grain::View* view)
     impl_->nativeView = Grain::createGrainRootView(view);
 }
 
+
 CocoaView::~CocoaView() = default;
+
 
 void CocoaView::requestRedraw() {
     if (impl_ == nullptr ||
@@ -31,6 +34,7 @@ void CocoaView::requestRedraw() {
     [impl_->nativeView setNeedsDisplay:YES];
 }
 
+
 void* CocoaView::nativeView() noexcept {
     if (impl_ == nullptr) {
         return nullptr;
@@ -38,6 +42,27 @@ void* CocoaView::nativeView() noexcept {
 
     return static_cast<void*>(impl_->nativeView);
 }
+
+
+Vec2d CocoaView::mousePos() const noexcept {
+    if (impl_ == nullptr || impl_->nativeView == nil) {
+        return {};
+    }
+
+    NSView* view = impl_->nativeView;
+    NSWindow* window = view.window;
+
+    if (window == nil) {
+        return {};
+    }
+
+    NSPoint screenPoint = [NSEvent mouseLocation];
+    NSPoint windowPoint = [window convertPointFromScreen:screenPoint];
+    NSPoint viewPoint = [view convertPoint:windowPoint fromView:nil];
+
+    return {viewPoint.x, viewPoint.y};
+}
+
 
 std::unique_ptr<View> createView(Grain::View* grainView) {
     return std::make_unique<CocoaView>(grainView);

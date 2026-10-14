@@ -222,6 +222,7 @@ target_sources(
         src/Platform/View.cpp
 
         src/UI/Component.cpp
+        src/UI/Label.cpp
         src/UI/Button.cpp
 
         src/Animation/Animation.cpp
@@ -283,6 +284,7 @@ target_sources(
         include/grain/Graphics/Font.hpp
 
         include/grain/UI/Component.hpp
+        include/grain/UI/Label.hpp
         include/grain/UI/Button.hpp
 
         include/grain/Animation/Animation.hpp
@@ -309,7 +311,7 @@ if(APPLE)
             src/Platform/macOS/CoreGraphicContext.mm
             src/Platform/macOS/CocoaFont.mm
             src/Platform/macOS/GrainRootView.mm
-            src/Platform/macOS/MacOSAnimationDriver.mm
+            src/Platform/macOS/CocoaAnimationDriver.mm
     )
 
     target_link_libraries(

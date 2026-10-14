@@ -3,25 +3,10 @@
 #include <cstdint>
 #include <iostream>
 
-void drawButton(Grain::GraphicContext& gc, const Grain::String& text, const Grain::Rectd& bounds, const Grain::Font& font) {
-    double radius = 14;
-    gc.setFillColor({0, 0, 0, 1});
-    gc.addRoundRectPath(bounds, radius);
-    gc.fillPath();
-    // gc.setStrokeSize(1);
-    auto b = bounds;
-    b.inset(0.5);
-    gc.addRoundRectPath(b, radius);
-    gc.setStrokeColor({1, 1, 1, 1});
-    gc.strokePath();
-    // gc.strokeRect({bounds.x + 0.5, bounds.y + 0.5, bounds.width - 1, bounds.height - 1});
-    gc.drawTextInRect(text, bounds, Grain::Alignment::Center, &font, {1, 1, 1, 1});
-}
 
 class TestView : public Grain::View {
 public:
-    double mx_{};
-    double my_{};
+    Grain::Vec2d mouse_pos_{};
 
     double animationX_ = 0.0;
     double rotation_ = 0.0;
@@ -63,7 +48,7 @@ public:
     }
 
     void handleEvent(const Grain::Event& event) override {
-        if (event.type == Grain::EventType::KeyDown) {
+        if (event.type_ == Grain::EventType::KeyDown) {
             std::cout << "KeyDown" << std::endl;
             startAnimation();
         }
@@ -71,8 +56,7 @@ public:
             View::handleEvent(event);
         }
 
-        mx_ = event.mouseX;
-        my_ = event.mouseY;
+        mouse_pos_ = event.mouse_pos_;
 
         requestRedraw();
     }
@@ -125,7 +109,6 @@ void stringExample() {
 using namespace Grain;
 
 int main() {
-
     auto& app = App::instance();
     app.setIcon("/Users/roaldchristesen/Documents/Pippa/Pippa Logo.png");
 
@@ -134,30 +117,39 @@ int main() {
     {
         auto view = std::make_unique<TestView>();
 
+        int i = 0;
         for (double y = 20; y < 1280; y += 50) {
             for (double x = 20; x < 1920; x += 160) {
-                auto& button = view->addComponent<Button>("Hello");
-                button.setBounds({x, y, 120.0, 30.0});
 
-                button.setAction([&button, x, y] {
-                    auto& driver = Grain::AnimationDriver::instance();
+                if ((i % 7) == 0) {
+                    auto& label = view->addComponent<Label>("Hello");
+                    label.setBounds({x, y, 120.0, 30.0});
+                }
+                else {
+                    auto& button = view->addComponent<Button>("Hello");
+                    button.setBounds({x, y, 120.0, 30.0});
 
-                    driver.start();
+                    button.setAction([&button, x, y] -> void {
+                        auto& driver = Grain::AnimationDriver::instance();
 
-                    driver.animate(
-                        0.0,
-                        1.0,
-                        [&button, x, y](Grain::Animation& animation) {
-                            const double progress = animation.progress();
+                        driver.start();
 
-                            button.setBounds({
-                                x + 100.0 * progress,
-                                y,
-                                120.0,
-                                30.0
+                        driver.animate(
+                            0.0,
+                            1.0,
+                            [&button, x, y](Grain::Animation& animation) -> void {
+                                const double progress = animation.progress();
+
+                                button.setBounds({
+                                    x + 100.0 * progress,
+                                    y,
+                                    120.0,
+                                    30.0
+                                });
                             });
-                        });
-                });
+                    });
+                }
+                i++;
             }
         }
 
@@ -177,5 +169,4 @@ int main() {
     app.run();
 
     stringExample();
-    return 0;
 }

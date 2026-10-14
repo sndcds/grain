@@ -7,15 +7,15 @@
 
 namespace Grain {
 
-class MacOSAnimationDriver {
+class CocoaAnimationDriver {
 public:
-    explicit MacOSAnimationDriver(
+    explicit CocoaAnimationDriver(
         std::function<void()> tickCallback);
 
-    ~MacOSAnimationDriver();
+    ~CocoaAnimationDriver();
 
-    MacOSAnimationDriver(const MacOSAnimationDriver&) = delete;
-    MacOSAnimationDriver& operator=(const MacOSAnimationDriver&) = delete;
+    CocoaAnimationDriver(const CocoaAnimationDriver&) = delete;
+    CocoaAnimationDriver& operator=(const CocoaAnimationDriver&) = delete;
 
     void start();
     void stop();

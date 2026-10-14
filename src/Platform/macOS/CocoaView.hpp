@@ -15,6 +15,9 @@ public:
     [[nodiscard]]
     void* nativeView() noexcept override;
 
+    [[nodiscard]]
+    Vec2d mousePos() const noexcept;
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl_;

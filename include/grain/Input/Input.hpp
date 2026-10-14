@@ -65,14 +65,9 @@ private:
     bool mouseButtonsPressed_[MouseButtonCount]{};
     bool mouseButtonsReleased_[MouseButtonCount]{};
 
-    double mouseX_ = 0.0;
-    double mouseY_ = 0.0;
-
-    double mouseDeltaX_ = 0.0;
-    double mouseDeltaY_ = 0.0;
-
-    double wheelDeltaX_ = 0.0;
-    double wheelDeltaY_ = 0.0;
+    Vec2d mouse_pos_{};
+    Vec2d mouse_delta_{};
+    Vec2d mouse_wheel_delta_{};
 };
 
 } // namespace Grain

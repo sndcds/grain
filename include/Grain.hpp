@@ -39,6 +39,7 @@
 #include <grain/Graphics/GraphicPath.hpp>
 #include <grain/Graphics/Font.hpp>
 #include <grain/UI/Component.hpp>
+#include <grain/UI/Label.hpp>
 #include <grain/UI/Button.hpp>
 #include <grain/Animation/Animation.hpp>
 #include <grain/Animation/AnimationDriver.hpp>

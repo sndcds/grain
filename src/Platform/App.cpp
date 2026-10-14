@@ -155,14 +155,13 @@ void App::quit() noexcept {
 void App::processEvent(const Event& event) {
     std::cout << "App::processEvent()" << std::endl;
     std::cout
-        << "  type: " << static_cast<int>(event.type)
-        << ", windowId: " << static_cast<int>(event.windowId)
-        << ", mouseButton: " << static_cast<int>(event.mouseButton)
-        << ", " << event.mouseX
-        << ", " << event.mouseY
+        << "  type: " << static_cast<int>(event.type_)
+        << ", windowId: " << static_cast<int>(event.window_id_)
+        << ", mouseButton: " << static_cast<int>(event.mouse_button_)
+        << ", " << event.mouse_pos_
         << '\n';
 
-    if (event.type == EventType::Quit) {
+    if (event.type_ == EventType::Quit) {
         quit();
         return;
     }
