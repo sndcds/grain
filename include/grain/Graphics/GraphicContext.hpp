@@ -12,6 +12,8 @@
 
 namespace Grain {
 
+class Gradient;
+
 class GraphicContext {
 public:
     virtual ~GraphicContext() = default;
@@ -30,55 +32,91 @@ public:
     //--------------------------------------------------------------------------
 
     virtual void save() = 0;
-
     virtual void restore() = 0;
-/*
-    virtual void save() {
-        stateStack_.push_back(state_);
-    }
 
-    virtual void restore() {
-        if (stateStack_.empty()) {
-            return;
-        }
-
-        state_ = stateStack_.back();
-        stateStack_.pop_back();
-    }
-*/
 
     //--------------------------------------------------------------------------
-    // State
+    // Clip
+    //--------------------------------------------------------------------------
+
+    virtual void clip(const Rectd& clip_rect) {
+        (void)clip_rect;
+    }
+
+    virtual void clipPath() = 0;
+
+    virtual void clipPathEvenOdd() = 0;
+
+
+    //--------------------------------------------------------------------------
+    // Blend
+    //--------------------------------------------------------------------------
+
+    virtual void setBlendMode(ColorBlendMode blend_mode) {
+        state_.blend_mode_ = blend_mode;
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Fill
     //--------------------------------------------------------------------------
 
     virtual void setFillColor(const Color& color) {
-        state_.fillColor = color;
+        state_.fill_color_ = color;
     }
+
+
+    //--------------------------------------------------------------------------
+    // Stroke
+    //--------------------------------------------------------------------------
 
     virtual void setStrokeColor(const Color&  color) {
-        state_.strokeColor = color;
+        state_.stroke_color_ = color;
     }
 
-    virtual void setLineWidth(double width)  {
-        state_.lineWidth = width;
+    virtual void setStrokeWidth(double width) {
+        state_.line_width_ = width;
     }
+
+    virtual void setStrokeJoinStyle(StrokeJoinStyle style) {
+        state_.line_join_ = style;
+
+    }
+
+    virtual void setStrokeCapStyle(StrokeCapStyle style) {
+        state_.line_cap_ = style;
+    }
+
+    virtual void setStrokeDash(
+        double phase,
+        const double* lengths,
+        size_t count) = 0;
 
 
     //--------------------------------------------------------------------------
     // Path
     //--------------------------------------------------------------------------
 
-    virtual void beginPath() noexcept = 0;
+    virtual void beginPath() = 0;
+    virtual void moveTo(const Vec2d& point) = 0;
+    virtual void lineTo(const Vec2d& point) = 0;
+    virtual void curveTo(
+        const Vec2d& control1,
+        const Vec2d& control2,
+        const Vec2d& point
+    ) = 0;
+    virtual void closePath() = 0;
 
-    virtual void moveTo(const Vec2d& point) noexcept = 0;
+    virtual void addRectPath(const Rectd& rect) = 0;
+    virtual void addEllipsePath(const Rectd& rect) = 0;
+    virtual void addCirclePath(const Vec2d& center, double radius) = 0;
+    virtual void addRingPath(
+        const Vec2d& center,
+        double outer_radius,
+        double inner_radius
+    ) = 0;
 
-    virtual void lineTo(const Vec2d& point) noexcept = 0;
-
-    virtual void curveTo(const Vec2d& control1, const Vec2d& control2, const Vec2d& point) noexcept = 0;
-
-    virtual void closePath() noexcept = 0;
-
-    void addPath(const GraphicPath& path) noexcept {
+    void addPath(const GraphicPath& path) {
         if (path.pointCount() > 1) {
             const GraphicPathPoint* firstPoint = nullptr;
             const GraphicPathPoint* prevPoint = nullptr;
@@ -129,7 +167,53 @@ public:
         }
     }
 
-    void addRoundRectPath( const Rectd& rect, double radius) noexcept {
+    void addRoundBarPath(const Rectd& rect) noexcept {
+        if (std::fabs(rect.width - rect.height) < std::numeric_limits<float>::epsilon()) {
+            // Draw as circle
+            addCirclePath(rect.center(), rect.width / 2.0);
+        }
+        else {
+            bool horizontal = rect.width > rect.height;
+            double radius = horizontal ? rect.height / 2.0 : rect.width / 2.0;
+            double a = radius * 0.55228475;
+
+            double x1 = rect.x;
+            double x2 = rect.x + radius - a;
+            double x3 = rect.x + radius;
+            double x6 = rect.x + rect.width;
+            double x5 = x6 - radius + a;
+            double x4 = x6 - radius;
+
+            double y1 = rect.y;
+            double y2 = rect.y + radius - a;
+            double y3 = rect.y + radius;
+            double y6 = rect.y + rect.height;
+            double y5 = y6 - radius + a;
+            double y4 = y6 - radius;
+
+            moveTo({x4, y1});
+            curveTo({x5, y1}, {x6, y2}, {x6, y3});
+            if (!horizontal) {
+                lineTo({x6, y4});
+            }
+            curveTo({x6, y5}, {x5, y6}, {x4, y6});
+            if (horizontal) {
+                lineTo({x3, y6});
+            }
+            curveTo({x2, y6}, {x1, y5}, {x1, y4});
+            if (!horizontal) {
+                lineTo({x1, y3});
+            }
+            curveTo({x1, y2}, {x2, y1}, {x3, y1});
+            if (horizontal) {
+                lineTo({x4, y1});
+            }
+            closePath();
+        }
+    }
+
+
+    void addRoundRectPath(const Rectd& rect, double radius) {
         if (radius > rect.width / 2) {
             radius = rect.width / 2;
         }
@@ -189,12 +273,22 @@ public:
     //--------------------------------------------------------------------------
 
     virtual void fillPath() = 0;
-
+    virtual void fillPathEvenOdd() = 0;
     virtual void fillRect(const Rectd& rect) = 0;
-
-    virtual void strokeRect(const Rectd& rect) = 0;
+    virtual void fillCircle(const Vec2d& center, double radius) = 0;
+    virtual void fillEllipse(const Rectd& rect) = 0;
 
     virtual void strokePath() = 0;
+    virtual void strokeRect(const Rectd& rect) = 0;
+    virtual void strokeCircle(const Vec2d& center, double radius) = 0;
+    virtual void strokeEllipse(const Rectd& rect) = 0;
+
+    virtual void fillGradient(
+        Gradient* gradient,
+        const Vec2d& start_pos,
+        const Vec2d& end_pos,
+        bool draw_before,
+        bool draw_after) = 0;
 
     virtual void drawText(
         const String& text,
@@ -215,19 +309,19 @@ public:
     //--------------------------------------------------------------------------
 
     virtual void translate(double x, double y) {
-        state_.transform *= Mat3<double>::translation(x, y);
+        state_.transform_ *= Mat3<double>::translation(x, y);
     }
 
     virtual void scale(double x, double y) {
-        state_.transform *= Mat3<double>::scaling(x, y);
+        state_.transform_ *= Mat3<double>::scaling(x, y);
     }
 
     virtual void rotate(double radians) {
-        state_.transform *= Mat3<double>::rotation(radians);
+        state_.transform_ *= Mat3<double>::rotation(radians);
     }
 
     virtual void rotateDegrees(double degrees) {
-        state_.transform *= Mat3<double>::rotationDegrees(degrees);
+        state_.transform_ *= Mat3<double>::rotationDegrees(degrees);
     }
 
 

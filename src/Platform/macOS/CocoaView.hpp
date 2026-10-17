@@ -12,11 +12,11 @@ public:
 
     void requestRedraw() override;
 
-    [[nodiscard]]
-    void* nativeView() noexcept override;
+    void requestRedraw(const Rectd& dirty_rect) override;
 
-    [[nodiscard]]
-    Vec2d mousePos() const noexcept;
+    [[nodiscard]] void* nativeView() noexcept override;
+
+    [[nodiscard]] Vec2d mousePos() const noexcept;
 
 private:
     class Impl;

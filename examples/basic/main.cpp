@@ -33,10 +33,27 @@ public:
             });
     }
 
-    void drawContent(Grain::GraphicContext& gc) override {
-        gc.setFillColor({.96, .96, .96, 1});
-        gc.fillRect({0, 0, 2000, 1300});
+    void drawContent(Grain::GraphicContext& gc, const Grain::Rectd& dirty_rect) override {
 
+        gc.save();
+
+        Grain::Gradient gradient;
+        gradient.addStop(0, {1, 0, 0, 1});
+        gradient.addStop(.2, {1, 1, 0, 1});
+        gradient.addStop(.5, {0, .5, 1, 1});
+        gradient.addStop(1, {0, 1, .5, 1});
+
+        gc.setFillColor({.96, .96, .96, 1});
+        gc.fillRect(dirty_rect);
+
+        gc.addRingPath(dirty_rect.center(), dirty_rect.shortSide() / 2, dirty_rect.shortSide() / 4);
+        // gc.setFillColor({1, 0, 0, 1});
+        // gc.fillPathEvenOdd();
+        gc.clipPathEvenOdd();
+        gc.fillGradient(&gradient, {.0, .0}, {1000, 1000}, true, true);
+
+
+        /*
         for (int32_t i = 0; i < 100; i++) {
             gc.save();
             gc.translate(animationX_, i);
@@ -45,6 +62,8 @@ public:
             gc.fillRect({-1600, 100, 1600 * 2, 300});
             gc.restore();
         }
+        */
+        gc.restore();
     }
 
     void handleEvent(const Grain::Event& event) override {
@@ -109,6 +128,16 @@ void stringExample() {
 using namespace Grain;
 
 int main() {
+
+    Grain::Random random;
+
+    float value = random.real();
+    float offset = random.bipolar(10.0f);
+    int32_t index = random.integer(0, 99);
+    bool enabled = random.chance(0.75f);
+    float noise = random.gaussian();
+
+
     auto& app = App::instance();
     app.setIcon("/Users/roaldchristesen/Documents/Pippa/Pippa Logo.png");
 
@@ -136,21 +165,58 @@ int main() {
 
                         driver.animate(
                             0.0,
-                            1.0,
+                            0.2,
                             [&button, x, y](Grain::Animation& animation) -> void {
                                 const double progress = animation.progress();
 
-                                button.setBounds({
-                                    x + 100.0 * progress,
-                                    y,
-                                    120.0,
-                                    30.0
-                                });
+                                Rectd src = {x, y, 120.0, 30.0};
+                                Rectd dst = {x - 20, y - 10, 120 + 40.0, 50.0};
+                                button.setBounds(src.lerp(dst, progress));
                             });
                     });
                 }
                 i++;
             }
+        }
+
+        Random random;
+
+        for (double y = 20; y < 1280; y += 40) {
+            auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
+
+            slider.setBounds(Rectd{20.0, y, 240.0, 30.0});
+            slider.setStep(1.0f);
+
+            slider.setOrientation(Slider::Orientation::Horizontal);
+            slider.setTrackSize(random.real(2, 12));
+
+            // slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
+
+            slider.setAction([](float value) {
+                std::cout << "Slider value: " << value << '\n';
+            });
+        }
+
+        for (double x = 300; x < 1280; x += 140) {
+            auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
+
+            slider.setBounds(Rectd{x, 200, 120, 800.0});
+            slider.setStep(1.0f);
+
+            slider.setOrientation(Slider::Orientation::Vertical);
+            slider.setTrackSize(random.real(20, 120));
+            auto s = random.real(slider.trackSize(), slider.trackSize() * 2);
+            slider.setHandleSize({s, s});
+
+            slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
+
+            slider.setAction([](float value) {
+                std::cout << "Slider value: " << value << '\n';
+            });
         }
 
         window->setRootView(std::move(view));

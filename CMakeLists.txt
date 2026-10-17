@@ -213,8 +213,10 @@ target_sources(
         src/Geometry/Bezier.cpp
 
         src/Graphics/Color.cpp
+        src/Graphics/ColorLUT.cpp
         src/Graphics/GraphicPathPoint.cpp
         src/Graphics/GraphicPath.cpp
+        src/Graphics/Gradient.cpp
         src/Graphics/Font.cpp
 
         src/Input/Input.cpp
@@ -224,9 +226,12 @@ target_sources(
         src/UI/Component.cpp
         src/UI/Label.cpp
         src/UI/Button.cpp
+        src/UI/Slider.cpp
 
         src/Animation/Animation.cpp
         src/Animation/AnimationDriver.cpp
+
+        external/mixbox/mixbox.cpp
 
 
         PUBLIC
@@ -242,6 +247,7 @@ target_sources(
         include/grain/Math/Math.hpp
         include/grain/Math/Functions.hpp
         include/grain/Math/Statistics.hpp
+        include/grain/Math/Random.hpp
         include/grain/Math/Interpolation.hpp
         include/grain/Math/Easing.hpp
         include/grain/Math/Polynomial.hpp
@@ -276,16 +282,19 @@ target_sources(
         include/grain/Platform/View.hpp
 
         include/grain/Graphics/Color.hpp
+        include/grain/Graphics/ColorLUT.hpp
         include/grain/Graphics/Canvas.hpp
         include/grain/Graphics/GraphicState.hpp
         include/grain/Graphics/GraphicContext.hpp
         include/grain/Graphics/GraphicPathPoint.hpp
         include/grain/Graphics/GraphicPath.hpp
+        include/grain/Graphics/Gradient.hpp
         include/grain/Graphics/Font.hpp
 
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp
         include/grain/UI/Button.hpp
+        include/grain/UI/Slider.hpp
 
         include/grain/Animation/Animation.hpp
         include/grain/Animation/AnimationDriver.hpp

@@ -35,6 +35,12 @@ void CocoaView::requestRedraw() {
 }
 
 
+void CocoaView::requestRedraw(const Rectd& dirty_rect) {
+    (void)dirty_rect;
+    requestRedraw();
+}
+
+
 void* CocoaView::nativeView() noexcept {
     if (impl_ == nullptr) {
         return nullptr;

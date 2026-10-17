@@ -61,18 +61,19 @@ public:
         return result;
     }
 
-    void drawComponents(GraphicContext& gc);
+    void drawComponents(GraphicContext& gc, const Rectd& dirty_rect);
 
-    virtual void draw(GraphicContext& context);
+    virtual void draw(GraphicContext& gc, const Rectd& dirty_rect);
 
-    virtual void drawContent(GraphicContext& gc);
-
-    virtual void handleEvent(const Event& event);
+    virtual void drawContent(GraphicContext& gc, const Rectd& dirty_rect);
 
     virtual void requestRedraw();
 
-    [[nodiscard]]
-    const Vec2d mousePos() noexcept {
+    void requestRedraw(const Rectd& dirty_rect);
+
+    virtual void handleEvent(const Event& event);
+
+    [[nodiscard]] const Vec2d mousePos() noexcept {
         return queryMousePos();
     }
 
@@ -84,8 +85,7 @@ private:
 
     void attach();
 
-    [[nodiscard]]
-    Platform::View* platformView() noexcept;
+    [[nodiscard]] Platform::View* platformView() noexcept;
 
     void updateHoveredComponent(Component* component);
 
@@ -93,8 +93,7 @@ private:
 
     Component* hitTest(const Vec2d& pos) noexcept;
 
-    [[nodiscard]]
-    Vec2d queryMousePos() const noexcept;
+    [[nodiscard]] Vec2d queryMousePos() const noexcept;
 
     Rectd bounds_{};
     View* parent_ = nullptr;
@@ -105,6 +104,7 @@ private:
     // Interaction states
     Component* hovered_component_ = nullptr;
     Component* focused_component_ = nullptr;
+    Component* mouse_capture_component_ = nullptr;
 
     friend class Window;
 };

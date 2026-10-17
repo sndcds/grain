@@ -58,21 +58,20 @@ enum class ColorBlendMode : int8_t {
 };
 
 struct GraphicState {
-    Color fillColor = Color::black();
-    Color strokeColor = Color::black();
+    Color fill_color_ = Color::black();
+    Color stroke_color_ = Color::black();
 
-    double lineWidth = 1.0;
+    double line_width_ = 1.0;
+    StrokeJoinStyle line_join_ = StrokeJoinStyle::Miter;
+    StrokeCapStyle line_cap_ = StrokeCapStyle::Butt;
 
-    StrokeJoinStyle lineJoin = StrokeJoinStyle::Miter;
-    StrokeCapStyle lineCap = StrokeCapStyle::Butt;
+    double miter_limit_ = 10.0;
 
-    double miterLimit = 10.0;
+    ColorBlendMode blend_mode_ = ColorBlendMode::Normal;
 
-    ColorBlendMode blendMode = ColorBlendMode::Normal;
+    float alpha_ = 1.0f;
 
-    float alpha = 1.0f;
-
-    Mat3<double> transform;
+    Mat3<double> transform_;
 };
 
 } // namespace Grain

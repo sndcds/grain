@@ -1,6 +1,7 @@
 #pragma once
 
 #include <grain/Input/Event.hpp>
+#include <grain/Geometry/Rect.hpp>
 #include <grain/String/String.hpp>
 
 #include <functional>
@@ -21,8 +22,10 @@ public:
 
     virtual void requestRedraw() = 0;
 
-    [[nodiscard]]
-    virtual void* nativeView() noexcept = 0;
+    virtual void requestRedraw(const Rectd& dirty_rect) = 0;
+
+    [[nodiscard]] virtual void* nativeView() noexcept = 0;
+
     virtual Vec2d mousePos() const noexcept = 0;
 };
 

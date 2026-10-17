@@ -21,11 +21,13 @@ void Button::draw(GraphicContext& gc) {
     b.inset(.5);
     double radius = bounds_.height / 2.5;
 
+    float alpha = 1;
     if (hovered_) {
         gc.setFillColor({1, .8, .8, 1});
     }
     else {
-        gc.setFillColor({1, 1, 1, 1});
+        gc.setFillColor({1, 1, 1, .4});
+        alpha = 0.4;
     }
 
     gc.addRoundRectPath(b, radius);
@@ -35,12 +37,13 @@ void Button::draw(GraphicContext& gc) {
     gc.setStrokeColor({0, 0, 0, 1});
     // gc.strokePath();
 
+
     gc.drawTextInRect(
         "kulturbytes",
         bounds_,
         Grain::Alignment::Center,
         font,
-        {0, 0, 0, 1});
+        Color(0, 0, 0, alpha));
 }
 
 void Button::setTitle(std::string title) {

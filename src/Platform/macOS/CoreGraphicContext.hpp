@@ -1,12 +1,17 @@
 #pragma once
 
 #include <CoreGraphics/CoreGraphics.h>
+#include <CoreText/CoreText.h>
 
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Geometry/Layout.hpp>
 
+#include "CFObject.hpp"
+
 
 namespace Grain {
+
+class Gradient;
 
 class CoreGraphicContext final : public GraphicContext {
 public:
@@ -18,25 +23,93 @@ public:
 
     void restore() override;
 
+
+    //--------------------------------------------------------------------------
+    // Fill
+    //--------------------------------------------------------------------------
+
+    void clip(const Rectd& clip_rect) override;
+
+    void clipPath() override;
+
+    void clipPathEvenOdd() override;
+
+
+    //--------------------------------------------------------------------------
+    // Blend
+    //--------------------------------------------------------------------------
+
+    void setBlendMode(ColorBlendMode mode) override;
+
+
+    //--------------------------------------------------------------------------
+    // Fill
+    //--------------------------------------------------------------------------
+
     void setFillColor(const Color& color) override;
+
+
+    //--------------------------------------------------------------------------
+    // Stroke
+    //--------------------------------------------------------------------------
 
     void setStrokeColor(const Color& color) override;
 
-    void setLineWidth(double width) override;
+    void setStrokeWidth(double width) override;
 
-    void beginPath() noexcept override;
-    void moveTo(const Vec2d& point) noexcept override;
-    void lineTo(const Vec2d& point) noexcept override;
-    void curveTo(const Vec2d& control1, const Vec2d& control2, const Vec2d& point) noexcept override;
-    void closePath() noexcept  override;
+    void setStrokeJoinStyle(StrokeJoinStyle style) override;
+
+    void setStrokeCapStyle(StrokeCapStyle style) override;
+
+    void setStrokeDash(
+        double phase,
+        const double* lengths,
+        size_t count
+    ) override;
+
+
+    //--------------------------------------------------------------------------
+    // Path
+    //--------------------------------------------------------------------------
+
+    void beginPath() override;
+    void moveTo(const Vec2d& point) override;
+    void lineTo(const Vec2d& point) override;
+    void curveTo(
+        const Vec2d& control1,
+        const Vec2d& control2,
+        const Vec2d& point
+    ) override;
+    void closePath() override;
+
+    void addRectPath(const Rectd& rect) override;
+    void addEllipsePath(const Rectd& rect) override;
+    void addCirclePath(const Vec2d& center, double radius) override;
+    void addRingPath(
+        const Vec2d& center,
+        double outer_radius,
+        double inner_radius
+    ) override;
+
 
     void fillPath() override;
+    void fillPathEvenOdd() override;
 
     void fillRect(const Rectd& rect) override;
+    void fillCircle(const Vec2d& center, double radius) override;
+    void fillEllipse(const Rectd& rect) override;
 
     void strokePath() override;
-
     void strokeRect(const Rectd& rect) override;
+    void strokeCircle(const Vec2d& center, double radius) override;
+    void strokeEllipse(const Rectd& rect) override;
+
+    void fillGradient(
+        Gradient* gradient,
+        const Vec2d& start_pos,
+        const Vec2d& end_pos,
+        bool draw_before,
+        bool draw_after) override;
 
     void drawText(
         const String& text,
@@ -66,11 +139,20 @@ public:
 
     void setTextMatrix(double a, double b, double c, double d, double tx, double ty);
 
-    static CGColorRef createCGColor(const Grain::Color& color);
+    CGColorRef createCGColor(const Color& color) const;
+
+    [[nodiscard]]
+    CFObject<CTLineRef> createTextLine(
+        const String& text,
+        const Font* font,
+        const Color& color
+    );
 
 private:
     CGContextRef context_ = nullptr;
-    Vec2d lastPoint_;
+
+    CGColorSpaceRef color_space_ = nullptr;
+    Vec2d last_point_;
 };
 
 } // namespace Grain

@@ -19,47 +19,49 @@ public:
     virtual ~Component() = default;
 
     Component(const Component&) = delete;
+
     Component& operator=(const Component&) = delete;
 
     Component(Component&&) = delete;
+
     Component& operator=(Component&&) = delete;
 
-    [[nodiscard]] View* view() const noexcept {
+    [[nodiscard]] View* view() const {
         return view_;
     }
 
-    void setView(View* view) noexcept {
+    void setView(View* view) {
         view_ = view;
     }
 
-    [[nodiscard]] const Rectd& bounds() const noexcept {
+    virtual void setBounds(const Rectd& bounds);
+
+    [[nodiscard]] const Rectd& bounds() const {
         return bounds_;
     }
 
-    void setBounds(const Rectd& bounds) noexcept {
-        if (bounds_ != bounds) {
-            bounds_ = bounds;
-            invalidate();
-        }
-    }
-
-    virtual bool contains(const Vec2d& pos) const noexcept;
+    virtual bool contains(const Vec2d& pos) const;
 
 
-    [[nodiscard]] bool enabled() const noexcept;
-    void setEnabled(bool enabled) noexcept;
+    [[nodiscard]] bool enabled() const;
 
-    [[nodiscard]] bool hovered() const noexcept;
-    void setHovered(bool hovered) noexcept;
+    void setEnabled(bool enabled);
 
-    [[nodiscard]] bool focused() const noexcept;
-    void setFocused(bool hovered) noexcept;
+    [[nodiscard]] bool hovered() const;
 
-    [[nodiscard]] bool pressed() const noexcept;
-    void setPressed(bool pressed) noexcept;
+    void setHovered(bool hovered);
 
-    [[nodiscard]] bool visible() const noexcept;
-    void setVisible(bool visible) noexcept;
+    [[nodiscard]] bool focused() const;
+
+    void setFocused(bool hovered);
+
+    [[nodiscard]] bool pressed() const;
+
+    void setPressed(bool pressed);
+
+    [[nodiscard]] bool visible() const;
+
+    void setVisible(bool visible);
 
     virtual void draw(GraphicContext& gc) = 0;
 
@@ -69,7 +71,7 @@ public:
     }
 
 protected:
-    void invalidate() noexcept;
+    void invalidate();
 
     Rectd bounds_{};
     View* view_ = nullptr;

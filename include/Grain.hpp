@@ -6,6 +6,7 @@
 #include <grain/Math/Math.hpp>
 #include <grain/Math/Functions.hpp>
 #include <grain/Math/Statistics.hpp>
+#include <grain/Math/Random.hpp>
 #include <grain/Math/Interpolation.hpp>
 #include <grain/Math/Easing.hpp>
 #include <grain/Math/Polynomial.hpp>
@@ -32,14 +33,17 @@
 #include <grain/Platform/View.hpp>
 #include <grain/Platform/Font.hpp>
 #include <grain/Graphics/Color.hpp>
+#include <grain/Graphics/ColorLUT.hpp>
 #include <grain/Graphics/Canvas.hpp>
 #include <grain/Graphics/GraphicState.hpp>
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Graphics/GraphicPathPoint.hpp>
 #include <grain/Graphics/GraphicPath.hpp>
+#include <grain/Graphics/Gradient.hpp>
 #include <grain/Graphics/Font.hpp>
 #include <grain/UI/Component.hpp>
 #include <grain/UI/Label.hpp>
 #include <grain/UI/Button.hpp>
+#include <grain/UI/Slider.hpp>
 #include <grain/Animation/Animation.hpp>
 #include <grain/Animation/AnimationDriver.hpp>

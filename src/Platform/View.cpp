@@ -93,41 +93,65 @@ Component* View::hitTest(const Vec2d& pos) noexcept {
 }
 
 
-void View::drawComponents(GraphicContext& gc) {
-    updateHoveredComponent(hitTest(mousePos()));
+void View::drawComponents(GraphicContext& gc, const Rectd& dirty_rect) {
+    // updateHoveredComponent(hitTest(mousePos()));
+
+    gc.clip(dirty_rect);
 
     for (auto& component : components_) {
         if (component->visible()) {
-            component->draw(gc);
+            if (dirty_rect.intersects(component->bounds())) {
+                component->draw(gc);
+            }
         }
     }
 }
 
 
-void View::drawContent(GraphicContext& gc) {
+void View::drawContent(GraphicContext& gc, const Rectd& dirty_rect) {
     (void)gc;
+    (void)dirty_rect;
 }
 
 
-void View::draw(GraphicContext& gc) {
-    drawContent(gc);
-    drawComponents(gc);
+void View::draw(GraphicContext& gc, const Rectd& dirty_rect) {
+    drawContent(gc, dirty_rect);
+    drawComponents(gc, dirty_rect);
 }
 
 
 void View::handleEvent(const Event& event) {
     switch (event.type_) {
         case EventType::MouseMove: {
-            updateHoveredComponent(hitTest(event.mouse_pos_));
+            if (mouse_capture_component_ != nullptr) {
+                mouse_capture_component_->handleEvent(event);
+            } else {
+                updateHoveredComponent(hitTest(event.mouse_pos_));
+            }
             break;
         }
 
-        case EventType::MouseButtonDown:
-        case EventType::MouseButtonUp: {
+        case EventType::MouseButtonDown: {
             Component* component = hitTest(event.mouse_pos_);
 
-            if (component != nullptr) {
+            if (component != nullptr && component->handleEvent(event)) {
+                mouse_capture_component_ = component;
+            }
+            break;
+        }
+
+        case EventType::MouseButtonUp: {
+            if (mouse_capture_component_ != nullptr) {
+                Component* component = mouse_capture_component_;
+                mouse_capture_component_ = nullptr;
+
                 component->handleEvent(event);
+            } else {
+                Component* component = hitTest(event.mouse_pos_);
+
+                if (component != nullptr) {
+                    component->handleEvent(event);
+                }
             }
             break;
         }
@@ -150,6 +174,15 @@ void View::requestRedraw() {
     }
 
     impl_->platformView->requestRedraw();
+}
+
+
+void View::requestRedraw(const Rectd& dirty_rect) {
+    if (impl_->platformView == nullptr) {
+        return;
+    }
+
+    impl_->platformView->requestRedraw(dirty_rect);
 }
 
 

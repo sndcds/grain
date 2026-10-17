@@ -5,6 +5,7 @@
 
 #include <grain/Platform/View.hpp>
 #include <grain/Input/Event.hpp>
+#include <grain/Geometry/Rect.hpp>
 
 
 namespace Grain {
@@ -87,8 +88,6 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 
 
 - (void)drawRect:(NSRect)dirtyRect {
-    (void)dirtyRect;
-
     if (grain_view_ == nullptr) {
         return;
     }
@@ -100,9 +99,16 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
         return;
     }
 
-    Grain::CoreGraphicContext graphicContext(context);
+    Grain::CoreGraphicContext gc(context);
 
-    grain_view_->draw(graphicContext);
+    Grain::Rectd dirty_rect = {
+        dirtyRect.origin.x,
+        dirtyRect.origin.y,
+        dirtyRect.size.width,
+        dirtyRect.size.height
+    };
+
+    grain_view_->draw(gc, dirty_rect);
 }
 
 
