@@ -194,6 +194,8 @@ target_sources(
 
         src/Core/ObjectBase.cpp
 
+        src/Type/FixValue.cpp
+
         src/Math/Math.cpp
         src/Math/Functions.cpp
         src/Math/Interpolation.cpp
@@ -209,6 +211,7 @@ target_sources(
 
         src/String/String.cpp
         src/String/StringUtf8.cpp
+        src/String/Character.cpp
 
         src/Geometry/Bezier.cpp
 
@@ -227,6 +230,7 @@ target_sources(
         src/UI/Label.cpp
         src/UI/Button.cpp
         src/UI/Slider.cpp
+        src/UI/TextField.cpp
 
         src/Animation/Animation.cpp
         src/Animation/AnimationDriver.cpp
@@ -243,6 +247,8 @@ target_sources(
         include/Grain.hpp
 
         include/grain/Core/ObjectBase.hpp
+
+        include/grain/Type/FixValue.hpp
 
         include/grain/Math/Math.hpp
         include/grain/Math/Functions.hpp
@@ -271,6 +277,7 @@ target_sources(
 
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
+        include/grain/String/Character.hpp
 
         include/grain/Containers/List.hpp
 
@@ -295,6 +302,7 @@ target_sources(
         include/grain/UI/Label.hpp
         include/grain/UI/Button.hpp
         include/grain/UI/Slider.hpp
+        include/grain/UI/TextField.hpp
 
         include/grain/Animation/Animation.hpp
         include/grain/Animation/AnimationDriver.hpp
@@ -318,6 +326,7 @@ if(APPLE)
             src/Platform/macOS/CocoaWindow.mm
             src/Platform/macOS/CocoaView.mm
             src/Platform/macOS/CoreGraphicContext.mm
+            src/Platform/macOS/CoreTextLayout.mm
             src/Platform/macOS/CocoaFont.mm
             src/Platform/macOS/GrainRootView.mm
             src/Platform/macOS/CocoaAnimationDriver.mm

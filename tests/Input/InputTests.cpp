@@ -8,8 +8,8 @@ TEST_CASE("Input: key down", "[Input]") {
     Input input;
 
     Event event;
-    event.type = EventType::KeyDown;
-    event.key = Key::A;
+    event.type_ = EventType::KeyDown;
+    event.key_ = Key::A;
 
     input.processEvent(event);
 
@@ -22,8 +22,8 @@ TEST_CASE("Input: key press is only reported once", "[Input]") {
     Input input;
 
     Event event;
-    event.type = EventType::KeyDown;
-    event.key = Key::A;
+    event.type_ = EventType::KeyDown;
+    event.key_ = Key::A;
 
     input.processEvent(event);
 
@@ -42,8 +42,8 @@ TEST_CASE("Input: beginFrame clears transient key state", "[Input]") {
     Input input;
 
     Event event;
-    event.type = EventType::KeyDown;
-    event.key = Key::A;
+    event.type_ = EventType::KeyDown;
+    event.key_ = Key::A;
 
     input.processEvent(event);
 
@@ -64,12 +64,12 @@ TEST_CASE("Input: key up", "[Input]") {
     Input input;
 
     Event keyDown;
-    keyDown.type = EventType::KeyDown;
-    keyDown.key = Key::A;
+    keyDown.type_ = EventType::KeyDown;
+    keyDown.key_ = Key::A;
 
     Event keyUp;
-    keyUp.type = EventType::KeyUp;
-    keyUp.key = Key::A;
+    keyUp.type_ = EventType::KeyUp;
+    keyUp.key_ = Key::A;
 
     input.processEvent(keyDown);
     input.beginFrame();
@@ -85,12 +85,12 @@ TEST_CASE("Input: beginFrame clears transient release state", "[Input]") {
     Input input;
 
     Event keyDown;
-    keyDown.type = EventType::KeyDown;
-    keyDown.key = Key::A;
+    keyDown.type_ = EventType::KeyDown;
+    keyDown.key_ = Key::A;
 
     Event keyUp;
-    keyUp.type = EventType::KeyUp;
-    keyUp.key = Key::A;
+    keyUp.type_ = EventType::KeyUp;
+    keyUp.key_ = Key::A;
 
     input.processEvent(keyDown);
     input.beginFrame();
@@ -111,8 +111,8 @@ TEST_CASE("Input: mouse button down", "[Input]") {
     Input input;
 
     Event event;
-    event.type = EventType::MouseButtonDown;
-    event.mouseButton = MouseButton::Left;
+    event.type_ = EventType::MouseButtonDown;
+    event.mouse_button_ = MouseButton::Left;
 
     input.processEvent(event);
 
@@ -127,12 +127,12 @@ TEST_CASE("Input: mouse button up", "[Input]") {
     Input input;
 
     Event buttonDown;
-    buttonDown.type = EventType::MouseButtonDown;
-    buttonDown.mouseButton = MouseButton::Left;
+    buttonDown.type_ = EventType::MouseButtonDown;
+    buttonDown.mouse_button_ = MouseButton::Left;
 
     Event buttonUp;
-    buttonUp.type = EventType::MouseButtonUp;
-    buttonUp.mouseButton = MouseButton::Left;
+    buttonUp.type_ = EventType::MouseButtonUp;
+    buttonUp.mouse_button_ = MouseButton::Left;
 
     input.processEvent(buttonDown);
     input.beginFrame();
@@ -156,8 +156,8 @@ TEST_CASE("Input: beginFrame clears transient mouse state", "[Input]") {
     Input input;
 
     Event event;
-    event.type = EventType::MouseButtonDown;
-    event.mouseButton = MouseButton::Left;
+    event.type_ = EventType::MouseButtonDown;
+    event.mouse_button_ = MouseButton::Left;
 
     input.processEvent(event);
 

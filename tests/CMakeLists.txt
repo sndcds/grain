@@ -3,6 +3,7 @@ include(CTest)
 add_executable(
         GrainTests
         Core/ObjectBaseTests.cpp
+        Type/TypeTests.cpp
         Containers/ListTests.cpp
         Math/MathTests.cpp
         Math/InterpolationTests.cpp

@@ -111,19 +111,6 @@ public:
         bool draw_before,
         bool draw_after) override;
 
-    void drawText(
-        const String& text,
-        const Vec2d& pos,
-        const Font* font,
-        const Color& color) override;
-
-    double drawTextInRect(
-        const String& text,
-        const Rectd& rect,
-        Alignment alignment,
-        const Font* font,
-        const Color& color) override;
-
     void translate(double x, double y) override;
 
     void scale(double x, double y) override;
@@ -141,12 +128,52 @@ public:
 
     CGColorRef createCGColor(const Color& color) const;
 
+
+    //--------------------------------------------------------------------------
+    //  Text
+    //--------------------------------------------------------------------------
+
     [[nodiscard]]
     CFObject<CTLineRef> createTextLine(
         const String& text,
         const Font* font,
         const Color& color
     );
+
+    void drawText(
+        const String& text,
+        const Vec2d& pos,
+        const Font* font,
+        const Color& color
+    ) override;
+
+    double drawTextInRect(
+        const String& text,
+        const Rectd& rect,
+        Alignment alignment,
+        const Font* font,
+        const Color& color
+    ) override;
+
+    [[nodiscard]]
+    std::unique_ptr<TextLayout> createTextLayout(
+        const String& text,
+        const Font& font
+    ) override;
+
+    void drawTextLayout(
+        const TextLayout& layout,
+        const Vec2d& position,
+        const Color& color
+    ) override;
+
+    void drawTextLayoutRange(
+        const TextLayout& layout,
+        const Vec2d& position,
+        int32_t start,
+        int32_t end,
+        const Color& color
+    ) override;
 
 private:
     CGContextRef context_ = nullptr;

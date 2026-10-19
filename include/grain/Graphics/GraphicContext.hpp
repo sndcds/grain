@@ -9,10 +9,12 @@
 #include <grain/Geometry/Layout.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace Grain {
 
 class Gradient;
+class TextLayout;
 
 class GraphicContext {
 public:
@@ -28,7 +30,7 @@ public:
 
 
     //--------------------------------------------------------------------------
-    // Stack
+    //  Stack
     //--------------------------------------------------------------------------
 
     virtual void save() = 0;
@@ -36,7 +38,7 @@ public:
 
 
     //--------------------------------------------------------------------------
-    // Clip
+    //  Clip
     //--------------------------------------------------------------------------
 
     virtual void clip(const Rectd& clip_rect) {
@@ -49,7 +51,7 @@ public:
 
 
     //--------------------------------------------------------------------------
-    // Blend
+    //  Blend
     //--------------------------------------------------------------------------
 
     virtual void setBlendMode(ColorBlendMode blend_mode) {
@@ -58,7 +60,7 @@ public:
 
 
     //--------------------------------------------------------------------------
-    // Fill
+    //  Fill
     //--------------------------------------------------------------------------
 
     virtual void setFillColor(const Color& color) {
@@ -67,7 +69,7 @@ public:
 
 
     //--------------------------------------------------------------------------
-    // Stroke
+    //  Stroke
     //--------------------------------------------------------------------------
 
     virtual void setStrokeColor(const Color&  color) {
@@ -90,11 +92,12 @@ public:
     virtual void setStrokeDash(
         double phase,
         const double* lengths,
-        size_t count) = 0;
+        size_t count
+    ) = 0;
 
 
     //--------------------------------------------------------------------------
-    // Path
+    //  Path
     //--------------------------------------------------------------------------
 
     virtual void beginPath() = 0;
@@ -269,7 +272,7 @@ public:
 
 
     //--------------------------------------------------------------------------
-    // Draw
+    //  Draw
     //--------------------------------------------------------------------------
 
     virtual void fillPath() = 0;
@@ -288,24 +291,12 @@ public:
         const Vec2d& start_pos,
         const Vec2d& end_pos,
         bool draw_before,
-        bool draw_after) = 0;
-
-    virtual void drawText(
-        const String& text,
-        const Vec2d& pos,
-        const Font* font,
-        const Color& color) = 0;
-
-    virtual double drawTextInRect(
-        const String& text,
-        const Rectd& rect,
-        Alignment alignment,
-        const Font* font,
-        const Color& color) = 0;
+        bool draw_after
+    ) = 0;
 
 
     //--------------------------------------------------------------------------
-    // Transform
+    //  Transform
     //--------------------------------------------------------------------------
 
     virtual void translate(double x, double y) {
@@ -324,6 +315,44 @@ public:
         state_.transform_ *= Mat3<double>::rotationDegrees(degrees);
     }
 
+
+    //--------------------------------------------------------------------------
+    //  Text
+    //--------------------------------------------------------------------------
+
+    virtual std::unique_ptr<TextLayout> createTextLayout(
+        const String& text,
+        const Font& font
+    ) = 0;
+
+    virtual void drawText(
+        const String& text,
+        const Vec2d& pos,
+        const Font* font,
+        const Color& color
+    ) = 0;
+
+    virtual double drawTextInRect(
+        const String& text,
+        const Rectd& rect,
+        Alignment alignment,
+        const Font* font,
+        const Color& color
+    ) = 0;
+
+    virtual void drawTextLayout(
+        const TextLayout& layout,
+        const Vec2d& position,
+        const Color& color
+    ) = 0;
+
+    virtual void drawTextLayoutRange(
+        const TextLayout& layout,
+        const Vec2d& position,
+        int32_t start,
+        int32_t end,
+        const Color& color
+    ) = 0;
 
 protected:
     GraphicContext() = default;

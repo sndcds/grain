@@ -8,7 +8,7 @@ constexpr int InvalidIndex = -1;
 
 } // namespace
 
-int Input::keyIndex(Key key) noexcept {
+int Input::keyIndex(KeyCode key) noexcept {
     const auto value = static_cast<int>(key);
 
     if (value < 0 || value >= KeyCount) {
@@ -119,19 +119,19 @@ void Input::processEvent(const Event& event) noexcept {
     }
 }
 
-bool Input::isKeyDown(Key key) const noexcept {
+bool Input::isKeyDown(KeyCode key) const noexcept {
     const int index = keyIndex(key);
 
     return index >= 0 && keysDown_[index];
 }
 
-bool Input::wasKeyPressed(Key key) const noexcept {
+bool Input::wasKeyPressed(KeyCode key) const noexcept {
     const int index = keyIndex(key);
 
     return index >= 0 && keysPressed_[index];
 }
 
-bool Input::wasKeyReleased(Key key) const noexcept {
+bool Input::wasKeyReleased(KeyCode key) const noexcept {
     const int index = keyIndex(key);
 
     return index >= 0 && keysReleased_[index];

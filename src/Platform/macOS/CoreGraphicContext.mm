@@ -1,5 +1,6 @@
-#include "CoreGraphicContext.hpp"
 #include "CFObject.hpp"
+#include "CoreGraphicContext.hpp"
+#include "CoreTextLayout.hpp"
 #include "grain/Geometry/Bezier.hpp"
 #include "grain/Graphics/Gradient.hpp"
 
@@ -592,30 +593,176 @@ void AppleCGContext::drawRadialGradient(
 }
 */
 
+
+//------------------------------------------------------------------------------
+//  Text
+//------------------------------------------------------------------------------
+
+
+CFObject<CTLineRef> CoreGraphicContext::createTextLine(
+    const String& text,
+    const Font* font,
+    const Color& color
+) {
+    if (font == nullptr) {
+        return {};
+    }
+
+    CFObject<CGColorRef> cg_color(createCGColor(color));
+    if (!cg_color) {
+        return {};
+    }
+
+    CFStringRef keys[] = {
+        kCTFontAttributeName,
+        kCTForegroundColorAttributeName
+    };
+
+    CFTypeRef values[] = {
+        font->nativeHandle(),
+        cg_color.get()
+    };
+
+    CFObject<CFDictionaryRef> attributes(
+        CFDictionaryCreate(
+            kCFAllocatorDefault,
+            reinterpret_cast<const void**>(keys),
+            reinterpret_cast<const void**>(values),
+            2,
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks
+        )
+    );
+
+    if (!attributes) {
+        return {};
+    }
+
+    CFObject<CFStringRef> string(
+        CFStringCreateWithCString(
+            kCFAllocatorDefault,
+            text.utf8(),
+            kCFStringEncodingUTF8
+        )
+    );
+
+    if (!string) {
+        return {};
+    }
+
+    CFObject<CFAttributedStringRef> attributed_string(
+        CFAttributedStringCreate(
+            kCFAllocatorDefault,
+            string.get(),
+            attributes.get()
+        )
+    );
+
+    if (!attributed_string) {
+        return {};
+    }
+
+    return CFObject<CTLineRef>(
+        CTLineCreateWithAttributedString(
+            attributed_string.get()
+        )
+    );
+}
+
+
+void drawLineAtTopLeft(
+    CGContextRef context,
+    CTLineRef line,
+    const Vec2d& position,
+    double ascent,
+    const Color& color
+) {
+    if (context == nullptr || line == nullptr) {
+        return;
+    }
+
+    CGContextSaveGState(context);
+
+    CGContextSetRGBFillColor(
+        context,
+        color.red,
+        color.green,
+        color.blue,
+        color.alpha
+    );
+
+    // Convert the top-left position to a Core Text baseline.
+    CGContextTranslateCTM(
+        context,
+        position.x,
+        position.y + ascent
+    );
+
+    // Core Text glyph coordinates point upwards; NSView is flipped.
+    CGContextScaleCTM(context, 1.0, -1.0);
+
+    CGContextSetTextMatrix(
+        context,
+        CGAffineTransformIdentity
+    );
+
+    CGContextSetTextPosition(context, 0.0, 0.0);
+
+    CTLineDraw(line, context);
+
+    CGContextRestoreGState(context);
+}
+
+
+std::unique_ptr<TextLayout> CoreGraphicContext::createTextLayout(
+    const String& text,
+    const Font& font
+) {
+    return std::make_unique<CoreTextLayout>(text, font);
+}
+
+
+void CoreGraphicContext::drawTextLayout(
+    const TextLayout& layout,
+    const Vec2d& position,
+    const Color& color
+) {
+    const auto* core_layout =
+        dynamic_cast<const CoreTextLayout*>(&layout);
+
+    if (core_layout == nullptr) {
+        return;
+    }
+
+    drawLineAtTopLeft(
+        context_,
+        core_layout->nativeLine(),
+        position,
+        core_layout->ascent(),
+        color
+    );
+}
+
+
 void CoreGraphicContext::drawText(
     const String& text,
     const Vec2d& pos,
     const Font* font,
     const Color& color
 ) {
-    if (context_ == nullptr || font == nullptr) {
+    if (font == nullptr || !font->isValid()) {
         return;
     }
 
-    auto line = createTextLine(text, font, color);
-    if (!line) {
-        return;
-    }
+    CoreTextLayout layout(text, *font);
 
-    setTextMatrix(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
-
-    CGContextSetTextPosition(
+    drawLineAtTopLeft(
         context_,
-        pos.x,
-        pos.y
+        layout.nativeLine(),
+        pos,
+        layout.ascent(),
+        color
     );
-
-    CTLineDraw(line.get(), context_);
 }
 
 
@@ -709,6 +856,89 @@ double CoreGraphicContext::drawTextInRect(
     return lineBounds.size.width;
 }
 
+
+void CoreGraphicContext::drawTextLayoutRange(
+    const TextLayout& layout,
+    const Vec2d& position,
+    int32_t start,
+    int32_t end,
+    const Color& color)
+{
+    if (context_ == nullptr || start >= end) {
+        return;
+    }
+
+    const auto* text_layout =
+        dynamic_cast<const CoreTextLayout*>(&layout);
+
+    if (text_layout == nullptr) {
+        return;
+    }
+
+    const CTLineRef line = text_layout->nativeLine();
+
+    if (line == nullptr) {
+        return;
+    }
+
+    // Clamp indices to the valid string-index range.
+    start = std::max<int32_t>(0, start);
+    end = std::max(start, end);
+
+    const double start_x =
+        text_layout->offsetForIndex(start);
+
+    const double end_x =
+        text_layout->offsetForIndex(end);
+
+    if (start_x == end_x) {
+        return;
+    }
+
+    const double ascent = text_layout->ascent();
+
+    CGContextSaveGState(context_);
+
+    // Restrict drawing to the selected horizontal range.
+    const CGRect clip_rect = CGRectMake(
+        position.x + std::min(start_x, end_x),
+        position.y,
+        std::abs(end_x - start_x),
+        text_layout->ascent() + text_layout->descent()
+    );
+
+    CGContextClipToRect(context_, clip_rect);
+
+    CGContextSetRGBFillColor(
+        context_,
+        color.red,
+        color.green,
+        color.blue,
+        color.alpha
+    );
+
+    // Match the coordinate transformation used by drawTextLayout().
+    CGContextTranslateCTM(
+        context_,
+        position.x,
+        position.y + ascent
+    );
+
+    CGContextScaleCTM(context_, 1.0, -1.0);
+
+    CGContextSetTextMatrix(context_, CGAffineTransformIdentity);
+    CGContextSetTextPosition(context_, 0.0, 0.0);
+
+    CTLineDraw(line, context_);
+
+    CGContextRestoreGState(context_);
+}
+
+
+//------------------------------------------------------------------------------
+//  Transformation
+//------------------------------------------------------------------------------
+
 void CoreGraphicContext::translate(double x, double y) {
     if (context_ == nullptr) {
         return;
@@ -790,77 +1020,6 @@ CGColorRef CoreGraphicContext::createCGColor(
     };
 
     return CGColorCreate(color_space_, components);
-}
-
-
-CFObject<CTLineRef> CoreGraphicContext::createTextLine(
-    const String& text,
-    const Font* font,
-    const Color& color
-) {
-    if (font == nullptr) {
-        return {};
-    }
-
-    CFObject<CGColorRef> cg_color(createCGColor(color));
-    if (!cg_color) {
-        return {};
-    }
-
-    CFStringRef keys[] = {
-        kCTFontAttributeName,
-        kCTForegroundColorAttributeName
-    };
-
-    CFTypeRef values[] = {
-        font->nativeHandle(),
-        cg_color.get()
-    };
-
-    CFObject<CFDictionaryRef> attributes(
-        CFDictionaryCreate(
-            kCFAllocatorDefault,
-            reinterpret_cast<const void**>(keys),
-            reinterpret_cast<const void**>(values),
-            2,
-            &kCFTypeDictionaryKeyCallBacks,
-            &kCFTypeDictionaryValueCallBacks
-        )
-    );
-
-    if (!attributes) {
-        return {};
-    }
-
-    CFObject<CFStringRef> string(
-        CFStringCreateWithCString(
-            kCFAllocatorDefault,
-            text.utf8(),
-            kCFStringEncodingUTF8
-        )
-    );
-
-    if (!string) {
-        return {};
-    }
-
-    CFObject<CFAttributedStringRef> attributed_string(
-        CFAttributedStringCreate(
-            kCFAllocatorDefault,
-            string.get(),
-            attributes.get()
-        )
-    );
-
-    if (!attributed_string) {
-        return {};
-    }
-
-    return CFObject<CTLineRef>(
-        CTLineCreateWithAttributedString(
-            attributed_string.get()
-        )
-    );
 }
 
 } // namespace Grain

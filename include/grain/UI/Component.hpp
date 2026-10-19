@@ -45,23 +45,32 @@ public:
 
     [[nodiscard]] bool enabled() const;
 
-    void setEnabled(bool enabled);
+    virtual void setEnabled(bool enabled);
 
-    [[nodiscard]] bool hovered() const;
+    [[nodiscard]] bool hovered() const { return hovered_; }
 
     void setHovered(bool hovered);
 
-    [[nodiscard]] bool focused() const;
+    [[nodiscard]] bool focused() const { return focused_; }
 
     void setFocused(bool hovered);
 
-    [[nodiscard]] bool pressed() const;
+    [[nodiscard]] bool pressed() const { return pressed_; }
 
     void setPressed(bool pressed);
 
-    [[nodiscard]] bool visible() const;
+    [[nodiscard]] bool visible() const { return visible_; }
 
     void setVisible(bool visible);
+
+    [[nodiscard]] bool editable() const;
+
+    virtual void setEditable(bool editable);
+
+    [[nodiscard]] bool numberMode() const;
+
+    virtual void setNumberMode(bool number_mode);
+
 
     virtual void draw(GraphicContext& gc) = 0;
 
@@ -76,11 +85,16 @@ protected:
     Rectd bounds_{};
     View* view_ = nullptr;
 
+    Component* receiver_component_ = nullptr;
+
+    bool can_get_focus_ = false;
     bool enabled_ = true;
     bool hovered_ = false;
     bool focused_ = false;
     bool pressed_ = false;
     bool visible_ = true;
+    bool editable_ = true;
+    bool number_mode_ = false;
 };
 
 }

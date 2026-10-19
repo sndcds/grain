@@ -27,11 +27,12 @@ enum class EventType {
     MouseWheel
 };
 
-enum class Key {
+enum class KeyCode : uint32_t {
     Unknown,
 
     Escape,
     Enter,
+    CarriageReturn,
     Tab,
     Backspace,
     Space,
@@ -118,7 +119,8 @@ enum class KeyModifiers : std::uint8_t {
     Shift = 1 << 0,
     Control = 1 << 1,
     Alt = 1 << 2,
-    Super = 1 << 3
+    Super = 1 << 3,
+    Command = 1 << 4
 };
 
 constexpr KeyModifiers operator|(
@@ -141,34 +143,40 @@ constexpr KeyModifiers operator&(
     );
 }
 
-constexpr bool hasModifier(
-    KeyModifiers modifiers,
-    KeyModifiers modifier
-    ) noexcept {
-    return (modifiers & modifier) == modifier;
-}
-
 struct Event {
     EventType type_ = EventType::None;
 
     uint64_t window_id_ = 0;
 
     // Keyboard
-    Key key_ = Key::Unknown;
+    KeyCode key_ = KeyCode::Unknown;
     KeyModifiers modifiers_ = KeyModifiers::None;
 
     // Text input
+    String text_;
     char32_t character_ = U'\0';
+    bool is_repeat_ = false;
 
     // Mouse
     Vec2d mouse_pos_{};
     Vec2d mouse_delta_{};
     Vec2d mouse_wheel_{};
     MouseButton mouse_button_ = MouseButton::Left;
+    int32_t mouse_click_count_ = 0;
 
     // Window dimensions.
-    int width_ = 0;
-    int height_ = 0;
+    int32_t width_ = 0;
+    int32_t height_ = 0;
+
+    [[nodiscard]]
+    constexpr bool hasKeyModifier(KeyModifiers modifier) const {
+        return (modifiers_ & modifier) == modifier;
+    }
+
+    [[nodiscard]]
+    constexpr bool hasKeyModifierOnly(KeyModifiers modifier) const {
+        return modifiers_ == modifier;
+    }
 };
 
 using EventHandler = std::function<void(const Event&)>;

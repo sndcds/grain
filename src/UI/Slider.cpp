@@ -5,16 +5,12 @@
 
 #include <algorithm>
 #include <cmath>
+#include <iomanip>
 #include <utility>
 
 namespace Grain {
 
-Slider::Slider(
-    View* view,
-    double min,
-    double max,
-    double value
-)
+Slider::Slider(View* view, double min, double max, double value)
     : Component(view)
 {
     setRange(min, max);

@@ -1,10 +1,30 @@
 #include "grain/String/String.hpp"
-
 #include "grain/String/StringUtf8.hpp"
 
 #include <ostream>
+#include <algorithm>
+#include <cstring>
+#include <memory>
 
 namespace Grain {
+bool String::isAsciiAtIndex(
+    size_type code_point_index,
+    char& out_char) const {
+    const auto offset = byteOffset(code_point_index);
+
+    if (offset >= data_.size()) {
+        return false;
+    }
+
+    const auto byte = static_cast<unsigned char>(data_[offset]);
+
+    if (byte > 0x7F) {
+        return false;
+    }
+
+    out_char = static_cast<char>(byte);
+    return true;
+}
 
 //------------------------------------------------------------------------------
 // Construction
@@ -36,24 +56,24 @@ String& String::operator=(std::string_view utf8) {
 // Basic properties
 //------------------------------------------------------------------------------
 
-bool String::empty() const noexcept {
+bool String::empty() const {
     return data_.empty();
 }
 
-String::size_type String::length() const noexcept {
+String::size_type String::length() const {
     return StringUtf8::length(data_);
 }
 
-String::size_type String::byteLength() const noexcept {
+String::size_type String::byteLength() const {
     return data_.size();
 }
 
-bool String::isAscii() const noexcept {
+bool String::isAscii() const {
     return StringUtf8::isAscii(data_);
 }
 
 bool String::isValidUtf8(
-    size_type* invalid_byte_index) const noexcept {
+    size_type* invalid_byte_index) const {
     return StringUtf8::isValid(
         data_,
         invalid_byte_index);
@@ -63,15 +83,15 @@ bool String::isValidUtf8(
 // Access
 //------------------------------------------------------------------------------
 
-const char* String::c_str() const noexcept {
+const char* String::c_str() const {
     return data_.c_str();
 }
 
-std::string_view String::view() const noexcept {
+std::string_view String::view() const {
     return data_;
 }
 
-char String::byteAt(size_type index) const noexcept {
+char String::byteAt(size_type index) const {
     if (index >= data_.size()) {
         return '\0';
     }
@@ -79,12 +99,12 @@ char String::byteAt(size_type index) const noexcept {
     return data_[index];
 }
 
-char32_t String::codePointAt(size_type index) const noexcept {
+char32_t String::codePointAt(size_type index) const {
     return StringUtf8::codePointAt(data_, index);
 }
 
 String::size_type String::byteOffset(
-    size_type code_point_index) const noexcept {
+    size_type code_point_index) const {
     return StringUtf8::byteOffset(
         data_,
         code_point_index);
@@ -94,7 +114,7 @@ String::size_type String::byteOffset(
 // Modification
 //------------------------------------------------------------------------------
 
-void String::clear() noexcept {
+void String::clear() {
     data_.clear();
 }
 
@@ -155,6 +175,21 @@ void String::insert(
 
     data_.insert(byte_index, utf8);
 }
+
+
+void String::insertAtCharacterIndex(const char* text, int32_t index) {
+    if (text == nullptr || *text == '\0') {
+        return;
+    }
+
+    const size_type character_index =
+        index < 0
+            ? 0
+            : static_cast<size_type>(index);
+
+    insert(character_index, std::string_view(text));
+}
+
 
 void String::erase(
     size_type code_point_index,
@@ -248,7 +283,7 @@ String String::substr(
 
 String::size_type String::find(
     std::string_view needle,
-    size_type code_point_index) const noexcept {
+    size_type code_point_index) const {
 
     const size_type start =
         byteOffset(code_point_index);
@@ -268,17 +303,17 @@ String::size_type String::find(
 }
 
 bool String::contains(
-    std::string_view needle) const noexcept {
+    std::string_view needle) const {
     return data_.find(needle) != std::string::npos;
 }
 
 bool String::startsWith(
-    std::string_view prefix) const noexcept {
+    std::string_view prefix) const {
     return data_.starts_with(prefix);
 }
 
 bool String::endsWith(
-    std::string_view suffix) const noexcept {
+    std::string_view suffix) const {
     return data_.ends_with(suffix);
 }
 
@@ -286,7 +321,7 @@ bool String::endsWith(
 // Whitespace
 //------------------------------------------------------------------------------
 
-String::size_type String::leadingWhitespace() const noexcept {
+String::size_type String::leadingWhitespace() const {
     size_type count = 0;
 
     while (
@@ -300,7 +335,7 @@ String::size_type String::leadingWhitespace() const noexcept {
     return count;
 }
 
-String::size_type String::trailingWhitespace() const noexcept {
+String::size_type String::trailingWhitespace() const {
     size_type count = 0;
 
     while (
@@ -344,17 +379,17 @@ void String::trim() {
 //------------------------------------------------------------------------------
 
 int String::compare(
-    const String& other) const noexcept {
+    const String& other) const {
     return data_.compare(other.data_);
 }
 
 int String::compare(
-    std::string_view other) const noexcept {
+    std::string_view other) const {
     return data_.compare(other);
 }
 
 int String::compare(
-    const char* other) const noexcept {
+    const char* other) const {
 
     if (other == nullptr) {
         return 1;
@@ -364,7 +399,7 @@ int String::compare(
 }
 
 bool String::equalsIgnoreCase(
-    std::string_view other) const noexcept {
+    std::string_view other) const {
 
     if (data_.size() != other.size()) {
         return false;
@@ -401,62 +436,62 @@ bool String::equalsIgnoreCase(
 
 bool operator==(
     const String& lhs,
-    const String& rhs) noexcept {
+    const String& rhs) {
     return lhs.data_ == rhs.data_;
 }
 
 bool operator==(
     const String& lhs,
-    const char* rhs) noexcept {
+    const char* rhs) {
     return lhs.view() ==
            std::string_view(rhs ? rhs : "");
 }
 
 bool operator==(
     const char* lhs,
-    const String& rhs) noexcept {
+    const String& rhs) {
     return rhs == lhs;
 }
 
 bool operator!=(
     const String& lhs,
-    const String& rhs) noexcept {
+    const String& rhs) {
     return !(lhs == rhs);
 }
 
 bool operator!=(
     const String& lhs,
-    const char* rhs) noexcept {
+    const char* rhs) {
     return !(lhs == rhs);
 }
 
 bool operator!=(
     const char* lhs,
-    const String& rhs) noexcept {
+    const String& rhs) {
     return !(lhs == rhs);
 }
 
 bool operator==(
     const String& lhs,
-    std::string_view rhs) noexcept {
+    std::string_view rhs) {
     return lhs.data_ == rhs;
 }
 
 bool operator==(
     std::string_view lhs,
-    const String& rhs) noexcept {
+    const String& rhs) {
     return lhs == rhs.data_;
 }
 
 bool operator!=(
     const String& lhs,
-    std::string_view rhs) noexcept {
+    std::string_view rhs) {
     return !(lhs == rhs);
 }
 
 bool operator!=(
     std::string_view lhs,
-    const String& rhs) noexcept {
+    const String& rhs) {
     return !(lhs == rhs);
 }
 
@@ -540,7 +575,7 @@ std::ostream& operator<<(
 //------------------------------------------------------------------------------
 
 String::size_type String::codePointIndexFromByteIndex(
-    size_type byte_index) const noexcept {
+    size_type byte_index) const {
 
     return StringUtf8::codePointIndex(
         data_,
@@ -548,7 +583,7 @@ String::size_type String::codePointIndexFromByteIndex(
 }
 
 bool String::isAsciiWhitespace(
-    unsigned char byte) noexcept {
+    unsigned char byte) {
 
     switch (byte) {
     case ' ':

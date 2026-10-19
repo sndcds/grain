@@ -20,13 +20,13 @@ public:
     ~Input() = default;
 
     [[nodiscard]]
-    bool isKeyDown(Key key) const noexcept;
+    bool isKeyDown(KeyCode key) const noexcept;
 
     [[nodiscard]]
-    bool wasKeyPressed(Key key) const noexcept;
+    bool wasKeyPressed(KeyCode key) const noexcept;
 
     [[nodiscard]]
-    bool wasKeyReleased(Key key) const noexcept;
+    bool wasKeyReleased(KeyCode key) const noexcept;
 
     [[nodiscard]]
     bool isMouseButtonDown(MouseButton button) const noexcept;
@@ -51,7 +51,7 @@ private:
     static constexpr int KeyCount = 256;
     static constexpr int MouseButtonCount = 4;
 
-    static int keyIndex(Key key) noexcept;
+    static int keyIndex(KeyCode key) noexcept;
 
     static int mouseButtonIndex(
         MouseButton button

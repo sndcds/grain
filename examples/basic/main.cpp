@@ -1,6 +1,9 @@
+#include "grain/UI/TextField.hpp"
+
 #include <Grain.hpp>
 
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 
 
@@ -67,16 +70,8 @@ public:
     }
 
     void handleEvent(const Grain::Event& event) override {
-        if (event.type_ == Grain::EventType::KeyDown) {
-            std::cout << "KeyDown" << std::endl;
-            startAnimation();
-        }
-        else {
-            View::handleEvent(event);
-        }
-
+        View::handleEvent(event);
         mouse_pos_ = event.mouse_pos_;
-
         requestRedraw();
     }
 };
@@ -128,7 +123,6 @@ void stringExample() {
 using namespace Grain;
 
 int main() {
-
     Grain::Random random;
 
     float value = random.real();
@@ -194,8 +188,8 @@ int main() {
             // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
             // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
-            slider.setAction([](float value) {
-                std::cout << "Slider value: " << value << '\n';
+            slider.setAction([](double value) {
+                std::cout << "Slider value: " << std::fixed << std::setprecision(2) << value << '\n';
             });
         }
 
@@ -203,7 +197,7 @@ int main() {
             auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
 
             slider.setBounds(Rectd{x, 200, 120, 800.0});
-            slider.setStep(1.0f);
+            slider.setStep(0.01f);
 
             slider.setOrientation(Slider::Orientation::Vertical);
             slider.setTrackSize(random.real(20, 120));
@@ -214,10 +208,18 @@ int main() {
             slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
             slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
-            slider.setAction([](float value) {
-                std::cout << "Slider value: " << value << '\n';
+            slider.setAction([](double value) {
+                std::cout << "Slider value: " << std::fixed << std::setprecision(2) << value << '\n';
             });
         }
+
+        {
+            auto& text_field = view->addComponent<TextField>();
+            text_field.setBounds(Rectd{500, 500, 240, 40.0});
+            text_field.setText("Hello World! 1234567890");
+            text_field.setFocused(true);
+        }
+
 
         window->setRootView(std::move(view));
     }

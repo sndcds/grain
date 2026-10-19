@@ -156,6 +156,13 @@ void View::handleEvent(const Event& event) {
             break;
         }
 
+        case EventType::KeyDown: {
+            if (focused_component_ != nullptr) {
+                std::cout << event.text_ << '\n';
+            }
+            break;
+        }
+
         default: {
             if (focused_component_ != nullptr &&
                 focused_component_->visible() &&

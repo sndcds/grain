@@ -35,11 +35,6 @@ void Component::setEnabled(bool enabled) {
 }
 
 
-bool Component::hovered() const {
-    return hovered_;
-}
-
-
 void Component::setHovered(bool hovered) {
     if (hovered_ != hovered) {
         hovered_ = hovered;
@@ -55,15 +50,6 @@ void Component::setFocused(bool focused) {
     }
 }
 
-bool Component::focused() const {
-    return focused_;
-}
-
-
-bool Component::pressed() const {
-    return pressed_;
-}
-
 
 void Component::setPressed(bool pressed) {
     if (pressed_ != pressed) {
@@ -73,13 +59,25 @@ void Component::setPressed(bool pressed) {
 }
 
 
-bool Component::visible() const {
-    return visible_;
-}
-
 void Component::setVisible(bool visible) {
     if (visible_ != visible) {
         visible_ = visible;
+        invalidate();
+    }
+}
+
+
+void Component::setEditable(bool editable) {
+    if (editable_ != editable) {
+        editable_ = editable;
+        invalidate();
+    }
+}
+
+
+void Component::setNumberMode(bool number_mode) {
+    if (number_mode_ != number_mode) {
+        number_mode_ = number_mode;
         invalidate();
     }
 }
