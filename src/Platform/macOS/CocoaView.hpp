@@ -11,12 +11,10 @@ public:
     ~CocoaView() override;
 
     void requestRedraw() override;
-
     void requestRedraw(const Rectd& dirty_rect) override;
 
-    [[nodiscard]] void* nativeView() noexcept override;
-
-    [[nodiscard]] Vec2d mousePos() const noexcept;
+    [[nodiscard]] void* nativeView() override;
+    [[nodiscard]] Vec2d mousePos() const override;
 
 private:
     class Impl;

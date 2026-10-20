@@ -10,19 +10,18 @@ namespace Grain {
 
 class Window::Impl {
 public:
-    uint64_t id;
+    uint64_t id_;
 
-    std::unique_ptr<Platform::Window> platformWindow;
-    std::unique_ptr<View> rootView;
+    std::unique_ptr<Platform::Window> platform_window_;
+    std::unique_ptr<View> root_view_;
 
     explicit Impl(
         uint64_t id,
-        std::unique_ptr<Platform::Window> platformWindow
-        )
-        : id(id),
-          platformWindow(std::move(platformWindow))
+        std::unique_ptr<Platform::Window> platform_window
+    )
+        : id_(id),
+          platform_window_(std::move(platform_window))
     {
-        std::cout << "Window::Impl()" << std::endl;
     }
 };
 
@@ -30,83 +29,90 @@ public:
 Window::Window(std::unique_ptr<Impl> impl)
     : impl_(std::move(impl))
 {
-    std::cout << "Window::Window()" << std::endl;
 }
 
 Window::~Window() = default;
 
 
-uint64_t Window::id() const noexcept {
-    return impl_->id;
+auto Window::id() const -> uint64_t {
+    return impl_->id_;
 }
 
 
 void Window::show() {
-    std::cout << "Window::show()" << std::endl;
     if (impl_ == nullptr ||
-        impl_->platformWindow == nullptr) {
+        impl_->platform_window_ == nullptr) {
         return;
     }
 
-    impl_->platformWindow->show();
+    impl_->platform_window_->show();
 }
 
 
 void Window::requestRedraw() {
-    std::cout << "Window::requestRedraw() id: " << id() << std::endl;
     if (impl_ == nullptr ||
-        impl_->platformWindow == nullptr) {
+        impl_->platform_window_ == nullptr) {
         return;
     }
 
-    impl_->platformWindow->requestRedraw();
+    impl_->platform_window_->requestRedraw();
 }
 
 
 void Window::setRootView(std::unique_ptr<View> view) {
-    std::cout << "Window::setRootView()" << std::endl;
-
-    if (impl_ == nullptr || impl_->platformWindow == nullptr) {
+    if (impl_ == nullptr || impl_->platform_window_ == nullptr) {
         return;
     }
 
-    std::cout << "  Take ownership of the view" << std::endl;
-    impl_->rootView = std::move(view);
+    impl_->root_view_ = std::move(view);
 
-    if (impl_->rootView == nullptr) {
-        impl_->platformWindow->setRootView(nullptr);
+    if (impl_->root_view_ == nullptr) {
+        impl_->platform_window_->setRootView(nullptr);
         return;
     }
 
-    std::cout << "  Attach the view" << std::endl;
-    impl_->rootView->attach();
+    impl_->root_view_->attach();
 
-    std::cout << "  Set platform root view" << std::endl;
-    impl_->platformWindow->setRootView(
-        impl_->rootView->platformView()
+    impl_->platform_window_->setRootView(
+        impl_->root_view_->platformView()
     );
 }
 
 
-std::unique_ptr<Window> Window::create(
+void Window::handleEvent(const Event& event) {
+    (void)event;
+    // TODO: Implement behaviour! Should the window close/delete?
+}
+
+
+auto Window::create(
     uint64_t id,
-    std::unique_ptr<Platform::Window> platformWindow
-    )
+    std::unique_ptr<Platform::Window> platform_window
+) -> std::unique_ptr<Window>
 {
-    std::cout << "Window::create() id: " << id << std::endl;
-    if (platformWindow == nullptr) {
+    if (!platform_window) {
         return nullptr;
     }
 
-    auto impl =
-        std::make_unique<Impl>(
-            id,
-            std::move(platformWindow)
-            );
+    auto impl = std::make_unique<Impl>(
+        id,
+        std::move(platform_window)
+    );
 
-    return std::unique_ptr<Window>(
+    auto window = std::unique_ptr<Window>(
         new Window(std::move(impl))
-        );
+    );
+
+    Window* window_ptr = window.get();
+
+    window->impl_->platform_window_->setEventHandler(
+        [window_ptr](const Event& event) -> void {
+            window_ptr->handleEvent(event);
+        }
+    );
+
+    return window;
 }
+
 
 } // namespace Grain

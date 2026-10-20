@@ -11,30 +11,32 @@ class CocoaAnimationDriver;
 
 class AnimationDriver {
 public:
-    static AnimationDriver& instance();
+    AnimationDriver(const AnimationDriver&) = delete;
+    auto operator=(const AnimationDriver&) -> AnimationDriver& = delete;
 
-    Animation* animate(
+    static auto instance() -> AnimationDriver&;
+
+    auto animate(
         double delay,
         double duration,
-        Animation::Callback callback);
+        Animation::Callback callback
+    ) -> Animation*;
 
-    Animation* animateContinuous(
+    auto animateContinuous(
         double delay,
-        Animation::Callback callback);
+        Animation::Callback callback
+    ) -> Animation*;
 
     void cancel(Animation& animation);
 
     void start();
     void stop();
 
-    [[nodiscard]] bool isRunning() const noexcept;
+    [[nodiscard]] auto isRunning() const noexcept -> bool;
 
 private:
     AnimationDriver();
     ~AnimationDriver();
-
-    AnimationDriver(const AnimationDriver&) = delete;
-    AnimationDriver& operator=(const AnimationDriver&) = delete;
 
     void tick();
 

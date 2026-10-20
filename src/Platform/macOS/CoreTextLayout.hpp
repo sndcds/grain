@@ -26,9 +26,7 @@ public:
     [[nodiscard]] double ascent() const override;
     [[nodiscard]] double descent() const override;
 
-    [[nodiscard]] double offsetForIndex(
-        int32_t index
-    ) const override;
+    [[nodiscard]] double offsetForIndex(int32_t index) const override;
 
     [[nodiscard]] CTLineRef nativeLine() const noexcept {
         return line_.get();

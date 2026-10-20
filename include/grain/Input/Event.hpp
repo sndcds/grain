@@ -9,23 +9,27 @@ namespace Grain {
 
 enum class EventType {
     None,
-
     Quit,
 
-    WindowClose,
+    // Window lifecycle and state.
+    WindowCloseRequested,
+    WindowWillClose,
     WindowResize,
     WindowFocusGained,
     WindowFocusLost,
 
+    // Keyboard.
     KeyDown,
     KeyUp,
-    TextInput,
+    ModifiersChanged,
 
+    // Mouse.
     MouseMove,
     MouseButtonDown,
     MouseButtonUp,
-    MouseWheel
+    MouseWheel,
 };
+
 
 enum class KeyCode : uint32_t {
     Unknown,

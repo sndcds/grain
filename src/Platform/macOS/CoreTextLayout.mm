@@ -29,16 +29,13 @@ CFObject<CFAttributedStringRef> createAttributedString(
     const Font& font)
 {
     auto string = createCFString(text);
-
     if (!string) {
         return {};
     }
 
-    CTFontRef native_font =
-        static_cast<CTFontRef>(font.nativeHandle());
-
     CFObject<CTFontRef> fallback_font;
 
+    CTFontRef native_font = static_cast<CTFontRef>(font.nativeHandle());
     if (native_font == nullptr) {
         fallback_font.reset(
             CTFontCreateUIFontForLanguage(
@@ -55,13 +52,8 @@ CFObject<CFAttributedStringRef> createAttributedString(
         return {};
     }
 
-    const void* keys[] = {
-        kCTFontAttributeName
-    };
-
-    const void* values[] = {
-        native_font
-    };
+    const void* keys[] = { kCTFontAttributeName };
+    const void* values[] = { native_font };
 
     CFObject<CFDictionaryRef> attributes(
         CFDictionaryCreate(
@@ -73,7 +65,6 @@ CFObject<CFAttributedStringRef> createAttributedString(
             &kCFTypeDictionaryValueCallBacks
         )
     );
-
     if (!attributes) {
         return {};
     }
@@ -90,12 +81,8 @@ CFObject<CFAttributedStringRef> createAttributedString(
 } // namespace
 
 
-CoreTextLayout::CoreTextLayout(
-    const String& text,
-    const Font& font)
-{
+CoreTextLayout::CoreTextLayout(const String& text, const Font& font) {
     auto attributed_string = createAttributedString(text, font);
-
     if (!attributed_string) {
         return;
     }
@@ -116,8 +103,7 @@ CoreTextLayout::CoreTextLayout(
     CFIndex utf16_index = 0;
 
     for (std::size_t i = 0; i < bytes.size();) {
-        const auto lead =
-            static_cast<unsigned char>(bytes[i]);
+        const auto lead = static_cast<unsigned char>(bytes[i]);
 
         std::size_t byte_count = 1;
         uint32_t code_point = lead;

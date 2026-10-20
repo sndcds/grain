@@ -1,7 +1,6 @@
 #import <AppKit/AppKit.h>
 
 #include "CocoaWindow.hpp"
-
 #include <grain/Platform/View.hpp>
 
 #include <memory>
@@ -9,15 +8,48 @@
 #include <string_view>
 
 
+@interface CocoaWindowDelegate : NSObject <NSWindowDelegate>
+
+@property(nonatomic, copy) BOOL (^shouldCloseHandler)(void);
+@property(nonatomic, copy) void (^willCloseHandler)(void);
+
+@end
+
+@implementation CocoaWindowDelegate
+
+- (BOOL)windowShouldClose:(NSWindow*)sender {
+    (void)sender;
+
+    if (self.shouldCloseHandler) {
+        return self.shouldCloseHandler();
+    }
+
+    return YES;
+}
+
+- (void)windowWillClose:(NSNotification*)notification {
+    (void)notification;
+
+    if (self.willCloseHandler) {
+        self.willCloseHandler();
+    }
+}
+
+@end
+
+
 namespace Grain::Platform {
+
 
 class CocoaWindow::Impl {
 public:
-    NSWindow* window = nil;
+    NSWindow* window_ = nil;
+    NSView* native_root_view_ = nil;
+    CocoaWindowDelegate* delegate = nil;
 
-    NSView* nativeRootView = nil;
+    Grain::EventHandler event_handler;
 
-    Grain::EventHandler eventHandler;
+    bool closing = false;
 };
 
 
@@ -26,13 +58,12 @@ CocoaWindow::CocoaWindow(
     std::string_view title,
     int width,
     int height,
-    EventHandler eventHandler
-    ) : windowId_(id),
-        impl_(std::make_unique<Impl>())
+    EventHandler event_handler
+)
+    : window_id_(id),
+    impl_(std::make_unique<Impl>())
 {
-    std::cout << "CocoaWindow::CocoaWindow()" << std::endl;
-
-    impl_->eventHandler = std::move(eventHandler);
+    impl_->event_handler = std::move(event_handler);
 
     NSString* ns_title =
         [
@@ -53,7 +84,7 @@ CocoaWindow::CocoaWindow(
         static_cast<CGFloat>(height)
     );
 
-    impl_->window =
+    impl_->window_ =
         [[NSWindow alloc]
             initWithContentRect:rect
             styleMask:
@@ -65,13 +96,34 @@ CocoaWindow::CocoaWindow(
             defer:NO
         ];
 
-    if (impl_->window == nil) {
+    if (impl_->window_ == nil) {
         return;
     }
 
-    [impl_->window setTitle:ns_title];
-    [impl_->window setAcceptsMouseMovedEvents:YES];
-    [impl_->window center];
+    [impl_->window_ setTitle:ns_title];
+    [impl_->window_ setAcceptsMouseMovedEvents:YES];
+    [impl_->window_ center];
+
+
+    // Install the delegate
+
+    impl_->delegate = [[CocoaWindowDelegate alloc] init];
+
+    impl_->delegate.shouldCloseHandler = ^BOOL {
+        return YES;
+    };
+
+    impl_->delegate.willCloseHandler = [this]() {
+        Event event;
+        event.type_ = EventType::WindowWillClose;
+
+        emitEvent(event);
+
+        impl_->closing = true;
+    };
+
+    impl_->window_.delegate = impl_->delegate;
+
 }
 
 
@@ -80,68 +132,78 @@ CocoaWindow::~CocoaWindow() {
         return;
     }
 
-    impl_->nativeRootView = nil;
-
-    if (impl_->window != nil) {
-        [impl_->window close];
-        impl_->window = nil;
+    if (impl_->window_ != nil) {
+        impl_->window_.delegate = nil;
+        [impl_->window_ close];
+        impl_->window_ = nil;
     }
+
+    impl_->native_root_view_ = nil;
 }
 
 
 void CocoaWindow::show() {
-    if (impl_->window == nil) {
+    if (impl_->window_ == nil) {
         return;
     }
 
-    [impl_->window makeKeyAndOrderFront:nil];
+    [impl_->window_ makeKeyAndOrderFront:nil];
 }
 
 
 void CocoaWindow::requestRedraw() {
     if (impl_ == nullptr ||
-        impl_->nativeRootView == nil) {
+        impl_->native_root_view_ == nil) {
         return;
     }
 
-    std::cout << "CocoaWindow::requestRedraw()" << std::endl;
-    [impl_->nativeRootView setNeedsDisplay:YES];
+    [impl_->native_root_view_ setNeedsDisplay:YES];
 }
 
 
-void CocoaWindow::setRootView(
-    Grain::Platform::View* platformView
-)
-{
-    std::cout << "CocoaWindow::setRootView(): "
-              << static_cast<const void*>(platformView)
-              << std::endl;
-
+void CocoaWindow::setRootView(Grain::Platform::View* platform_view) {
     if (impl_ == nullptr ||
-        impl_->window == nil) {
+        impl_->window_ == nil) {
         return;
     }
 
-    [impl_->window setContentView:nil];
-    impl_->nativeRootView = nil;
+    [impl_->window_ setContentView:nil];
+    impl_->native_root_view_ = nil;
 
-    if (platformView == nullptr) {
+    if (platform_view == nullptr) {
         return;
     }
 
-    NSView* nativeView =
-        static_cast<NSView*>(platformView->nativeView());
-
+    auto nativeView = static_cast<NSView*>(platform_view->nativeView());
     if (nativeView == nil) {
         return;
     }
 
-    impl_->nativeRootView = nativeView;
+    impl_->native_root_view_ = nativeView;
 
-    [impl_->window setContentView:nativeView];
+    [impl_->window_ setContentView:nativeView];
 
     [nativeView setAutoresizingMask:
         NSViewWidthSizable | NSViewHeightSizable];
 }
+
+
+void CocoaWindow::setEventHandler(EventHandler event_handler) {
+    if (!impl_) {
+        return;
+    }
+
+    impl_->event_handler = std::move(event_handler);
+}
+
+
+void CocoaWindow::emitEvent(const Event& event) {
+    if (!impl_ || !impl_->event_handler) {
+        return;
+    }
+
+    impl_->event_handler(event);
+}
+
 
 } // namespace Grain::Platform

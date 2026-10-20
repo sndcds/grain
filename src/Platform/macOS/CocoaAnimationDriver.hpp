@@ -27,11 +27,11 @@ public:
     void runMainThreadTick();
 
 private:
-    CVDisplayLinkRef displayLink_ = nullptr;
+    CVDisplayLinkRef display_link_ = nullptr;
 
-    std::function<void()> tickCallback_;
+    std::function<void()> tick_callback_;
 
-    std::atomic_bool tickQueued_{false};
+    std::atomic_bool tick_queued_{false};
 
     bool running_ = false;
 };

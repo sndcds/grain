@@ -11,6 +11,6 @@ namespace Grain {
 
 class View;
 
-NSView* createGrainRootView(View* grainView);
+NSView* createGrainRootView(View* grain_view);
 
 } // namespace Grain

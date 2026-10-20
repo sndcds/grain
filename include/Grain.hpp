@@ -1,6 +1,5 @@
 #pragma once
 
-#include <grain/Core/ObjectBase.hpp>
 #include <grain/Type/FixValue.hpp>
 #include <grain/Containers/List.hpp>
 #include <grain/Geometry/Layout.hpp>

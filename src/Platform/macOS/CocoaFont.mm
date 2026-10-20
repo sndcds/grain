@@ -9,10 +9,7 @@ namespace Grain::Platform {
 
 namespace {
 
-CFStringRef makeCFString(
-    const char* str,
-    int32_t length) noexcept
-{
+CFStringRef makeCFString(const char* str, int32_t length) {
     if (str == nullptr) {
         return nullptr;
     }
@@ -21,7 +18,8 @@ CFStringRef makeCFString(
         return CFStringCreateWithCString(
             kCFAllocatorDefault,
             str,
-            kCFStringEncodingUTF8);
+            kCFStringEncodingUTF8
+        );
     }
 
     return CFStringCreateWithBytes(
@@ -29,21 +27,17 @@ CFStringRef makeCFString(
         reinterpret_cast<const UInt8*>(str),
         length,
         kCFStringEncodingUTF8,
-        false);
+        false
+    );
 }
 
-double safeCellHeight(
-    double ascent,
-    double descent,
-    double leading) noexcept
-{
+
+double safeCellHeight(double ascent, double descent, double leading) {
     return ascent + descent + leading;
 }
 
-CTLineRef createLine(
-    CFStringRef string,
-    CTFontRef font) noexcept
-{
+
+CTLineRef createLine(CFStringRef string, CTFontRef font) {
     if (string == nullptr || font == nullptr) {
         return nullptr;
     }
@@ -51,7 +45,9 @@ CTLineRef createLine(
     CFObject<CFMutableAttributedStringRef> attributes(
         CFAttributedStringCreateMutable(
             kCFAllocatorDefault,
-            0));
+            0
+        )
+    );
 
     if (!attributes) {
         return nullptr;
@@ -60,31 +56,33 @@ CTLineRef createLine(
     CFAttributedStringReplaceString(
         attributes.get(),
         CFRangeMake(0, 0),
-        string);
+        string
+    );
 
     CFAttributedStringSetAttribute(
         attributes.get(),
         CFRangeMake(
             0,
-            CFStringGetLength(string)),
+            CFStringGetLength(string)
+        ),
         kCTFontAttributeName,
-        font);
+        font
+    );
 
-    return CTLineCreateWithAttributedString(attributes.get());
+    return CTLineCreateWithAttributedString(
+        attributes.get()
+    );
 }
 
 } // namespace
 
 
-CocoaFont::CocoaFont(
-    const String& name,
-    float size) noexcept
-{
+CocoaFont::CocoaFont(const String& name, float size) {
     set(name, size);
 }
 
 
-void CocoaFont::resetMetrics() noexcept {
+void CocoaFont::resetMetrics() {
     is_valid_ = false;
 
     font_name_ = String();
@@ -108,10 +106,7 @@ void CocoaFont::resetMetrics() noexcept {
 }
 
 
-void CocoaFont::set(
-    const String& name,
-    float size) noexcept
-{
+void CocoaFont::set(const String& name, float size) {
     ct_font_.reset();
     resetMetrics();
 
@@ -124,21 +119,27 @@ void CocoaFont::set(
             CTFontCreateUIFontForLanguage(
                 kCTFontSystemFontType,
                 size,
-                nullptr));
+                nullptr
+            )
+        );
     }
     else {
-        CFObject<CFStringRef> cfName(
+        CFObject<CFStringRef> cf_name(
             CFStringCreateWithCString(
                 kCFAllocatorDefault,
                 name_utf8,
-                kCFStringEncodingUTF8));
+                kCFStringEncodingUTF8
+            )
+        );
 
-        if (cfName) {
+        if (cf_name) {
             ct_font_.reset(
                 CTFontCreateWithName(
-                    cfName.get(),
+                    cf_name.get(),
                     size,
-                    nullptr));
+                    nullptr
+                )
+            );
         }
     }
 
@@ -148,23 +149,28 @@ void CocoaFont::set(
 
     is_valid_ = true;
 
-    CFObject<CFStringRef> postscriptName(
-        CTFontCopyPostScriptName(ct_font_.get()));
+    CFObject<CFStringRef> postscript_name(
+        CTFontCopyPostScriptName(ct_font_.get())
+    );
 
-    if (postscriptName) {
+
+    if (postscript_name) {
         char buffer[1024];
 
         if (CFStringGetCString(
-                postscriptName.get(),
+                postscript_name.get(),
                 buffer,
                 sizeof(buffer),
-                kCFStringEncodingUTF8)) {
+                kCFStringEncodingUTF8
+            )
+        ) {
             font_name_ = String(buffer);
         }
     }
 
     CFObject<CFStringRef> displayName(
-        CTFontCopyDisplayName(ct_font_.get()));
+        CTFontCopyDisplayName(ct_font_.get())
+    );
 
     if (displayName) {
         char buffer[1024];
@@ -173,7 +179,9 @@ void CocoaFont::set(
                 displayName.get(),
                 buffer,
                 sizeof(buffer),
-                kCFStringEncodingUTF8)) {
+                kCFStringEncodingUTF8
+            )
+        ) {
             display_name_ = String(buffer);
         }
     }
@@ -182,8 +190,7 @@ void CocoaFont::set(
 }
 
 
-void CocoaFont::updateMetrics() noexcept
-{
+void CocoaFont::updateMetrics() {
     if (!ct_font_) {
         return;
     }
@@ -193,196 +200,163 @@ void CocoaFont::updateMetrics() noexcept
     ascent_ = CTFontGetAscent(font);
     descent_ = CTFontGetDescent(font);
     leading_ = CTFontGetLeading(font);
-
     x_height_ = CTFontGetXHeight(font);
     cap_height_ = CTFontGetCapHeight(font);
-
-    cell_height_ = safeCellHeight(
-        ascent_,
-        descent_,
-        leading_);
-
+    cell_height_ = safeCellHeight(ascent_, descent_, leading_);
     line_height_ = cell_height_;
-
     italic_angle_ = CTFontGetSlantAngle(font);
 
-    underline_position_ =
-        CTFontGetUnderlinePosition(font);
+    underline_position_ = CTFontGetUnderlinePosition(font);
+    underline_thickness_ = CTFontGetUnderlineThickness(font);
 
-    underline_thickness_ =
-        CTFontGetUnderlineThickness(font);
+    units_per_em_ = static_cast<int32_t>(CTFontGetUnitsPerEm(font));
+    glyph_count_ = static_cast<int32_t>(CTFontGetGlyphCount(font));
 
-    units_per_em_ =
-        static_cast<int32_t>(
-            CTFontGetUnitsPerEm(font));
+    const CGRect box = CTFontGetBoundingBox(font);
 
-    glyph_count_ =
-        static_cast<int32_t>(
-            CTFontGetGlyphCount(font));
-
-    const CGRect box =
-        CTFontGetBoundingBox(font);
-
-    bounding_box_ = Rectd(
-        box.origin.x,
-        box.origin.y,
-        box.size.width,
-        box.size.height);
+    bounding_box_ =
+        Rectd(
+            box.origin.x, box.origin.y, box.size.width, box.size.height
+        );
 }
 
 
-const char* CocoaFont::fontNameUtf8() const noexcept
-{
+const char* CocoaFont::fontNameUtf8() const {
     return font_name_.utf8();
 }
 
 
-const char* CocoaFont::displayNameUtf8() const noexcept
-{
+const char* CocoaFont::displayNameUtf8() const {
     return display_name_.utf8();
 }
 
 
-float CocoaFont::size() const noexcept
-{
+float CocoaFont::size() const {
     return font_size_;
 }
 
 
-bool CocoaFont::isValid() const noexcept
-{
+bool CocoaFont::isValid() const {
     return is_valid_;
 }
 
 
-double CocoaFont::ascent() const noexcept
-{
+double CocoaFont::ascent() const {
     return ascent_;
 }
 
 
-double CocoaFont::descent() const noexcept
-{
+double CocoaFont::descent() const {
     return descent_;
 }
 
 
-double CocoaFont::xHeight() const noexcept
-{
+double CocoaFont::xHeight() const {
     return x_height_;
 }
 
 
-double CocoaFont::capHeight() const noexcept
-{
+double CocoaFont::capHeight() const {
     return cap_height_;
 }
 
 
-double CocoaFont::leading() const noexcept
-{
+double CocoaFont::leading() const {
     return leading_;
 }
 
 
-double CocoaFont::cellHeight() const noexcept
-{
+double CocoaFont::cellHeight() const {
     return cell_height_;
 }
 
 
-double CocoaFont::lineHeight() const noexcept
-{
+double CocoaFont::lineHeight() const {
     return line_height_;
 }
 
 
-double CocoaFont::italicAngle() const noexcept
-{
+double CocoaFont::italicAngle() const {
     return italic_angle_;
 }
 
 
-double CocoaFont::underlinePosition() const noexcept
-{
+double CocoaFont::underlinePosition() const{
     return underline_position_;
 }
 
 
-double CocoaFont::underlineThickness() const noexcept
-{
+double CocoaFont::underlineThickness() const {
     return underline_thickness_;
 }
 
 
-int32_t CocoaFont::unitsPerEm() const noexcept
-{
+int32_t CocoaFont::unitsPerEm() const {
     return units_per_em_;
 }
 
 
-int32_t CocoaFont::glyphCount() const noexcept
-{
+int32_t CocoaFont::glyphCount() const {
     return glyph_count_;
 }
 
 
-const Rectd& CocoaFont::boundingBox() const noexcept
-{
+const Rectd& CocoaFont::boundingBox() const {
     return bounding_box_;
 }
 
 
 double CocoaFont::glyphAdvanceWidth(
     const char* symbol,
-    int32_t length) const noexcept
-{
+    int32_t length
+) const {
     if (!ct_font_ || symbol == nullptr) {
         return 0.0;
     }
 
     CFObject<CFStringRef> string(
-        makeCFString(symbol, length));
+        makeCFString(symbol, length)
+    );
 
     if (!string) {
         return 0.0;
     }
 
-    const CFIndex length_utf16 =
-        CFStringGetLength(string.get());
+    const CFIndex length_utf16 = CFStringGetLength(string.get());
 
     if (length_utf16 == 0) {
         return 0.0;
     }
 
-    std::vector<UniChar> characters(
-        static_cast<size_t>(length_utf16));
+    std::vector<UniChar> characters(static_cast<size_t>(length_utf16));
 
     CFStringGetCharacters(
         string.get(),
         CFRangeMake(0, length_utf16),
-        characters.data());
+        characters.data()
+    );
 
-    std::vector<CGGlyph> glyphs(
-        static_cast<size_t>(length_utf16));
+    std::vector<CGGlyph> glyphs(static_cast<size_t>(length_utf16));
 
     if (!CTFontGetGlyphsForCharacters(
             ct_font_.get(),
             characters.data(),
             glyphs.data(),
-            length_utf16)) {
+            length_utf16
+        )
+    ) {
         return 0.0;
     }
 
-    std::vector<CGSize> advances(
-        static_cast<size_t>(length_utf16));
+    std::vector<CGSize> advances(static_cast<size_t>(length_utf16));
 
     CTFontGetAdvancesForGlyphs(
         ct_font_.get(),
         kCTFontOrientationHorizontal,
         glyphs.data(),
         advances.data(),
-        length_utf16);
+        length_utf16
+    );
 
     double width = 0.0;
 
@@ -394,24 +368,17 @@ double CocoaFont::glyphAdvanceWidth(
 }
 
 
-Sized CocoaFont::textDimension(
-    const char* str,
-    int32_t byte_length) const noexcept
-{
+Sized CocoaFont::textDimension(const char* str, int32_t byte_length) const  {
     if (!ct_font_ || str == nullptr) {
         return Sized{};
     }
 
-    CFObject<CFStringRef> string(
-        makeCFString(str, byte_length));
-
+    CFObject<CFStringRef> string(makeCFString(str, byte_length));
     if (!string) {
         return Sized{};
     }
 
-    CFObject<CTLineRef> line(
-        createLine(string.get(), ct_font_.get()));
-
+    CFObject<CTLineRef> line(createLine(string.get(), ct_font_.get()));
     if (!line) {
         return Sized{};
     }
@@ -425,11 +392,10 @@ Sized CocoaFont::textDimension(
             line.get(),
             &ascent,
             &descent,
-            &leading);
+            &leading
+        );
 
-    return Sized(
-        width,
-        ascent + descent + leading);
+    return Sized(width, ascent + descent + leading);
 }
 
 
@@ -437,8 +403,8 @@ int32_t CocoaFont::charIndexAtX(
     const char* str,
     double x,
     double& in_out_delta,
-    double& out_cursor_x) const noexcept
-{
+    double& out_cursor_x
+) const {
     in_out_delta = 0.0;
     out_cursor_x = 0.0;
 
@@ -446,16 +412,12 @@ int32_t CocoaFont::charIndexAtX(
         return -1;
     }
 
-    CFObject<CFStringRef> string(
-        makeCFString(str, -1));
-
+    CFObject<CFStringRef> string(makeCFString(str, -1));
     if (!string) {
         return -1;
     }
 
-    CFObject<CTLineRef> line(
-        createLine(string.get(), ct_font_.get()));
-
+    CFObject<CTLineRef> line(createLine(string.get(), ct_font_.get()));
     if (!line) {
         return -1;
     }
@@ -465,14 +427,16 @@ int32_t CocoaFont::charIndexAtX(
     const CFIndex index =
         CTLineGetStringIndexForPosition(
             line.get(),
-            CGPointMake(x, 0.0));
+            CGPointMake(x, 0.0)
+        );
 
     if (index >= 0) {
         out_cursor_x =
             CTLineGetOffsetForStringIndex(
                 line.get(),
                 index,
-                &secondary_offset);
+                &secondary_offset
+            );
     }
 
     in_out_delta = secondary_offset;
@@ -485,11 +449,12 @@ int32_t CocoaFont::charIndexAtX(
 }
 
 
-std::vector<String> availableFontNames() noexcept {
+std::vector<String> availableFontNames() {
     std::vector<String> result;
 
     CFObject<CTFontCollectionRef> collection(
-        CTFontCollectionCreateFromAvailableFonts(nullptr));
+        CTFontCollectionCreateFromAvailableFonts(nullptr)
+    );
 
     if (!collection) {
         return result;
@@ -497,7 +462,9 @@ std::vector<String> availableFontNames() noexcept {
 
     CFObject<CFArrayRef> descriptors(
         CTFontCollectionCreateMatchingFontDescriptors(
-            collection.get()));
+            collection.get()
+        )
+    );
 
     if (!descriptors) {
         return result;
@@ -511,7 +478,9 @@ std::vector<String> availableFontNames() noexcept {
         auto descriptor =
             static_cast<CTFontDescriptorRef>(
                 const_cast<void*>(
-                    CFArrayGetValueAtIndex(descriptors.get(), i)));
+                    CFArrayGetValueAtIndex(descriptors.get(), i)
+                )
+            );
 
         if (!descriptor) {
             continue;
@@ -521,8 +490,10 @@ std::vector<String> availableFontNames() noexcept {
             static_cast<CFStringRef>(
                 CTFontDescriptorCopyAttribute(
                     descriptor,
-                    kCTFontNameAttribute)));
-
+                    kCTFontNameAttribute
+                )
+            )
+        );
         if (!name) {
             continue;
         }
@@ -534,7 +505,9 @@ std::vector<String> availableFontNames() noexcept {
                 name.get(),
                 buffer,
                 sizeof(buffer),
-                kCFStringEncodingUTF8)) {
+                kCFStringEncodingUTF8
+            )
+        ) {
             result.emplace_back(buffer);
         }
     }
@@ -543,20 +516,19 @@ std::vector<String> availableFontNames() noexcept {
 }
 
 
-std::vector<String> availableFontFamilies() noexcept {
+std::vector<String> availableFontFamilies() {
     std::vector<String> result;
 
     CFObject<CTFontCollectionRef> collection(
-        CTFontCollectionCreateFromAvailableFonts(nullptr));
-
+        CTFontCollectionCreateFromAvailableFonts(nullptr)
+    );
     if (!collection) {
         return result;
     }
 
     CFObject<CFArrayRef> descriptors(
-        CTFontCollectionCreateMatchingFontDescriptors(
-            collection.get()));
-
+        CTFontCollectionCreateMatchingFontDescriptors(collection.get())
+    );
     if (!descriptors) {
         return result;
     }
@@ -569,14 +541,18 @@ std::vector<String> availableFontFamilies() noexcept {
         auto descriptor =
             static_cast<CTFontDescriptorRef>(
                 const_cast<void*>(
-                    CFArrayGetValueAtIndex(descriptors.get(), i)));
+                    CFArrayGetValueAtIndex(descriptors.get(), i)
+                )
+            );
 
         CFObject<CFStringRef> family(
             static_cast<CFStringRef>(
                 CTFontDescriptorCopyAttribute(
                     descriptor,
-                    kCTFontFamilyNameAttribute)));
-
+                    kCTFontFamilyNameAttribute
+                )
+            )
+        );
         if (!family) {
             continue;
         }
@@ -587,7 +563,9 @@ std::vector<String> availableFontFamilies() noexcept {
                 family.get(),
                 buffer,
                 sizeof(buffer),
-                kCFStringEncodingUTF8)) {
+                kCFStringEncodingUTF8
+            )
+        ) {
             result.emplace_back(buffer);
         }
     }
@@ -596,10 +574,7 @@ std::vector<String> availableFontFamilies() noexcept {
 }
 
 
-std::unique_ptr<Font> createFont(
-    const String& name,
-    float size) noexcept
-{
+std::unique_ptr<Font> createFont(const String& name, float size) {
     return std::make_unique<CocoaFont>(name, size);
 }
 

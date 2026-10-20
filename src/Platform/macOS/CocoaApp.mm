@@ -33,22 +33,14 @@ CocoaApp::~CocoaApp() = default;
 
 
 bool CocoaApp::setIcon(const std::string& path) {
-    std::cout << "CocoaApp::setIcon()" << std::endl;
-    NSString* filePath =
-        [NSString stringWithUTF8String:path.c_str()];
+    NSString* filePath = [NSString stringWithUTF8String:path.c_str()];
 
-    std::cout << "2" << std::endl;
-    NSImage* image =
-        [[NSImage alloc] initWithContentsOfFile:filePath];
-    std::cout << "3" << std::endl;
-
+    NSImage* image = [[NSImage alloc] initWithContentsOfFile:filePath];
     if (image == nil) {
         return false;
     }
-    std::cout << "4" << std::endl;
 
     [NSApplication sharedApplication].applicationIconImage = image;
-    std::cout << "5" << std::endl;
 
     return true;
 }
@@ -59,9 +51,7 @@ std::unique_ptr<Window> CocoaApp::createWindow(
     std::string_view title,
     int width,
     int height
-)
-{
-    std::cout << "CocoaApp::createWindow()" << std::endl;
+) {
     return std::make_unique<CocoaWindow>(
         id,
         title,

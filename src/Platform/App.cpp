@@ -11,23 +11,18 @@ namespace Grain {
 
 class App::Impl {
 public:
-    std::unique_ptr<Platform::App> platformApp;
-    std::vector<std::unique_ptr<Window> > windows;
+    std::unique_ptr<Platform::App> platform_app_;
+    std::vector<std::unique_ptr<Window> > windows_;
 
-    Input input;
+    Input input_;
+    uint64_t next_window_id = 1;
+    bool running_ = false;
 
-    uint64_t nextWindowId = 1;
-
-    bool running = false;
-
-    Impl()
-        : platformApp(Platform::createApp()) {
-        std::cout << "App::Impl()" << std::endl;
-    }
+    Impl() : platform_app_(Platform::createApp()) {}
 };
 
 
-App& App::instance() {
+auto App::instance() -> App& {
     static App app;
     return app;
 }
@@ -36,9 +31,9 @@ App& App::instance() {
 App::App()
     : impl_(std::make_unique<Impl>())
 {
-    if (impl_->platformApp != nullptr) {
-        impl_->platformApp->setEventHandler(
-            [this](const Event& event) {
+    if (impl_->platform_app_ != nullptr) {
+        impl_->platform_app_->setEventHandler(
+            [this](const Event& event) -> void {
                 processEvent(event);
             }
         );
@@ -46,53 +41,47 @@ App::App()
 }
 
 
-bool App::setIcon(const std::string& path) {
-    if (impl_ == nullptr || impl_->platformApp == nullptr) {
+auto App::setIcon(const std::string& path) -> bool {
+    if (impl_ == nullptr || impl_->platform_app_ == nullptr) {
         return false;
     }
 
-    return impl_->platformApp->setIcon(path);
+    return impl_->platform_app_->setIcon(path);
 }
 
 
-Window* App::createWindow(
+auto App::createWindow(
     std::string_view title,
     int width,
     int height
-    )
+) -> Window*
 {
-    std::cout << "App::createWindow()" << std::endl;
-    if (impl_ == nullptr || impl_->platformApp == nullptr) {
+    if (impl_ == nullptr || impl_->platform_app_ == nullptr) {
         return nullptr;
     }
 
-    const uint64_t windowId = impl_->nextWindowId++;
+    const uint64_t window_id = impl_->next_window_id++;
 
-    auto platformWindow =
-        impl_->platformApp->createWindow(
-            windowId,
+    auto platform_window =
+        impl_->platform_app_->createWindow(
+            window_id,
             title,
             width,
             height
         );
 
-    if (platformWindow == nullptr) {
+    if (platform_window == nullptr) {
         return nullptr;
     }
 
-    auto window =
-        Window::create(
-            windowId,
-            std::move(platformWindow)
-        );
-
+    auto window = Window::create(window_id, std::move(platform_window));
     if (window == nullptr) {
         return nullptr;
     }
 
     Window* result = window.get();
 
-    impl_->windows.push_back(std::move(window));
+    impl_->windows_.push_back(std::move(window));
 
     result->show();
 
@@ -100,11 +89,11 @@ Window* App::createWindow(
 }
 
 
-/*
+/* TODO: ???
 View* App::addView(std::unique_ptr<View> view) {
     std::cout << "App::addView()" << std::endl;
 
-    if (impl_ == nullptr || impl_->platformApp == nullptr) {
+    if (impl_ == nullptr || impl_->platform_app == nullptr) {
         return nullptr;
     }
 
@@ -115,58 +104,44 @@ View* App::addView(std::unique_ptr<View> view) {
 */
 
 
-Input& App::input() noexcept {
-    return impl_->input;
+auto App::input() noexcept -> Input& {
+    return impl_->input_;
 }
 
 
-const Input& App::input() const noexcept {
-    return impl_->input;
+auto App::input() const noexcept -> const Input& {
+    return impl_->input_;
 }
 
 
 void App::run() {
-    std::cout << "App::run()" << std::endl;
-
-    if (impl_ == nullptr || impl_->platformApp == nullptr) {
+    if (impl_ == nullptr || impl_->platform_app_ == nullptr) {
         return;
     }
 
-    impl_->running = true;
-
-    impl_->input.beginFrame();
-
-    impl_->platformApp->run();
-
-    impl_->running = false;
+    impl_->running_ = true;
+    impl_->input_.beginFrame();
+    impl_->platform_app_->run();
+    impl_->running_ = false;
 }
 
 
 void App::quit() noexcept {
-    std::cout << "App::quit()" << std::endl;
-    impl_->running = false;
+    impl_->running_ = false;
 
-    if (impl_->platformApp != nullptr) {
-        impl_->platformApp->quit();
+    if (impl_->platform_app_ != nullptr) {
+        impl_->platform_app_->quit();
     }
 }
 
 
 void App::processEvent(const Event& event) {
-    std::cout << "App::processEvent()" << std::endl;
-    std::cout
-        << "  type: " << static_cast<int>(event.type_)
-        << ", windowId: " << static_cast<int>(event.window_id_)
-        << ", mouseButton: " << static_cast<int>(event.mouse_button_)
-        << ", " << event.mouse_pos_
-        << '\n';
-
     if (event.type_ == EventType::Quit) {
         quit();
         return;
     }
 
-    impl_->input.processEvent(event);
+    impl_->input_.processEvent(event);
 }
 
 } // namespace Grain

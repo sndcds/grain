@@ -7,7 +7,7 @@ namespace Grain::Platform {
 
 class CocoaView::Impl {
 public:
-    NSView* nativeView = nil;
+    NSView* native_view_ = nil;
 };
 
 
@@ -18,7 +18,7 @@ CocoaView::CocoaView(Grain::View* view)
         return;
     }
 
-    impl_->nativeView = Grain::createGrainRootView(view);
+    impl_->native_view_ = Grain::createGrainRootView(view);
 }
 
 
@@ -26,12 +26,11 @@ CocoaView::~CocoaView() = default;
 
 
 void CocoaView::requestRedraw() {
-    if (impl_ == nullptr ||
-        impl_->nativeView == nil) {
+    if (impl_ == nullptr || impl_->native_view_ == nil) {
         return;
     }
 
-    [impl_->nativeView setNeedsDisplay:YES];
+    [impl_->native_view_ setNeedsDisplay:YES];
 }
 
 
@@ -41,21 +40,21 @@ void CocoaView::requestRedraw(const Rectd& dirty_rect) {
 }
 
 
-void* CocoaView::nativeView() noexcept {
+void* CocoaView::nativeView() {
     if (impl_ == nullptr) {
         return nullptr;
     }
 
-    return static_cast<void*>(impl_->nativeView);
+    return static_cast<void*>(impl_->native_view_);
 }
 
 
-Vec2d CocoaView::mousePos() const noexcept {
-    if (impl_ == nullptr || impl_->nativeView == nil) {
+Vec2d CocoaView::mousePos() const {
+    if (impl_ == nullptr || impl_->native_view_ == nil) {
         return {};
     }
 
-    NSView* view = impl_->nativeView;
+    NSView* view = impl_->native_view_;
     NSWindow* window = view.window;
 
     if (window == nil) {

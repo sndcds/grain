@@ -192,8 +192,6 @@ target_sources(
         Grain
         PRIVATE
 
-        src/Core/ObjectBase.cpp
-
         src/Type/FixValue.cpp
 
         src/Math/Math.cpp
@@ -245,8 +243,6 @@ target_sources(
         FILES
 
         include/Grain.hpp
-
-        include/grain/Core/ObjectBase.hpp
 
         include/grain/Type/FixValue.hpp
 

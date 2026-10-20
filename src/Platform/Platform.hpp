@@ -21,12 +21,10 @@ public:
     virtual ~View() = default;
 
     virtual void requestRedraw() = 0;
-
     virtual void requestRedraw(const Rectd& dirty_rect) = 0;
 
-    [[nodiscard]] virtual void* nativeView() noexcept = 0;
-
-    virtual Vec2d mousePos() const noexcept = 0;
+    [[nodiscard]] virtual auto nativeView() -> void* = 0;
+    [[nodiscard]] virtual auto mousePos() const -> Vec2d = 0;
 };
 
 
@@ -35,57 +33,48 @@ class View;
 class Window {
 public:
     Window(const Window&) = delete;
-
-    Window& operator=(const Window&) = delete;
-
+    auto operator=(const Window&) -> Window& = delete;
     Window(Window&&) = delete;
-
-    Window& operator=(Window&&) = delete;
+    auto operator=(Window&&) -> Window& = delete;
 
     virtual ~Window() = default;
 
     virtual void show() = 0;
-
     virtual void requestRedraw() = 0;
-
     virtual void setRootView(Grain::Platform::View* platformView) = 0;
+    virtual void setEventHandler(EventHandler eventHandler) = 0;
 
 protected:
     Window() = default;
 };
 
 
-std::unique_ptr<View> createView(Grain::View* view);
+auto createView(Grain::View* view) -> std::unique_ptr<View>;
 
 
 class App {
 public:
     App(const App&) = delete;
-
-    App& operator=(const App&) = delete;
-
+    auto operator=(const App&) -> App& = delete;
     App(App&&) = delete;
-
-    App& operator=(App&&) = delete;
+    auto operator=(App&&) -> App& = delete;
 
     virtual ~App() = default;
 
-    virtual bool setIcon(const std::string& path) = 0;
+    virtual auto setIcon(const std::string& path) -> bool = 0;
 
-
-    virtual std::unique_ptr<Window> createWindow(
+    virtual auto createWindow(
         uint64_t id,
         std::string_view title,
         int width,
         int height
-        ) = 0;
+    ) -> std::unique_ptr<Window> = 0;
 
     void setEventHandler(EventHandler handler) {
         eventHandler_ = std::move(handler);
     }
 
     virtual void run() = 0;
-
     virtual void quit() = 0;
 
 protected:
@@ -101,7 +90,7 @@ private:
     EventHandler eventHandler_;
 };
 
-std::unique_ptr<App> createApp();
+auto createApp() -> std::unique_ptr<App>;
 
 } // namespace Platform
 

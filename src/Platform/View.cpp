@@ -33,7 +33,7 @@ void View::attach() {
 }
 
 
-Platform::View* View::platformView() noexcept {
+auto View::platformView() -> Platform::View* {
     if (impl_ == nullptr) {
         return nullptr;
     }
@@ -76,7 +76,7 @@ void View::updateFocusedComponent(Component* component) {
 }
 
 
-Component* View::hitTest(const Vec2d& pos) noexcept {
+auto View::hitTest(const Vec2d& pos) -> Component* {
     for (auto & it : std::ranges::reverse_view(components_)) {
         Component* component = it.get();
 
@@ -120,7 +120,7 @@ void View::draw(GraphicContext& gc, const Rectd& dirty_rect) {
 }
 
 
-void View::handleEvent(const Event& event) {
+void View::handleMouseEvent(const Event& event) {
     switch (event.type_) {
         case EventType::MouseMove: {
             if (mouse_capture_component_ != nullptr) {
@@ -156,6 +156,14 @@ void View::handleEvent(const Event& event) {
             break;
         }
 
+        default:
+            break;
+    }
+}
+
+
+void View::handleKeyEvent(const Event& event) {
+    switch (event.type_) {
         case EventType::KeyDown: {
             if (focused_component_ != nullptr) {
                 std::cout << event.text_ << '\n';
@@ -163,6 +171,14 @@ void View::handleEvent(const Event& event) {
             break;
         }
 
+        default:
+            break;
+    }
+}
+
+
+void View::handleEvent(const Event& event) {
+    switch (event.type_) {
         default: {
             if (focused_component_ != nullptr &&
                 focused_component_->visible() &&
@@ -193,7 +209,7 @@ void View::requestRedraw(const Rectd& dirty_rect) {
 }
 
 
-Vec2d View::queryMousePos() const noexcept {
+auto View::queryMousePos() const -> Vec2d {
     if (impl_ == nullptr || impl_->platformView == nullptr) {
         return {};
     }

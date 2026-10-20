@@ -13,97 +13,77 @@ namespace Grain::Platform {
 
 class CocoaFont final : public Font {
 public:
-    CocoaFont(
-        const String& name,
-        float size) noexcept;
+    CocoaFont(const String& name, float size);
 
-    ~CocoaFont() noexcept = default;
+    ~CocoaFont() = default;
 
     CocoaFont(const CocoaFont&) = delete;
     CocoaFont& operator=(const CocoaFont&) = delete;
 
-    [[nodiscard]]
-    const char* fontNameUtf8() const noexcept override;
+    [[nodiscard]] const char* fontNameUtf8() const override;
 
-    [[nodiscard]]
-    const char* displayNameUtf8() const noexcept override;
+    [[nodiscard]] const char* displayNameUtf8() const override;
 
-    [[nodiscard]]
-    float size() const noexcept override;
+    [[nodiscard]] float size() const override;
 
-    [[nodiscard]]
-    bool isValid() const noexcept override;
+    [[nodiscard]] bool isValid() const override;
 
-    void resetMetrics() noexcept;
+    void resetMetrics();
 
-    void set(
-        const String& name,
-        float size) noexcept override;
+    void set(const String& name, float size) override;
 
-    [[nodiscard]]
-    double ascent() const noexcept override;
+    [[nodiscard]] double ascent() const override;
 
-    [[nodiscard]]
-    double descent() const noexcept override;
+    [[nodiscard]] double descent() const override;
 
-    [[nodiscard]]
-    double xHeight() const noexcept override;
+    [[nodiscard]] double xHeight() const override;
 
-    [[nodiscard]]
-    double capHeight() const noexcept override;
+    [[nodiscard]] double capHeight() const override;
 
-    [[nodiscard]]
-    double leading() const noexcept override;
+    [[nodiscard]] double leading() const override;
 
-    [[nodiscard]]
-    double cellHeight() const noexcept override;
+    [[nodiscard]] double cellHeight() const override;
 
-    [[nodiscard]]
-    double lineHeight() const noexcept override;
+    [[nodiscard]] double lineHeight() const override;
 
-    [[nodiscard]]
-    double italicAngle() const noexcept override;
+    [[nodiscard]] double italicAngle() const override;
 
-    [[nodiscard]]
-    double underlinePosition() const noexcept override;
+    [[nodiscard]] double underlinePosition() const override;
 
-    [[nodiscard]]
-    double underlineThickness() const noexcept override;
+    [[nodiscard]] double underlineThickness() const override;
 
-    [[nodiscard]]
-    int32_t unitsPerEm() const noexcept override;
+    [[nodiscard]] int32_t unitsPerEm() const override;
 
-    [[nodiscard]]
-    int32_t glyphCount() const noexcept override;
+    [[nodiscard]] int32_t glyphCount() const override;
 
-    [[nodiscard]]
-    const Rectd& boundingBox() const noexcept override;
+    [[nodiscard]] const Rectd& boundingBox() const override;
 
-    [[nodiscard]]
-    double glyphAdvanceWidth(
+    [[nodiscard]] double glyphAdvanceWidth(
         const char* symbol,
-        int32_t length = -1) const noexcept override;
+        int32_t length = -1
+    ) const override;
 
-    [[nodiscard]]
-    Sized textDimension(
+    [[nodiscard]] Sized textDimension(
         const char* str,
-        int32_t byte_length = -1) const noexcept override;
+        int32_t byte_length = -1
+    ) const override;
 
-    [[nodiscard]]
-    int32_t charIndexAtX(
+    [[nodiscard]] int32_t charIndexAtX(
         const char* str,
         double x,
         double& in_out_delta,
-        double& out_cursor_x) const noexcept override;
+        double& out_cursor_x
+    ) const override;
 
-    void* nativeHandle() const noexcept override {
+    void* nativeHandle() const override {
         return const_cast<void*>(
-            static_cast<const void*>(ct_font_.get()));
+            static_cast<const void*>(ct_font_.get())
+        );
     }
 
 private:
-    void release() noexcept;
-    void updateMetrics() noexcept;
+    void release();
+    void updateMetrics();
 
     String font_name_;
     String display_name_;

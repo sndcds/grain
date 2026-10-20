@@ -7,24 +7,22 @@ namespace Grain {
 class MetalCanvas final : public Canvas {
 public:
     MetalCanvas(
-        id<MTLCommandBuffer> commandBuffer,
+        id<MTLCommandBuffer> command_buffer,
         id<MTLRenderCommandEncoder> encoder
     )
-        : commandBuffer_(commandBuffer),
+        : command_buffer_(command_buffer),
           encoder_(encoder)
     {
     }
 
-    ~MetalCanvas() override
-    {
+    ~MetalCanvas() override {
         if (encoder_) {
             [encoder_ endEncoding];
             encoder_ = nil;
         }
     }
 
-    void clear(Color color) override
-    {
+    void clear(Color color) override {
         // The render pass normally performs the clear operation
         // before the encoder is created. Therefore there is
         // intentionally nothing to do here yet.
@@ -34,11 +32,7 @@ public:
         (void)color;
     }
 
-    void fillRect(
-        const Rect& rect,
-        Color color
-    ) override
-    {
+    void fillRect(const Rect& rect, Color color) override {
         /*
          * TODO:
          *
@@ -53,7 +47,7 @@ public:
     }
 
 private:
-    id<MTLCommandBuffer> commandBuffer_ = nil;
+    id<MTLCommandBuffer> command_buffer_ = nil;
     id<MTLRenderCommandEncoder> encoder_ = nil;
 };
 

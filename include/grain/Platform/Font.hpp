@@ -4,100 +4,59 @@
 #include <grain/Geometry/Size.hpp>
 #include <grain/String/String.hpp>
 
-#include <cstdint>
 #include <memory>
 
 namespace Grain::Platform {
 
 class Font {
 public:
-    virtual ~Font() noexcept = default;
+    virtual ~Font() = default;
 
-    [[nodiscard]]
-    virtual const char* fontNameUtf8() const noexcept = 0;
+    [[nodiscard]] virtual auto fontNameUtf8() const -> const char* = 0;
+    [[nodiscard]] virtual auto displayNameUtf8() const -> const char* = 0;
 
-    [[nodiscard]]
-    virtual const char* displayNameUtf8() const noexcept = 0;
+    [[nodiscard]] virtual auto size() const -> float = 0;
+    [[nodiscard]] virtual auto isValid() const -> bool = 0;
 
-    [[nodiscard]]
-    virtual float size() const noexcept = 0;
+    virtual void set(const String& name, float size) = 0;
 
-    [[nodiscard]]
-    virtual bool isValid() const noexcept = 0;
+    [[nodiscard]] virtual auto ascent() const -> double = 0;
+    [[nodiscard]] virtual auto descent() const -> double = 0;
+    [[nodiscard]] virtual auto xHeight() const -> double = 0;
+    [[nodiscard]] virtual auto capHeight() const -> double = 0;
+    [[nodiscard]] virtual auto leading() const -> double = 0;
+    [[nodiscard]] virtual auto cellHeight() const -> double = 0;
+    [[nodiscard]] virtual auto lineHeight() const -> double = 0;
+    [[nodiscard]] virtual auto italicAngle() const -> double = 0;
+    [[nodiscard]] virtual auto underlinePosition() const -> double = 0;
+    [[nodiscard]] virtual auto underlineThickness() const -> double = 0;
+    [[nodiscard]] virtual auto unitsPerEm() const -> int32_t = 0;
+    [[nodiscard]] virtual auto glyphCount() const -> int32_t = 0;
 
-    virtual void set(
-        const String& name,
-        float size) noexcept = 0;
+    [[nodiscard]] virtual auto boundingBox() const -> const Rectd& = 0;
 
-    [[nodiscard]]
-    virtual double ascent() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double descent() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double xHeight() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double capHeight() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double leading() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double cellHeight() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double lineHeight() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double italicAngle() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double underlinePosition() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double underlineThickness() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual int32_t unitsPerEm() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual int32_t glyphCount() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual const Rectd& boundingBox() const noexcept = 0;
-
-    [[nodiscard]]
-    virtual double glyphAdvanceWidth(
+    [[nodiscard]] virtual auto glyphAdvanceWidth(
         const char* symbol,
-        int32_t length = -1) const noexcept = 0;
+        int32_t length
+    ) const -> double = 0;
 
-    [[nodiscard]]
-    virtual Sized textDimension(
+    [[nodiscard]] virtual auto textDimension(
         const char* str,
-        int32_t byte_length = -1) const noexcept = 0;
+        int32_t byte_length
+    ) const -> Sized = 0;
 
-    [[nodiscard]]
-    virtual int32_t charIndexAtX(
+    [[nodiscard]] virtual auto charIndexAtX(
         const char* str,
         double x,
         double& in_out_delta,
-        double& out_cursor_x) const noexcept = 0;
+        double& out_cursor_x
+    ) const -> int32_t = 0;
 
-    [[nodiscard]]
-    virtual void* nativeHandle() const noexcept = 0;
+    [[nodiscard]] virtual auto nativeHandle() const -> void* = 0;
 };
 
-[[nodiscard]]
-std::vector<String> availableFontNames() noexcept;
-
-[[nodiscard]]
-std::vector<String> availableFontFamilies() noexcept;
-
-[[nodiscard]]
-std::unique_ptr<Font> createFont(
-    const String& name,
-    float size) noexcept;
+[[nodiscard]] auto availableFontNames() -> std::vector<String>;
+[[nodiscard]] auto availableFontFamilies() -> std::vector<String>;
+[[nodiscard]] auto createFont(const String& name, float size) -> std::unique_ptr<Font>;
 
 } // namespace Grain::Platform

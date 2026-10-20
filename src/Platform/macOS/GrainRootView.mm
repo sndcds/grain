@@ -126,17 +126,10 @@ static KeyModifiers keyModifiersFromEvent(NSEvent* event) {
 
 static MouseButton mouseButtonFromEvent(NSEvent* event) {
     switch (event.buttonNumber) {
-        case 0:
-            return MouseButton::Left;
-
-        case 1:
-            return MouseButton::Right;
-
-        case 2:
-            return MouseButton::Middle;
-
-        default:
-            return MouseButton::Other;
+        case 0: return MouseButton::Left;
+        case 1: return MouseButton::Right;
+        case 2: return MouseButton::Middle;
+        default: return MouseButton::Other;
     }
 }
 
@@ -232,7 +225,7 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
     grain_event.modifiers_ =
         Grain::keyModifiersFromEvent(event);
 
-    grain_view_->handleEvent(grain_event);
+    grain_view_->handleMouseEvent(grain_event);
 }
 
 
@@ -336,7 +329,36 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
         grain_event.text_ = "";
     }
 
-    grain_view_->handleEvent(grain_event);
+    grain_view_->handleKeyEvent(grain_event);
+}
+
+
+- (void)keyUp:(NSEvent*)event
+{
+    if (grain_view_ == nullptr) {
+        return;
+    }
+
+    Grain::Event grain_event;
+    grain_event.type_ = Grain::EventType::KeyUp;
+    grain_event.key_ = Grain::keyCodeFromEvent(event);
+    grain_event.modifiers_ = Grain::keyModifiersFromEvent(event);
+
+    grain_view_->handleKeyEvent(grain_event);
+}
+
+
+- (void)flagsChanged:(NSEvent*)event
+{
+    if (grain_view_ == nullptr) {
+        return;
+    }
+
+    Grain::Event grain_event;
+    grain_event.type_ = Grain::EventType::ModifiersChanged;
+    grain_event.modifiers_ = Grain::keyModifiersFromEvent(event);
+
+    grain_view_->handleKeyEvent(grain_event);
 }
 
 

@@ -39,14 +39,15 @@ CVReturn displayLinkCallback(
 } // namespace
 
 CocoaAnimationDriver::CocoaAnimationDriver(
-    std::function<void()> tickCallback)
-    : tickCallback_(std::move(tickCallback))
+    std::function<void()> tick_callback
+)
+    : tick_callback_(std::move(tick_callback))
 {
-    CVDisplayLinkCreateWithActiveCGDisplays(&displayLink_);
+    CVDisplayLinkCreateWithActiveCGDisplays(&display_link_);
 
-    if (displayLink_ != nullptr) {
+    if (display_link_ != nullptr) {
         CVDisplayLinkSetOutputCallback(
-            displayLink_,
+            display_link_,
             displayLinkCallback,
             this);
     }
@@ -55,28 +56,28 @@ CocoaAnimationDriver::CocoaAnimationDriver(
 CocoaAnimationDriver::~CocoaAnimationDriver() {
     stop();
 
-    if (displayLink_ != nullptr) {
-        CVDisplayLinkRelease(displayLink_);
-        displayLink_ = nullptr;
+    if (display_link_ != nullptr) {
+        CVDisplayLinkRelease(display_link_);
+        display_link_ = nullptr;
     }
 }
 
 void CocoaAnimationDriver::start() {
-    if (displayLink_ == nullptr || running_) {
+    if (display_link_ == nullptr || running_) {
         return;
     }
 
-    if (CVDisplayLinkStart(displayLink_) == kCVReturnSuccess) {
+    if (CVDisplayLinkStart(display_link_) == kCVReturnSuccess) {
         running_ = true;
     }
 }
 
 void CocoaAnimationDriver::stop() {
-    if (displayLink_ == nullptr || !running_) {
+    if (display_link_ == nullptr || !running_) {
         return;
     }
 
-    CVDisplayLinkStop(displayLink_);
+    CVDisplayLinkStop(display_link_);
 
     running_ = false;
 }
@@ -92,7 +93,7 @@ void CocoaAnimationDriver::scheduleTick() {
 
     bool expected = false;
 
-    if (!tickQueued_.compare_exchange_strong(
+    if (!tick_queued_.compare_exchange_strong(
             expected,
             true,
             std::memory_order_acq_rel)) {
@@ -106,11 +107,11 @@ void CocoaAnimationDriver::scheduleTick() {
 }
 
 void CocoaAnimationDriver::runMainThreadTick() {
-    if (running_ && tickCallback_) {
-        tickCallback_();
+    if (running_ && tick_callback_) {
+        tick_callback_();
     }
 
-    tickQueued_.store(
+    tick_queued_.store(
         false,
         std::memory_order_release);
 }

@@ -20,7 +20,6 @@ public:
     ~CoreGraphicContext() override = default;
 
     void save() override;
-
     void restore() override;
 
 
@@ -29,9 +28,7 @@ public:
     //--------------------------------------------------------------------------
 
     void clip(const Rectd& clip_rect) override;
-
     void clipPath() override;
-
     void clipPathEvenOdd() override;
 
 
@@ -54,18 +51,10 @@ public:
     //--------------------------------------------------------------------------
 
     void setStrokeColor(const Color& color) override;
-
     void setStrokeWidth(double width) override;
-
     void setStrokeJoinStyle(StrokeJoinStyle style) override;
-
     void setStrokeCapStyle(StrokeCapStyle style) override;
-
-    void setStrokeDash(
-        double phase,
-        const double* lengths,
-        size_t count
-    ) override;
+    void setStrokeDash(double phase, const double* lengths, size_t count) override;
 
 
     //--------------------------------------------------------------------------
@@ -111,12 +100,14 @@ public:
         bool draw_before,
         bool draw_after) override;
 
+
+    //--------------------------------------------------------------------------
+    //  Transform.
+    //--------------------------------------------------------------------------
+
     void translate(double x, double y) override;
-
     void scale(double x, double y) override;
-
     void rotate(double radians) override;
-
     void rotateDegrees(double degrees) override;
 
 
@@ -133,8 +124,7 @@ public:
     //  Text
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    CFObject<CTLineRef> createTextLine(
+    [[nodiscard]] CFObject<CTLineRef> createTextLine(
         const String& text,
         const Font* font,
         const Color& color
@@ -155,8 +145,7 @@ public:
         const Color& color
     ) override;
 
-    [[nodiscard]]
-    std::unique_ptr<TextLayout> createTextLayout(
+    [[nodiscard]] std::unique_ptr<TextLayout> createTextLayout(
         const String& text,
         const Font& font
     ) override;

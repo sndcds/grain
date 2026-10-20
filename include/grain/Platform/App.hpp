@@ -11,43 +11,29 @@ namespace Grain {
 
 class App {
 public:
-    static App& instance();
+    static auto instance() -> App&;
 
     App(const App&) = delete;
-
-    App& operator=(const App&) = delete;
-
+    auto operator=(const App&) -> App& = delete;
     App(App&&) = delete;
+    auto operator=(App&&) -> App& = delete;
 
-    App& operator=(App&&) = delete;
+    auto setIcon(const std::string& path) -> bool;
+    auto createWindow(std::string_view title, int width, int height) -> Window*;
 
-    bool setIcon(const std::string& path);
-
-    Window* createWindow(
-        std::string_view title,
-        int width,
-        int height
-        );
-
-    // View* addView(std::unique_ptr<View> view);
-
-    Input& input() noexcept;
-
-    const Input& input() const noexcept;
+    [[nodiscard]] auto input() noexcept -> Input&;
+    [[nodiscard]] auto input() const noexcept -> const Input&;
 
     void run();
-
     void quit() noexcept;
 
 private:
     App();
-
     ~App() = default;
 
     void processEvent(const Event& event);
 
     class Impl;
-
     std::unique_ptr<Impl> impl_;
 };
 

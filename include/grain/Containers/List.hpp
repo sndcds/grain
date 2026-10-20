@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstddef>
 #include <memory>
-#include <type_traits>
 #include <utility>
 
 namespace Grain {
@@ -68,7 +67,7 @@ public:
     List(const List&)
         requires (!std::copy_constructible<T>) = delete;
 
-    List& operator=(const List& other)
+    auto operator=(const List& other) -> List&
         requires std::copy_constructible<T> {
         if (this == &other) {
             return *this;
@@ -80,7 +79,7 @@ public:
         return *this;
     }
 
-    List& operator=(const List&)
+    auto operator=(const List&) -> List&
         requires (!std::copy_constructible<T>) = delete;
 
     //--------------------------------------------------------------------------
@@ -96,7 +95,7 @@ public:
         other.capacity_ = 0;
     }
 
-    List& operator=(List&& other) noexcept {
+    auto operator=(List&& other) noexcept -> List& {
         if (this == &other) {
             return *this;
         }
@@ -119,20 +118,9 @@ public:
     // Capacity
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    SizeType size() const noexcept {
-        return size_;
-    }
-
-    [[nodiscard]]
-    SizeType capacity() const noexcept {
-        return capacity_;
-    }
-
-    [[nodiscard]]
-    bool empty() const noexcept {
-        return size_ == 0;
-    }
+    [[nodiscard]] auto size() const noexcept -> SizeType { return size_; }
+    [[nodiscard]] auto capacity() const noexcept -> SizeType { return capacity_; }
+    [[nodiscard]] auto empty() const noexcept -> bool { return size_ == 0; }
 
     void reserve(SizeType new_capacity) {
         if (new_capacity <= capacity_) {
@@ -193,7 +181,7 @@ public:
 
     template <typename... Args>
         requires std::constructible_from<T, Args...>
-    T& emplace_back(Args&&... args) {
+    auto emplace_back(Args&&... args) -> T& {
         if (size_ == capacity_) {
             reserve(growth_capacity());
         }
@@ -214,32 +202,32 @@ public:
     // Element access
     //--------------------------------------------------------------------------
 
-    T& operator[](SizeType index) noexcept {
+    auto operator[](SizeType index) noexcept -> T& {
         assert(index < size_);
         return data_[index];
     }
 
-    const T& operator[](SizeType index) const noexcept {
+    auto operator[](SizeType index) const noexcept -> const T& {
         assert(index < size_);
         return data_[index];
     }
 
-    T& front() noexcept {
+    auto front() noexcept -> T& {
         assert(size_ > 0);
         return data_[0];
     }
 
-    const T& front() const noexcept {
+    auto front() const noexcept -> const T& {
         assert(size_ > 0);
         return data_[0];
     }
 
-    T& back() noexcept {
+    auto back() noexcept -> T& {
         assert(size_ > 0);
         return data_[size_ - 1];
     }
 
-    const T& back() const noexcept {
+    auto back() const noexcept -> const T& {
         assert(size_ > 0);
         return data_[size_ - 1];
     }
@@ -248,41 +236,19 @@ public:
     // Raw storage
     //--------------------------------------------------------------------------
 
-    T* data() noexcept {
-        return data_;
-    }
-
-    const T* data() const noexcept {
-        return data_;
-    }
+    auto data() noexcept -> T* { return data_; }
+    auto data() const noexcept -> const T* { return data_; }
 
     //--------------------------------------------------------------------------
     // Iteration
     //--------------------------------------------------------------------------
 
-    Iterator begin() noexcept {
-        return data_;
-    }
-
-    ConstIterator begin() const noexcept {
-        return data_;
-    }
-
-    ConstIterator cbegin() const noexcept {
-        return data_;
-    }
-
-    Iterator end() noexcept {
-        return data_ + size_;
-    }
-
-    ConstIterator end() const noexcept {
-        return data_ + size_;
-    }
-
-    ConstIterator cend() const noexcept {
-        return data_ + size_;
-    }
+    auto begin() noexcept -> Iterator { return data_; }
+    auto begin() const noexcept -> ConstIterator { return data_; }
+    auto cbegin() const noexcept -> ConstIterator { return data_; }
+    auto end() noexcept -> Iterator { return data_ + size_; }
+    auto end() const noexcept -> ConstIterator { return data_ + size_; }
+    auto cend() const noexcept -> ConstIterator { return data_ + size_; }
 
     //--------------------------------------------------------------------------
     // Miscellaneous
@@ -298,7 +264,7 @@ public:
 
 private:
     [[nodiscard]]
-    SizeType growth_capacity() const noexcept {
+    auto growth_capacity() const noexcept -> SizeType {
         if (capacity_ == 0) {
             return 8;
         }

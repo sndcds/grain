@@ -28,34 +28,31 @@ class Window;
 class Window {
 public:
     Window(const Window&) = delete;
-
-    Window& operator=(const Window&) = delete;
-
+    auto operator=(const Window&) -> Window& = delete;
     Window(Window&&) = delete;
+    auto operator=(Window&&) -> Window& = delete;
 
-    Window& operator=(Window&&) = delete;
+    virtual ~Window();
 
-    ~Window();
-
-    uint64_t id() const noexcept;
+    [[nodiscard]] auto id() const -> uint64_t;
 
     void show();
-
     void requestRedraw();
 
     void setRootView(std::unique_ptr<View> view);
+    virtual void handleEvent(const Event& event);
 
 private:
     class Impl;
+    std::unique_ptr<Impl> impl_;
 
     explicit Window(std::unique_ptr<Impl> impl);
 
-    static std::unique_ptr<Window> create(
+    static auto create(
         uint64_t id,
         std::unique_ptr<Platform::Window> platformWindow
-        );
+        ) -> std::unique_ptr<Window>;
 
-    std::unique_ptr<Impl> impl_;
 
     friend class App;
 };

@@ -13,7 +13,7 @@ class Animation {
 public:
     using Callback = std::function<void(Animation&)>;
 
-    enum class State {
+    enum class State : uint8_t {
         Running,
         Finished,
         Cancelled
@@ -26,12 +26,12 @@ public:
 
     void cancel();
 
-    [[nodiscard]] bool isFinished() const noexcept;
-    [[nodiscard]] bool isCancelled() const noexcept;
-    [[nodiscard]] bool isRunning() const noexcept;
+    [[nodiscard]] auto isFinished() const noexcept -> bool;
+    [[nodiscard]] auto isCancelled() const noexcept -> bool;
+    [[nodiscard]] auto isRunning() const noexcept -> bool;
 
-    [[nodiscard]] double progress() const noexcept;
-    [[nodiscard]] uint64_t frameNumber() const noexcept;
+    [[nodiscard]] auto progress() const noexcept -> double;
+    [[nodiscard]] auto frameNumber() const noexcept -> uint64_t;
 
 private:
     friend class AnimationDriver;
@@ -41,14 +41,13 @@ private:
     AnimationClock::time_point startTime_;
     AnimationClock::duration duration_;
 
+    State state_ = State::Running;
+
     bool continuous_ = false;
-
-    Callback callback_;
-
     double progress_ = 0.0;
     uint64_t frameNumber_ = 0;
 
-    State state_ = State::Running;
+    Callback callback_;
 };
 
 } // namespace Grain

@@ -135,7 +135,7 @@ int main() {
     auto& app = App::instance();
     app.setIcon("/Users/roaldchristesen/Documents/Pippa/Pippa Logo.png");
 
-    auto window = app.createWindow("Grain", 400,  400);
+    auto *window = app.createWindow("Grain", 400,  400);
 
     {
         auto view = std::make_unique<TestView>();
@@ -188,8 +188,7 @@ int main() {
             // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
             // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
-            slider.setAction([](double value) {
-                std::cout << "Slider value: " << std::fixed << std::setprecision(2) << value << '\n';
+            slider.setAction([](double value) -> void {
             });
         }
 
@@ -208,8 +207,7 @@ int main() {
             slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
             slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
-            slider.setAction([](double value) {
-                std::cout << "Slider value: " << std::fixed << std::setprecision(2) << value << '\n';
+            slider.setAction([](double value) -> void {
             });
         }
 
