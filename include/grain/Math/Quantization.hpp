@@ -4,11 +4,10 @@
 
 namespace Grain::Quantization {
 
-[[nodiscard]]
-std::uint32_t quantize(
+[[nodiscard]] auto quantize(
     std::uint32_t value,
-    unsigned sourceBits,
-    unsigned targetBits
-) noexcept;
+    unsigned source_bits,
+    unsigned target_bits
+) -> std::uint32_t;
 
 } // namespace Grain::Quantization

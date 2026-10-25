@@ -9,7 +9,7 @@ namespace Grain {
 GraphicPathPoint::GraphicPathPoint(
     double x,
     double y
-) noexcept
+)
     : anchor(x, y),
       left(x, y),
       right(x, y)
@@ -25,12 +25,12 @@ GraphicPathPoint::GraphicPathPoint(
     double ly,
     double rx,
     double ry
-) noexcept
+)
     : anchor(x, y),
       left(lx, ly),
       right(rx, ry),
-      leftFlag(anchor.distance(left) > epsilon),
-      rightFlag(anchor.distance(right) > epsilon)
+      left_flag(anchor.distance(left) > epsilon),
+      right_flag(anchor.distance(right) > epsilon)
 {
 }
 
@@ -43,12 +43,12 @@ GraphicPathPoint::GraphicPathPoint(
     bool rightFlag,
     double rx,
     double ry
-) noexcept
+)
     : anchor(x, y),
       left(lx, ly),
       right(rx, ry),
-      leftFlag(leftFlag),
-      rightFlag(rightFlag)
+      left_flag(leftFlag),
+      right_flag(rightFlag)
 {
 }
 
@@ -58,12 +58,12 @@ GraphicPathPoint::GraphicPathPoint(
     const Vec2d& left,
     bool rightFlag,
     const Vec2d& right
-) noexcept
+)
     : anchor(anchor),
       left(left),
       right(right),
-      leftFlag(leftFlag),
-      rightFlag(rightFlag)
+      left_flag(leftFlag),
+      right_flag(rightFlag)
 {
 }
 
@@ -72,38 +72,25 @@ GraphicPathPoint::GraphicPathPoint(
 // Transform
 //------------------------------------------------------------------------------
 
-void GraphicPathPoint::translate(
-    const Vec2d& offset
-) noexcept
-{
+void GraphicPathPoint::translate(const Vec2d& offset) {
     anchor.translate(offset);
     left.translate(offset);
     right.translate(offset);
 }
 
-void GraphicPathPoint::translate(
-    double x,
-    double y
-) noexcept
-{
+void GraphicPathPoint::translate(double x, double y) {
     anchor.translate(x, y);
     left.translate(x, y);
     right.translate(x, y);
 }
 
-void GraphicPathPoint::rotate(
-    double radians
-) noexcept
-{
+void GraphicPathPoint::rotate(double radians) {
     left.rotate(anchor, radians);
     right.rotate(anchor, radians);
 }
 
 
-void GraphicPathPoint::rotateDegrees(
-    double degrees
-) noexcept
-{
+void GraphicPathPoint::rotateDegrees(double degrees) {
     left.rotateDegrees(anchor, degrees);
     right.rotateDegrees(anchor, degrees);
 }
@@ -116,8 +103,7 @@ void GraphicPathPoint::rotateDegrees(
 void GraphicPathPoint::projectToQuadrilateral(
     const Quadrilateral& quadrilateral,
     const Mat3d* matrix
-) noexcept
-{
+) {
     anchor = quadrilateral.project(anchor);
     left = quadrilateral.project(left);
     right = quadrilateral.project(right);

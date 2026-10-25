@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <cstdint>
 #include <functional>
 #include <optional>
 
@@ -19,19 +18,16 @@ public:
         Cancelled
     };
 
-    Animation(
-        double delay,
-        std::optional<double> duration,
-        Callback callback);
+    Animation(double delay, std::optional<double> duration, Callback callback);
 
     void cancel();
 
-    [[nodiscard]] auto isFinished() const noexcept -> bool;
-    [[nodiscard]] auto isCancelled() const noexcept -> bool;
-    [[nodiscard]] auto isRunning() const noexcept -> bool;
+    [[nodiscard]] auto isFinished() const -> bool;
+    [[nodiscard]] auto isCancelled() const -> bool;
+    [[nodiscard]] auto isRunning() const -> bool;
 
-    [[nodiscard]] auto progress() const noexcept -> double;
-    [[nodiscard]] auto frameNumber() const noexcept -> uint64_t;
+    [[nodiscard]] auto progress() const -> double;
+    [[nodiscard]] auto frameNumber() const -> uint64_t;
 
 private:
     friend class AnimationDriver;
@@ -39,7 +35,7 @@ private:
     void update();
 
     AnimationClock::time_point startTime_;
-    AnimationClock::duration duration_;
+    AnimationClock::duration duration_{};
 
     State state_ = State::Running;
 

@@ -14,18 +14,18 @@ public:
     static auto instance() -> App&;
 
     App(const App&) = delete;
-    auto operator=(const App&) -> App& = delete;
+    auto operator = (const App&) -> App& = delete;
     App(App&&) = delete;
-    auto operator=(App&&) -> App& = delete;
+    auto operator = (App&&) -> App& = delete;
 
     auto setIcon(const std::string& path) -> bool;
     auto createWindow(std::string_view title, int width, int height) -> Window*;
 
-    [[nodiscard]] auto input() noexcept -> Input&;
-    [[nodiscard]] auto input() const noexcept -> const Input&;
+    [[nodiscard]] auto input() -> Input&;
+    [[nodiscard]] auto input() const -> const Input&;
 
     void run();
-    void quit() noexcept;
+    void quit();
 
 private:
     App();

@@ -27,12 +27,12 @@ public:
         Animation::Callback callback
     ) -> Animation*;
 
-    void cancel(Animation& animation);
+    static void cancel(Animation& animation);
 
     void start();
     void stop();
 
-    [[nodiscard]] auto isRunning() const noexcept -> bool;
+    [[nodiscard]] auto isRunning() const -> bool;
 
 private:
     AnimationDriver();

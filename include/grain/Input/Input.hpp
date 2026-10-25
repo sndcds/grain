@@ -11,63 +11,46 @@ public:
 
     Input(const Input&) = delete;
 
-    Input& operator=(const Input&) = delete;
+    auto operator = (const Input&) -> Input& = delete;
 
     Input(Input&&) = delete;
 
-    Input& operator=(Input&&) = delete;
+    auto operator = (Input&&) -> Input& = delete;
 
     ~Input() = default;
 
-    [[nodiscard]]
-    bool isKeyDown(KeyCode key) const noexcept;
+    [[nodiscard]] auto isKeyDown(KeyCode key) const -> bool;
+    [[nodiscard]] auto wasKeyPressed(KeyCode key) const -> bool;
+    [[nodiscard]] auto wasKeyReleased(KeyCode key) const -> bool;
+    [[nodiscard]] auto isMouseButtonDown(MouseButton button) const -> bool;
+    [[nodiscard]] auto wasMouseButtonPressed(MouseButton button) const -> bool;
+    [[nodiscard]] auto wasMouseButtonReleased(MouseButton button) const -> bool;
 
-    [[nodiscard]]
-    bool wasKeyPressed(KeyCode key) const noexcept;
+    [[nodiscard]] auto mousePosition() const -> Vec2d;
+    [[nodiscard]] auto mouseDelta() const -> Vec2d;
 
-    [[nodiscard]]
-    bool wasKeyReleased(KeyCode key) const noexcept;
+    void beginFrame();
 
-    [[nodiscard]]
-    bool isMouseButtonDown(MouseButton button) const noexcept;
-
-    [[nodiscard]]
-    bool wasMouseButtonPressed(MouseButton button) const noexcept;
-
-    [[nodiscard]]
-    bool wasMouseButtonReleased(MouseButton button) const noexcept;
-
-    [[nodiscard]]
-    Vec2d mousePosition() const noexcept;
-
-    [[nodiscard]]
-    Vec2d mouseDelta() const noexcept;
-
-    void beginFrame() noexcept;
-
-    void processEvent(const Event& event) noexcept;
+    void processEvent(const Event& event);
 
 private:
     static constexpr int KeyCount = 256;
     static constexpr int MouseButtonCount = 4;
 
-    static int keyIndex(KeyCode key) noexcept;
+    static auto keyIndex(KeyCode key) -> int;
+    static auto mouseButtonIndex(MouseButton button) -> int;
 
-    static int mouseButtonIndex(
-        MouseButton button
-        ) noexcept;
+    std::array<bool, KeyCount> keys_down_{};
+    std::array<bool, KeyCount> keys_pressed_{};
+    std::array<bool, KeyCount> keys_released_{};
 
-    bool keysDown_[KeyCount]{};
-    bool keysPressed_[KeyCount]{};
-    bool keysReleased_[KeyCount]{};
+    std::array<bool, MouseButtonCount> mouse_buttons_down_{};
+    std::array<bool, MouseButtonCount> mouse_buttons_pressed_{};
+    std::array<bool, MouseButtonCount> mouse_buttons_released_{};
 
-    bool mouseButtonsDown_[MouseButtonCount]{};
-    bool mouseButtonsPressed_[MouseButtonCount]{};
-    bool mouseButtonsReleased_[MouseButtonCount]{};
-
-    Vec2d mouse_pos_{};
-    Vec2d mouse_delta_{};
-    Vec2d mouse_wheel_delta_{};
+    Vec2d mouse_pos_;
+    Vec2d mouse_delta_;
+    Vec2d mouse_wheel_delta_;
 };
 
 } // namespace Grain

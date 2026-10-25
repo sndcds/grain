@@ -14,7 +14,7 @@ public:
     static constexpr size_type npos = std::string_view::npos;
 
     //--------------------------------------------------------------------------
-    // Construction
+    //  Construction.
     //--------------------------------------------------------------------------
 
     String() = default;
@@ -29,24 +29,24 @@ public:
 
     String(String&&) = default;
 
-    String& operator=(const String&) = default;
+    auto operator = (const String&) -> String& = default;
 
-    String& operator=(String&&) = default;
+    auto operator = (String&&) -> String& = default;
 
-    String& operator=(const char* utf8);
+    auto operator = (const char* utf8) -> String&;
 
-    String& operator=(std::string_view utf8);
+    auto operator = (std::string_view utf8) -> String&;
 
     ~String() = default;
 
 
     //--------------------------------------------------------------------------
-    // Basic properties
+    //  Basic properties.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] bool empty() const;
+    [[nodiscard]] auto empty() const -> bool;
 
-    [[nodiscard]] bool isEmpty() const {
+    [[nodiscard]] auto isEmpty() const -> bool {
         return empty();
     }
 
@@ -56,32 +56,33 @@ public:
      * This is intentionally called `length()` rather than `size()` because
      * `size()` traditionally means the number of stored bytes for std::string.
      */
-    [[nodiscard]] size_type length() const;
+    [[nodiscard]] auto length() const -> size_type;
 
     /**
      * Number of bytes used by the UTF-8 representation.
      */
-    [[nodiscard]] size_type byteLength() const;
+    [[nodiscard]] auto byteLength() const -> size_type;
 
     /**
      * Returns true if every byte belongs to the ASCII range.
      */
-    [[nodiscard]] bool isAscii() const;
+    [[nodiscard]] auto isAscii() const -> bool;
 
     /**
      * Checks whether the stored byte sequence is valid UTF-8.
      */
-    [[nodiscard]] bool isValidUtf8(
-        size_type* invalid_byte_index = nullptr) const;
+    [[nodiscard]] auto isValidUtf8(
+        size_type* invalid_byte_index = nullptr
+    ) const -> bool;
 
-    [[nodiscard]]
-        bool isAsciiAtIndex(
-            size_type code_point_index,
-            char& out_char
-        ) const;
+    [[nodiscard]]auto isAsciiAtIndex(
+        size_type code_point_index,
+        char& out_char
+    ) const -> bool;
+
 
     //--------------------------------------------------------------------------
-    // Access
+    //  Access.
     //--------------------------------------------------------------------------
 
     /**
@@ -89,42 +90,43 @@ public:
      *
      * The returned pointer remains valid until the String is modified.
      */
-    [[nodiscard]] const char* c_str() const;
+    [[nodiscard]] auto c_str() const -> const char*;
 
     /**
      * Alias used by the existing Grain API.
      */
-    [[nodiscard]] const char* utf8() const {
+    [[nodiscard]] auto utf8() const -> const char* {
         return c_str();
     }
 
     /**
      * Read-only view of the underlying UTF-8 bytes.
      */
-    [[nodiscard]] std::string_view view() const;
+    [[nodiscard]] auto view() const -> std::string_view;
 
     /**
      * Direct read-only byte access.
      *
      * This is intentionally byte-based, not Unicode-character-based.
      */
-    [[nodiscard]] char byteAt(size_type index) const;
+    [[nodiscard]] auto byteAt(size_type index) const -> char;
 
     /**
      * Returns the Unicode code point at `index`.
      *
      * Returns U+FFFD if the index is invalid or the sequence is malformed.
      */
-    [[nodiscard]] char32_t codePointAt(size_type index) const;
+    [[nodiscard]] auto codePointAt(size_type index) const -> char32_t;
 
     /**
      * Returns the byte offset corresponding to a code-point index.
      */
-    [[nodiscard]] size_type byteOffset(
-        size_type code_point_index) const;
+    [[nodiscard]] auto byteOffset(
+        size_type code_point_index) const -> size_type;
+
 
     //--------------------------------------------------------------------------
-    // Modification
+    //  Modification.
     //--------------------------------------------------------------------------
 
     void clear();
@@ -139,11 +141,11 @@ public:
 
     void append(const char* utf8);
 
-    String& operator+=(std::string_view utf8);
+    auto operator += (std::string_view utf8) -> String&;
 
-    String& operator+=(const String& other);
+    auto operator += (const String& other) -> String&;
 
-    String& operator+=(const char* utf8);
+    auto operator += (const char* utf8) -> String&;
 
     void insert(size_type code_point_index, std::string_view utf8);
     void insertAtCharacterIndex(const char* text, int32_t index);
@@ -157,19 +159,21 @@ public:
         size_type code_point_count,
         std::string_view replacement);
 
+
     //--------------------------------------------------------------------------
-    // Substrings
+    //  Substrings.
     //--------------------------------------------------------------------------
 
     /**
      * Creates a substring using UTF-8 code-point indices.
      */
-    [[nodiscard]] String substr(
+    [[nodiscard]] auto substr(
         size_type code_point_index,
-        size_type code_point_count = npos) const;
+        size_type code_point_count = npos) const -> String;
+
 
     //--------------------------------------------------------------------------
-    // Searching
+    //  Searching.
     //--------------------------------------------------------------------------
 
     /**
@@ -177,26 +181,25 @@ public:
      *
      * Returns `npos` if it isn't found.
      */
-    [[nodiscard]] size_type find(
+    [[nodiscard]] auto find(
         std::string_view needle,
-        size_type code_point_index = 0) const;
+        size_type code_point_index = 0
+    ) const -> size_type;
 
-    [[nodiscard]] bool contains(
-        std::string_view needle) const;
+    [[nodiscard]] auto contains(std::string_view needle) const -> bool;
 
-    [[nodiscard]] bool startsWith(
-        std::string_view prefix) const;
+    [[nodiscard]] auto startsWith(std::string_view prefix) const -> bool;
 
-    [[nodiscard]] bool endsWith(
-        std::string_view suffix) const;
+    [[nodiscard]] auto endsWith(std::string_view suffix) const -> bool;
+
 
     //--------------------------------------------------------------------------
-    // Whitespace
+    //  Whitespace.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] size_type leadingWhitespace() const;
+    [[nodiscard]] auto leadingWhitespace() const -> size_type;
 
-    [[nodiscard]] size_type trailingWhitespace() const;
+    [[nodiscard]] auto trailingWhitespace() const -> size_type;
 
     void trim();
 
@@ -204,99 +207,49 @@ public:
 
     void trimRight();
 
-    //--------------------------------------------------------------------------
-    // Comparison
-    //--------------------------------------------------------------------------
-
-    [[nodiscard]] int compare(const String& other) const;
-
-    [[nodiscard]] int compare(std::string_view other) const;
-
-    [[nodiscard]] int compare(const char* other) const;
-
-    [[nodiscard]] bool equalsIgnoreCase(
-        std::string_view other) const;
 
     //--------------------------------------------------------------------------
-    // Operators
+    //  Comparison.
     //--------------------------------------------------------------------------
 
-    friend bool operator==(
-        const String& lhs,
-        const String& rhs);
+    [[nodiscard]] auto compare(const String& other) const -> int;
 
-    friend bool operator==(
-        const String& lhs,
-        const char* rhs);
+    [[nodiscard]] auto compare(std::string_view other) const -> int;
 
-    friend bool operator==(
-        const char* lhs,
-        const String& rhs);
+    [[nodiscard]] auto compare(const char* other) const -> int;
 
-    friend bool operator!=(
-        const String& lhs,
-        const String& rhs);
+    [[nodiscard]] auto equalsIgnoreCase(std::string_view other) const -> bool;
 
-    friend bool operator!=(
-        const String& lhs,
-        const char* rhs);
 
-    friend bool operator!=(
-        const char* lhs,
-        const String& rhs);
+    //--------------------------------------------------------------------------
+    //  Operators.
+    //--------------------------------------------------------------------------
 
-    friend bool operator==(
-        const String& lhs,
-        std::string_view rhs);
-
-    friend bool operator==(
-        std::string_view lhs,
-        const String& rhs);
-
-    friend bool operator!=(
-        const String& lhs,
-        std::string_view rhs);
-
-    friend bool operator!=(
-        std::string_view lhs,
-        const String& rhs);
-
-    friend String operator+(
-        const String& lhs,
-        const String& rhs);
-
-    friend String operator+(
-        const String& lhs,
-        std::string_view rhs);
-
-    friend String operator+(
-        std::string_view lhs,
-        const String& rhs);
-
-    friend String operator+(
-        const String& lhs,
-        const char* rhs);
-
-    friend String operator+(
-        const char* lhs,
-        const String& rhs);
-
-    friend std::ostream& operator<<(
-        std::ostream& stream,
-        const String& string);
+    friend auto operator == (const String& lhs, const String& rhs) -> bool;
+    friend auto operator == (const String& lhs, const char* rhs) -> bool;
+    friend auto operator == (const char* lhs, const String& rhs) -> bool;
+    friend auto operator != (const String& lhs, const String& rhs) -> bool;
+    friend auto operator != (const String& lhs, const char* rhs) -> bool;
+    friend auto operator != (const char* lhs, const String& rhs) -> bool;
+    friend auto operator == (const String& lhs, std::string_view rhs) -> bool;
+    friend auto operator == (std::string_view lhs, const String& rhs) -> bool;
+    friend auto operator != (const String& lhs, std::string_view rhs) -> bool;
+    friend auto operator != (std::string_view lhs, const String& rhs) -> bool;
+    friend auto operator + (const String& lhs, const String& rhs) -> String;
+    friend auto operator + (const String& lhs, std::string_view rhs) -> String;
+    friend auto operator + (std::string_view lhs, const String& rhs) -> String;
+    friend auto operator + (const String& lhs, const char* rhs) -> String;
+    friend auto operator + (const char* lhs, const String& rhs) -> String;
+    friend auto operator << (std::ostream& stream, const String& string) -> std::ostream&;
 
 private:
     std::string data_;
 
-    [[nodiscard]] size_type codePointIndexFromByteIndex(
-        size_type byte_index) const;
+    [[nodiscard]] auto codePointIndexFromByteIndex(size_type byte_index) const -> size_type;
 
-    [[nodiscard]] static bool isAsciiWhitespace(
-        unsigned char byte);
+    [[nodiscard]] static auto isAsciiWhitespace(unsigned char byte) -> bool;
 
-    void trimRange(
-        size_type begin,
-        size_type end);
+    void trimRange(size_type begin,size_type end);
 };
 
 } // namespace Grain

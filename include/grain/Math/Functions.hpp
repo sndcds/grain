@@ -8,11 +8,7 @@ namespace Grain::Functions {
 ///     exp(-x² / (2σ²)) / (sqrt(2π) σ)
 ///
 /// sigma must be positive.
-[[nodiscard]]
-double gaussKernel(
-    double x,
-    double sigma
-) noexcept;
+[[nodiscard]] auto gaussKernel(double x, double sigma) -> double;
 
 /// Normalized sinc function.
 ///
@@ -20,14 +16,8 @@ double gaussKernel(
 ///     sin(πx) / (πx)
 ///
 /// with sinc(0) = 1.
-[[nodiscard]]
-double sinc(
-    double x
-) noexcept;
+[[nodiscard]] auto sinc(double x) -> double;
 
-[[nodiscard]]
-double besselI0(
-    double x
-) noexcept;
+[[nodiscard]] auto besselI0(double x) -> double;
 
 } // namespace Grain::Functions

@@ -38,7 +38,7 @@ protected:
     bool show_loupe_if_empty_ = false;
 
     Alignment text_alignment_ = Alignment::Left;
-    float padding_[4]{};
+    std::array<float, 4> padding_ = {};
 
     String info_text_;
     String text_;
@@ -53,44 +53,44 @@ public:
 
     void drawCursor(GraphicContext& gc, float x) const;
 
-    [[nodiscard]] virtual float beamWidth() const {
+    [[nodiscard]] virtual auto beamWidth() const -> float {
         return beam_width_;
     }
 
-    [[nodiscard]] virtual int32_t cursorIndex() const {
+    [[nodiscard]] virtual auto cursorIndex() const -> int32_t {
         return cursor_index_;
     }
 
-    [[nodiscard]] virtual int32_t clampedCursorIndex() const {
+    [[nodiscard]] virtual auto clampedCursorIndex() const -> int32_t {
         return std::clamp<int32_t>(cursor_index_, 0, text_.length());
     }
 
-    [[nodiscard]] virtual int32_t selectionBegin() const {
+    [[nodiscard]] virtual auto selectionBegin() const -> int32_t {
         return selection_begin_;
     }
 
-    [[nodiscard]] virtual int32_t selectionEnd() const {
+    [[nodiscard]] virtual auto selectionEnd() const -> int32_t {
         return selection_end_;
     }
 
-    [[nodiscard]] virtual int32_t selectionLength() const {
+    [[nodiscard]] virtual auto selectionLength() const -> int32_t {
         return hasSelection() ? selection_end_ - selection_begin_ + 1 : 0;
     }
 
-    [[nodiscard]] virtual int32_t selectionDragStart() const {
+    [[nodiscard]] virtual auto selectionDragStart() const -> int32_t {
         return selection_drag_start_;
     }
 
-    [[nodiscard]] virtual bool stepFlipMode() const {
+    [[nodiscard]] virtual auto stepFlipMode() const -> bool {
         return step_flip_mode_;
     }
 
-    [[nodiscard]] virtual bool isPasswordMode() const {
+    [[nodiscard]] virtual auto isPasswordMode() const -> bool {
         return pass_word_mode_;
     }
 
     void setText(const char* text);
-    int32_t textLength();
+    auto textLength() -> int32_t;
 
     void setEnabled(bool enabled) override;
 
@@ -122,42 +122,43 @@ public:
         selection_drag_start_ = selection_drag_start;
     }
 
-    virtual bool setSelection(int32_t begin, int32_t end);
+    virtual auto setSelection(int32_t begin, int32_t end) -> bool;
 
-    virtual bool setCursor(int32_t cursor_index) {
+    virtual auto setCursor(int32_t cursor_index) -> bool {
         return setCursor(cursor_index, false);
     }
 
-    virtual bool setCursor(int32_t cursor_index, bool selection_mode);
+    virtual auto setCursor(int32_t cursor_index, bool selection_mode) -> bool;
 
-    virtual bool moveCursor(int32_t offset, bool shift_pressed);
+    virtual auto moveCursor(int32_t offset, bool shift_pressed) -> bool;
 
-    virtual bool setCursorToEnd() {
+    virtual auto setCursorToEnd() -> bool {
         return setCursor(textLength());
     }
 
-    virtual bool selectAll() {
+    virtual auto selectAll() -> bool {
         return setSelection(0, textLength());
     }
 
-    virtual bool selectWordAtCursor();
+    virtual auto selectWordAtCursor() -> bool;
 
-    virtual bool removeSelection();
+    virtual auto removeSelection() -> bool;
 
-    [[nodiscard]] virtual bool hasSelection() const {
+    [[nodiscard]] virtual auto hasSelection() const -> bool {
         return selection_begin_ >= 0 && selection_end_ > selection_begin_;
     }
 
-    virtual bool removeCharAheadOfCursor();
+    virtual auto removeCharAheadOfCursor() -> bool;
 
-    virtual bool removeSelectedText();
+    virtual auto removeSelectedText() -> bool;
 
     void insertText(const char* text);
 
     virtual void updateEdit();
 
 
-    void setReceiverComponent(Component* receiver) {
+    static void setReceiverComponent(Component* receiver) {
+        (void)receiver;
         /* TODO: Implement!
         receiver_component_ = receiver;
         if (receiver_component_) {
@@ -172,30 +173,30 @@ public:
             std::clamp<int32_t>(fractional_digits, 0, FixValue::kDecimalPrecision);
     }
 
-    FixValue value() const {
+    [[nodiscard]] auto value() const -> FixValue {
         return value_;
     }
 
-    int32_t valueAsInt32() const {
+    [[nodiscard]] auto valueAsInt32() const -> int32_t {
         return value_.asInt32();
     }
 
-    int32_t valueAsInt64() const {
-        return value_.asInt32();
+    [[nodiscard]] auto valueAsInt64() const -> int64_t {
+        return value_.asInt64();
     }
 
-    double valueAsDouble() const {
+    [[nodiscard]] auto valueAsDouble() const -> double {
         return value_.asDouble();
     }
 
-    bool setValue(const FixValue& value) {
+    auto setValue(const FixValue& value) -> bool {
         bool result = value_.set(value, min_, max_, fractional_digits_);
         setText(value_.toString().c_str());
         invalidate();
         return result;
     }
 
-    bool setValueInt(int32_t value) {
+    auto setValueInt(int32_t value) -> bool {
         return setValue(FixValue(value));
     }
 
@@ -252,14 +253,14 @@ public:
         invalidate();
     }
 
-    bool handleEvent(const Event& event) override;
-    bool _handleKeyDown(const Event& event);
+    auto handleEvent(const Event& event) -> bool override;
+    auto _handleKeyDown(const Event& event) -> bool;
     void _handleCommandShortcut(uint32_t key_char);
-    bool _handleEditingKey(
+    auto _handleEditingKey(
        const Event& event,
        KeyCode key,
        int32_t& new_cursor_index
-    );
+    ) -> bool;
     void _handleDeleteKey();
     void _handleTextInput(const Event& event);
     void _updateCursorAndSelection(
@@ -273,13 +274,13 @@ public:
 
     void resignFirstResponder();
 
-    int32_t cursorIndexAtPos(Vec2d pos);
+    auto cursorIndexAtPos(Vec2d pos) -> int32_t;
 
     void _checkSelectionAndCursor();
 
-    int32_t copyToPasteboard();
+    auto copyToPasteboard() -> int32_t;
 
-    int32_t pasteFromPasteboard();
+    auto pasteFromPasteboard() -> int32_t;
 };
 
 } // End of namespace Grain

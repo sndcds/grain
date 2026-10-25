@@ -4,7 +4,7 @@
 
 namespace Grain {
 
-bool isAsciiDigit(char32_t c) noexcept;
-bool isAsciiNumericLiteralCharacter(char32_t c) noexcept;
+auto isAsciiDigit(char32_t c) -> bool;
+auto isAsciiNumericLiteralCharacter(char32_t c) -> bool;
 
 } // namespace Grain

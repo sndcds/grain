@@ -15,7 +15,7 @@ public:
     void draw(GraphicContext& gc) override;
 
     void setText(std::string text);
-    [[nodiscard]] const std::string& text() const noexcept;
+    [[nodiscard]] auto text() const noexcept -> const std::string&;
 
 private:
     std::string text_;

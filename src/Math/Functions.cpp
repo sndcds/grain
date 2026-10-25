@@ -7,22 +7,17 @@
 
 namespace Grain::Functions {
 
-double gaussKernel(
-    const double x,
-    const double sigma
-) noexcept
-{
+auto gaussKernel(const double x,const double sigma) -> double {
     if (sigma <= 0.0) {
         return std::numeric_limits<double>::quiet_NaN();
     }
 
-    const double normalizedX = x / sigma;
+    const double normalized_x = x / sigma;
 
-    return std::exp(-0.5 * normalizedX * normalizedX)
-         / (sigma * std::sqrt(2.0 * std::numbers::pi));
+    return std::exp(-0.5 * normalized_x * normalized_x) / (sigma * std::sqrt(2.0 * std::numbers::pi));
 }
 
-double sinc(const double x) noexcept {
+auto sinc(const double x) -> double {
     if (x == 0.0) {
         return 1.0;
     }
@@ -32,19 +27,18 @@ double sinc(const double x) noexcept {
     return std::sin(px) / px;
 }
 
-double besselI0(const double x) noexcept {
-    const double halfX = x / 2.0;
+auto besselI0(const double x) -> double {
+    const double half_x = x / 2.0;
 
     double term = 1.0;
     double sum = 1.0;
 
     for (std::int32_t i = 1; i < 1000; ++i) {
-        const double n = static_cast<double>(i);
+        const auto n = static_cast<double>(i);
 
-        term *= (halfX * halfX) / (n * n);
+        term *= (half_x * half_x) / (n * n);
 
         const double next = sum + term;
-
         if (next == sum) {
             break;
         }

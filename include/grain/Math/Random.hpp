@@ -18,7 +18,7 @@ public:
     Random()
         : engine_(std::random_device{}()) {}
 
-    explicit Random(Seed seed) noexcept
+    explicit Random(Seed seed)
         : engine_(seed) {}
 
 
@@ -26,7 +26,7 @@ public:
     // Seeding
     //--------------------------------------------------------------------------
 
-    void seed(Seed value) noexcept {
+    void seed(Seed value) {
         engine_.seed(value);
         gaussian_.reset();
     }
@@ -36,19 +36,13 @@ public:
     // Integers
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    int32_t integer(int32_t min, int32_t max) {
+    [[nodiscard]] auto integer(int32_t min, int32_t max) -> int32_t {
         assert(min <= max);
-
-        return std::uniform_int_distribution<int32_t>(
-            min, max
-        )(engine_);
+        return std::uniform_int_distribution<int32_t>(min, max)(engine_);
     }
 
-    [[nodiscard]]
-    int32_t integer(int32_t max) {
+    [[nodiscard]] auto integer(int32_t max) -> int32_t {
         assert(max >= 0);
-
         return integer(0, max);
     }
 
@@ -57,19 +51,13 @@ public:
     // Real numbers
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    float real(float min, float max) {
+    [[nodiscard]] auto real(float min, float max) -> float {
         assert(min <= max);
-
-        return std::uniform_real_distribution<float>(
-            min, max
-        )(engine_);
+        return std::uniform_real_distribution<float>(min, max)(engine_);
     }
 
-    [[nodiscard]]
-    float real(float max = 1.0f) {
+    [[nodiscard]] auto real(float max = 1.0f) -> float {
         assert(max >= 0.0f);
-
         return real(0.0f, max);
     }
 
@@ -78,15 +66,12 @@ public:
     // Bipolar values
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    float bipolar(float max = 1.0f) {
+    [[nodiscard]] auto bipolar(float max = 1.0f) -> float {
         assert(max >= 0.0f);
-
         return real(-max, max);
     }
 
-    [[nodiscard]]
-    float bipolarPi() {
+    [[nodiscard]] auto bipolarPi() -> float {
         return bipolar(std::numbers::pi_v<float>);
     }
 
@@ -95,10 +80,8 @@ public:
     // Probability
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    bool chance(float probability = 0.5f) {
+    [[nodiscard]] auto chance(float probability = 0.5f) -> bool {
         assert(probability >= 0.0f && probability <= 1.0f);
-
         return real() < probability;
     }
 
@@ -107,11 +90,8 @@ public:
     // Gaussian distribution
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    float gaussian(float mean = 0.0f,
-                   float stddev = 1.0f) {
+    [[nodiscard]] auto gaussian(float mean = 0.0f, float stddev = 1.0f) -> float {
         assert(stddev > 0.0f);
-
         return gaussian_(
             engine_,
             std::normal_distribution<float>::param_type(
@@ -125,8 +105,7 @@ public:
     // Bytes
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    uint8_t byte() {
+    [[nodiscard]] auto byte() -> uint8_t {
         return static_cast<uint8_t>(integer(0, 255));
     }
 

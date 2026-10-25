@@ -16,80 +16,66 @@ struct Size {
     T width{};
     T height{};
 
-    constexpr Size() noexcept = default;
+    constexpr Size() = default;
 
-    constexpr Size(T width, T height) noexcept
-        : width(width),
-          height(height) {
+    constexpr Size(T width, T height) : width(width), height(height) {
     }
 
-    constexpr Size(const Size&) noexcept = default;
-    constexpr Size(Size&&) noexcept = default;
+    constexpr Size(const Size&) = default;
+    constexpr Size(Size&&) = default;
 
-    constexpr Size& operator=(const Size&) noexcept = default;
-    constexpr Size& operator=(Size&&) noexcept = default;
+    constexpr auto operator = (const Size&) -> Size& = default;
+    constexpr auto operator = (Size&&) -> Size& = default;
 
-    ~Size() noexcept = default;
+    ~Size() = default;
 
 
     template <typename U>
-    constexpr Size(const Size<U>& other) noexcept
+    constexpr Size(const Size<U>& other)
         : width(static_cast<T>(other.width)),
           height(static_cast<T>(other.height)) {
     }
 
     template <typename U>
-    constexpr Size& operator=(const Size<U>& other) noexcept {
+    constexpr auto operator = (const Size<U>& other) -> Size& {
         width = static_cast<T>(other.width);
         height = static_cast<T>(other.height);
         return *this;
     }
 
-    constexpr Size& operator=(const Rect<T>& rect) noexcept {
+    constexpr auto operator = (const Rect<T>& rect) -> Size& {
         width = rect.width;
         height = rect.height;
         return *this;
     }
 
 
-    [[nodiscard]]
-    constexpr T centerX() const noexcept {
+    [[nodiscard]] constexpr auto centerX() const -> T {
         return width / static_cast<T>(2);
     }
 
-    [[nodiscard]]
-    constexpr T centerY() const noexcept {
+    [[nodiscard]] constexpr auto centerY() const -> T {
         return height / static_cast<T>(2);
     }
 
-    [[nodiscard]]
-    constexpr Vec2<T> center() const noexcept {
-        return {
-            width / static_cast<T>(2),
-            height / static_cast<T>(2)
-        };
+    [[nodiscard]] constexpr auto center() const -> Vec2<T> {
+        return {width / static_cast<T>(2), height / static_cast<T>(2)};
     }
 
 
-    [[nodiscard]]
-    int64_t roundedWidth() const noexcept {
-        return static_cast<int64_t>(
-            std::round(static_cast<double>(width)));
+    [[nodiscard]] auto roundedWidth() const -> int64_t {
+        return static_cast<int64_t>(std::round(static_cast<double>(width)));
     }
 
-    [[nodiscard]]
-    int64_t roundedHeight() const noexcept {
-        return static_cast<int64_t>(
-            std::round(static_cast<double>(height)));
+    [[nodiscard]] auto roundedHeight() const -> int64_t {
+        return static_cast<int64_t>(std::round(static_cast<double>(height)));
     }
 
-    [[nodiscard]]
-    constexpr T area() const noexcept {
+    [[nodiscard]] constexpr auto area() const -> T {
         return width * height;
     }
 
-    [[nodiscard]]
-    double aspectRatio() const noexcept {
+    [[nodiscard]] auto aspectRatio() const -> double {
         constexpr double epsilon =
             std::numeric_limits<double>::epsilon();
 
@@ -102,66 +88,60 @@ struct Size {
         return std::numeric_limits<double>::max();
     }
 
-    [[nodiscard]]
-    bool isLandscape() const noexcept {
+    [[nodiscard]] auto isLandscape() const -> bool {
         return aspectRatio() < 1.0;
     }
 
-    [[nodiscard]]
-    bool isPortrait() const noexcept {
+    [[nodiscard]] auto isPortrait() const -> bool {
         return aspectRatio() > 1.0;
     }
 
-    [[nodiscard]]
-    bool isSquare() const noexcept {
-        return std::fabs(1.0 - aspectRatio())
-            <= std::numeric_limits<double>::epsilon();
+    [[nodiscard]] auto isSquare() const -> bool {
+        return std::fabs(1.0 - aspectRatio()) <= std::numeric_limits<double>::epsilon();
     }
 
 
-    constexpr void set(T value) noexcept {
+    constexpr void set(T value) {
         width = value;
         height = value;
     }
 
-    constexpr void set(
-        T width,
-        T height) noexcept {
+    constexpr void set(T width, T height) {
         this->width = width;
         this->height = height;
     }
 
-    constexpr void zero() noexcept {
+    constexpr void zero() {
         width = T{};
         height = T{};
     }
 
 
-    constexpr void flip() noexcept {
+    constexpr void flip() {
         std::swap(width, height);
     }
 
-    constexpr void scale(T value) noexcept {
+    constexpr void scale(T value) {
         width *= value;
         height *= value;
     }
 
 
-    constexpr bool operator==(
-        const Size& other) const noexcept {
+    constexpr auto operator == (
+        const Size& other) const -> bool {
         return width == other.width
             && height == other.height;
     }
 
-    constexpr bool operator!=(
-        const Size& other) const noexcept {
+    constexpr auto operator != (
+        const Size& other) const -> bool {
         return !(*this == other);
     }
 
 
-    friend std::ostream& operator<<(
+    friend auto operator << (
         std::ostream& os,
-        const Size& size) {
+        const Size& size) -> std::ostream& {
         os << size.width
            << ", "
            << size.height;
@@ -169,9 +149,9 @@ struct Size {
         return os;
     }
 
-    friend std::ostream& operator<<(
+    friend auto operator << (
         std::ostream& os,
-        const Size* size) {
+        const Size* size) -> std::ostream& {
         if (size == nullptr) {
             os << "Size nullptr";
         }
@@ -184,7 +164,9 @@ struct Size {
 };
 
 
-// Standard types
+//------------------------------------------------------------------------------
+//  Standard types.
+//------------------------------------------------------------------------------
 
 using Sizei = Size<int32_t>;
 using Sizel = Size<int64_t>;

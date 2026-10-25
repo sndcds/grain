@@ -14,7 +14,7 @@ public:
     std::unique_ptr<CocoaAnimationDriver> platformDriver;
 };
 
-AnimationDriver& AnimationDriver::instance() {
+auto AnimationDriver::instance() -> AnimationDriver& {
     static AnimationDriver driver;
     return driver;
 }
@@ -24,7 +24,7 @@ AnimationDriver::AnimationDriver()
 {
     impl_->platformDriver =
         std::make_unique<CocoaAnimationDriver>(
-            [this]() {
+            [this]() -> void {
                 tick();
             });
 }
@@ -33,20 +33,21 @@ AnimationDriver::~AnimationDriver() {
     stop();
 }
 
-Animation* AnimationDriver::animate(
+auto AnimationDriver::animate(
     double delay,
     double duration,
-    Animation::Callback callback)
+    Animation::Callback callback
+) -> Animation*
 {
     if (!callback) {
         return nullptr;
     }
 
-    auto animation = std::unique_ptr<Animation>(
-        new Animation(
-            delay,
-            duration,
-            std::move(callback)));
+    auto animation = std::make_unique<Animation>(
+        delay,
+        duration,
+        std::move(callback)
+    );
 
     Animation* result = animation.get();
 
@@ -55,19 +56,19 @@ Animation* AnimationDriver::animate(
     return result;
 }
 
-Animation* AnimationDriver::animateContinuous(
+auto AnimationDriver::animateContinuous(
     double delay,
-    Animation::Callback callback)
+    Animation::Callback callback) -> Animation*
 {
     if (!callback) {
         return nullptr;
     }
 
-    auto animation = std::unique_ptr<Animation>(
-        new Animation(
-            delay,
-            std::nullopt,
-            std::move(callback)));
+    auto animation = std::make_unique<Animation>(
+        delay,
+        std::nullopt,
+        std::move(callback)
+    );
 
     Animation* result = animation.get();
 
@@ -90,7 +91,7 @@ void AnimationDriver::stop() {
     }
 }
 
-bool AnimationDriver::isRunning() const noexcept {
+auto AnimationDriver::isRunning() const -> bool {
     return impl_->platformDriver &&
            impl_->platformDriver->isRunning();
 }
@@ -111,10 +112,10 @@ void AnimationDriver::tick() {
 
     std::erase_if(
         impl_->animations,
-        [](const std::unique_ptr<Animation>& animation) {
-            return animation->isFinished() ||
-                   animation->isCancelled();
-        });
+        [](const std::unique_ptr<Animation>& animation) -> bool {
+            return animation->isFinished() || animation->isCancelled();
+        }
+    );
 }
 
 } // namespace Grain

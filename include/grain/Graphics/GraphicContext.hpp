@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <grain/Graphics/GraphicState.hpp>
 #include <grain/Graphics/Color.hpp>
@@ -22,11 +23,11 @@ public:
 
     GraphicContext(const GraphicContext&) = delete;
 
-    GraphicContext& operator=(const GraphicContext&) = delete;
+    auto operator = (const GraphicContext&) -> GraphicContext& = delete;
 
     GraphicContext(GraphicContext&&) = delete;
 
-    GraphicContext& operator=(GraphicContext&&) = delete;
+    auto operator = (GraphicContext&&) -> GraphicContext& = delete;
 
 
     //--------------------------------------------------------------------------
@@ -125,20 +126,20 @@ public:
             const GraphicPathPoint* prevPoint = nullptr;
 
             for (int32_t i = 0; i < path.pointCount(); i++) {
-                auto point = path.pointPtrAtIndex(i);
+                const auto *point = path.pointPtrAtIndex(i);
 
                 if (i == 0) {
                     moveTo(point->anchor);
                     firstPoint = point;
                 }
                 else {
-                    if (prevPoint->rightFlag && point->leftFlag) {
+                    if (prevPoint->right_flag && point->left_flag) {
                         curveTo(prevPoint->right, point->left, point->anchor);
                     }
-                    else if (prevPoint->rightFlag) {
+                    else if (prevPoint->right_flag) {
                         curveTo(prevPoint->right, point->anchor, point->anchor);
                     }
-                    else if (point->leftFlag) {
+                    else if (point->left_flag) {
                         curveTo(prevPoint->anchor, point->left, point->anchor);
                     }
                     else {
@@ -150,14 +151,14 @@ public:
             }
 
             if (path.isClosed()) {
-                if (firstPoint) {
-                    if (prevPoint->rightFlag && firstPoint->leftFlag) {
+                if (firstPoint != nullptr) {
+                    if (prevPoint->right_flag && firstPoint->left_flag) {
                         curveTo(prevPoint->right, firstPoint->left, firstPoint->anchor);
                     }
-                    else if (prevPoint->rightFlag) {
+                    else if (prevPoint->right_flag) {
                         curveTo(prevPoint->right, firstPoint->anchor, firstPoint->anchor);
                     }
-                    else if (firstPoint->leftFlag) {
+                    else if (firstPoint->left_flag) {
                         curveTo(prevPoint->anchor, firstPoint->left, firstPoint->anchor);
                     }
                     else {
@@ -170,14 +171,14 @@ public:
         }
     }
 
-    void addRoundBarPath(const Rectd& rect) noexcept {
-        if (std::fabs(rect.width - rect.height) < std::numeric_limits<float>::epsilon()) {
+    void addRoundBarPath(const Rectd& rect) {
+        if (std::fabs(rect.width - rect.height) < std::numeric_limits<double>::epsilon()) {
             // Draw as circle
-            addCirclePath(rect.center(), rect.width / 2.0);
+            addCirclePath(rect.center(), rect.width / 2);
         }
         else {
             bool horizontal = rect.width > rect.height;
-            double radius = horizontal ? rect.height / 2.0 : rect.width / 2.0;
+            double radius = horizontal ? rect.height / 2 : rect.width / 2;
             double a = radius * 0.55228475;
 
             double x1 = rect.x;
@@ -217,12 +218,8 @@ public:
 
 
     void addRoundRectPath(const Rectd& rect, double radius) {
-        if (radius > rect.width / 2) {
-            radius = rect.width / 2;
-        }
-        if (radius > rect.height / 2) {
-            radius = rect.height / 2;
-        }
+        radius = std::min(radius, rect.width / 2);
+        radius = std::min(radius, rect.height / 2);
 
         double a = radius * 0.3907;
         double b = radius * 0.5944;
@@ -320,10 +317,10 @@ public:
     //  Text
     //--------------------------------------------------------------------------
 
-    virtual std::unique_ptr<TextLayout> createTextLayout(
+    virtual auto createTextLayout(
         const String& text,
         const Font& font
-    ) = 0;
+    ) -> std::unique_ptr<TextLayout> = 0;
 
     virtual void drawText(
         const String& text,
@@ -332,13 +329,13 @@ public:
         const Color& color
     ) = 0;
 
-    virtual double drawTextInRect(
+    virtual auto drawTextInRect(
         const String& text,
         const Rectd& rect,
         Alignment alignment,
         const Font* font,
         const Color& color
-    ) = 0;
+    ) -> double = 0;
 
     virtual void drawTextLayout(
         const TextLayout& layout,

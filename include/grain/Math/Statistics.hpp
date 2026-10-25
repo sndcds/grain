@@ -8,14 +8,12 @@
 namespace Grain::Statistics {
 
 template <typename T>
-[[nodiscard]]
-T median(T* values, std::size_t length)
-{
+[[nodiscard]] auto median(T* values, std::size_t length) -> T {
     if (values == nullptr || length == 0) {
         return T{};
     }
 
-    T* middle = values + length / 2;
+    T* middle = values + (length / 2);
 
     std::nth_element(values, middle, values + length);
 
@@ -27,16 +25,14 @@ T median(T* values, std::size_t length)
     const T lower = *std::max_element(values, middle);
 
     if constexpr (std::is_floating_point_v<T>) {
-        return lower + (upper - lower) / T{2};
+        return lower + ((upper - lower) / T{2});
     } else {
         return (lower + upper) / T{2};
     }
 }
 
 template <typename T>
-[[nodiscard]]
-T sum(const T* values, std::size_t length)
-{
+[[nodiscard]] auto sum(const T* values, std::size_t length) -> T {
     if (values == nullptr || length == 0) {
         return T{};
     }

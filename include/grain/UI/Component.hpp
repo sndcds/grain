@@ -20,13 +20,13 @@ public:
 
     Component(const Component&) = delete;
 
-    Component& operator=(const Component&) = delete;
+    auto operator = (const Component&) -> Component& = delete;
 
     Component(Component&&) = delete;
 
-    Component& operator=(Component&&) = delete;
+    auto operator = (Component&&) -> Component& = delete;
 
-    [[nodiscard]] View* view() const {
+    [[nodiscard]] auto view() const -> View* {
         return view_;
     }
 
@@ -36,45 +36,38 @@ public:
 
     virtual void setBounds(const Rectd& bounds);
 
-    [[nodiscard]] const Rectd& bounds() const {
+    [[nodiscard]] auto bounds() const -> const Rectd& {
         return bounds_;
     }
 
-    virtual bool contains(const Vec2d& pos) const;
+    [[nodiscard]] virtual auto contains(const Vec2d& pos) const -> bool;
 
 
-    [[nodiscard]] bool enabled() const;
-
+    [[nodiscard]] auto enabled() const -> bool;
     virtual void setEnabled(bool enabled);
 
-    [[nodiscard]] bool hovered() const { return hovered_; }
-
+    [[nodiscard]] auto hovered() const -> bool { return hovered_; }
     void setHovered(bool hovered);
 
-    [[nodiscard]] bool focused() const { return focused_; }
-
+    [[nodiscard]] auto focused() const -> bool { return focused_; }
     void setFocused(bool hovered);
 
-    [[nodiscard]] bool pressed() const { return pressed_; }
-
+    [[nodiscard]] auto pressed() const -> bool { return pressed_; }
     void setPressed(bool pressed);
 
-    [[nodiscard]] bool visible() const { return visible_; }
-
+    [[nodiscard]] auto visible() const -> bool { return visible_; }
     void setVisible(bool visible);
 
-    [[nodiscard]] bool editable() const;
-
+    [[nodiscard]] auto editable() const -> bool { return editable_; }
     virtual void setEditable(bool editable);
 
-    [[nodiscard]] bool numberMode() const;
-
+     [[nodiscard]] auto numberMode() const -> bool { return number_mode_; }
     virtual void setNumberMode(bool number_mode);
 
 
     virtual void draw(GraphicContext& gc) = 0;
 
-    virtual bool handleEvent(const Event& event) {
+    virtual auto handleEvent(const Event& event) -> bool {
         (void)event;
         return false;
     }
@@ -93,7 +86,7 @@ protected:
     bool focused_ = false;
     bool pressed_ = false;
     bool visible_ = true;
-    bool editable_ = true;
+    bool editable_ = false;
     bool number_mode_ = false;
 };
 

@@ -2,10 +2,6 @@
 
 namespace Grain::Optics {
 
-[[nodiscard]]
-double angleOfView(
-    double sensorSize,
-    double focalLength
-) noexcept;
+[[nodiscard]] auto angleOfView(double sensor_size, double focal_length) -> double;
 
 }

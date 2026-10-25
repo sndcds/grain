@@ -28,26 +28,26 @@ public:
     template<typename T>
         requires std::is_integral_v<T>
     constexpr FixValue(T value)
-        : raw_(static_cast<RawType>(value) * kScale) {}
+        : raw_(static_cast<RawType>(value) * kScale) {
+    }
 
     template<typename T>
         requires std::is_floating_point_v<T>
     explicit FixValue(T value)
-        : raw_(fromDouble(static_cast<double>(value))) {}
+        : raw_(fromDouble(static_cast<double>(value))) {
+    }
 
     explicit FixValue(std::string_view text) {
         set(text);
     }
 
-    [[nodiscard]]
-    static constexpr FixValue fromRaw(RawType raw) {
+    [[nodiscard]] static constexpr auto fromRaw(RawType raw) -> FixValue {
         FixValue result;
         result.raw_ = raw;
         return result;
     }
 
-    [[nodiscard]]
-    constexpr RawType raw() const {
+    [[nodiscard]] constexpr auto raw() const -> RawType {
         return raw_;
     }
 
@@ -55,135 +55,116 @@ public:
         raw_ = raw;
     }
 
-    [[nodiscard]]
-    constexpr int64_t asInt32() const {
+    [[nodiscard]] constexpr auto asInt32() const -> int32_t {
         return static_cast<int32_t>(std::round(asDouble()));
     }
 
-    [[nodiscard]]
-    constexpr int64_t asInt64() const {
+    [[nodiscard]] constexpr auto asInt64() const -> int64_t {
         return static_cast<int64_t>(std::round(asDouble()));
     }
 
-    [[nodiscard]]
-    constexpr double asDouble() const {
+    [[nodiscard]] constexpr auto asDouble() const -> double {
         return static_cast<double>(raw_) / kScale;
     }
 
-    [[nodiscard]]
-    constexpr float asFloat() const {
+    [[nodiscard]] constexpr auto asFloat() const -> float {
         return static_cast<float>(asDouble());
     }
 
-    [[nodiscard]]
-    constexpr bool isZero() const {
+    [[nodiscard]] constexpr auto isZero() const -> bool {
         return raw_ == 0;
     }
 
-    [[nodiscard]]
-    constexpr bool isPositive() const {
+    [[nodiscard]] constexpr auto isPositive() const -> bool {
         return raw_ > 0;
     }
 
-    [[nodiscard]]
-    constexpr bool isNegative() const {
+    [[nodiscard]] constexpr auto isNegative() const -> bool {
         return raw_ < 0;
     }
 
-    [[nodiscard]]
-    constexpr bool isInt() const {
+    [[nodiscard]] constexpr auto isInt() const -> bool {
         return raw_ % kScale == 0;
     }
 
-    [[nodiscard]]
-    constexpr bool isFloat() const {
+    [[nodiscard]] constexpr auto isFloat() const -> bool {
         return raw_ % kScale != 0;
     }
 
-    [[nodiscard]]
-    constexpr explicit operator bool() const {
+    [[nodiscard]] constexpr explicit operator bool() const {
         return raw_ != 0;
     }
 
-    [[nodiscard]]
-    constexpr auto operator<=>(const FixValue&) const = default;
+    [[nodiscard]] constexpr auto operator <=> (const FixValue&) const = default;
 
-    [[nodiscard]]
-    constexpr FixValue operator-() const {
+    [[nodiscard]] constexpr auto operator - () const -> FixValue {
         return fromRaw(-raw_);
     }
 
-    [[nodiscard]]
-    constexpr FixValue operator+(FixValue other) const {
+    [[nodiscard]] constexpr auto operator + (FixValue other) const -> FixValue {
         return fromRaw(raw_ + other.raw_);
     }
 
-    [[nodiscard]]
-    constexpr FixValue operator-(FixValue other) const {
+    [[nodiscard]] constexpr auto operator - (FixValue other) const -> FixValue {
         return fromRaw(raw_ - other.raw_);
     }
 
-    [[nodiscard]]
-    FixValue operator*(FixValue other) const;
+    [[nodiscard]] auto operator * (FixValue other) const -> FixValue;
 
-    [[nodiscard]]
-    FixValue operator/(FixValue other) const;
+    [[nodiscard]] auto operator / (FixValue other) const -> FixValue;
 
-    constexpr FixValue& operator+=(FixValue other) {
+    constexpr auto operator += (FixValue other) -> FixValue& {
         raw_ += other.raw_;
         return *this;
     }
 
-    constexpr FixValue& operator-=(FixValue other) {
+    constexpr auto operator -= (FixValue other) -> FixValue& {
         raw_ -= other.raw_;
         return *this;
     }
 
-    FixValue& operator*=(FixValue other) {
+    auto operator *= (FixValue other) -> FixValue& {
         return *this = *this * other;
     }
 
-    FixValue& operator/=(FixValue other) {
+    auto operator /= (FixValue other) -> FixValue& {
         return *this = *this / other;
     }
 
-    [[nodiscard]]
-    constexpr FixValue abs() const {
+    [[nodiscard]] constexpr auto abs() const -> FixValue {
         return fromRaw(raw_ < 0 ? -raw_ : raw_);
     }
 
-    [[nodiscard]]
-    constexpr FixValue floor() const {
+    [[nodiscard]] constexpr auto floor() const -> FixValue {
         const auto integer = raw_ / kScale;
         const auto remainder = raw_ % kScale;
 
         return fromRaw((integer - (remainder < 0 ? 1 : 0)) * kScale);
     }
 
-    [[nodiscard]]
-    constexpr FixValue ceil() const {
+    [[nodiscard]] constexpr auto ceil() const -> FixValue {
         const auto integer = raw_ / kScale;
         const auto remainder = raw_ % kScale;
 
         return fromRaw((integer + (remainder > 0 ? 1 : 0)) * kScale);
     }
 
-    [[nodiscard]] FixValue round() const;
+    [[nodiscard]] auto round() const -> FixValue;
 
-    [[nodiscard]] FixValue sqrt() const;
+    [[nodiscard]] auto sqrt() const -> FixValue;
 
-    bool set(std::string_view text);
+    auto set(std::string_view text) -> bool;
 
-    bool setDouble(double value);
+    auto setDouble(double value) -> bool;
 
-    bool setInt64(int64_t value);
+    auto setInt64(int64_t value) -> bool;
 
-    bool set(
+    auto set(
         const FixValue& value,
         const FixValue& min,
         const FixValue& max,
         int32_t precision
-    ) noexcept {
+    ) -> bool {
         FixValue new_value = value;
         new_value.clamp(min, max);
         new_value.setPrecision(precision);
@@ -197,17 +178,17 @@ public:
     void setPrecision(int precision);
 
     void clamp(FixValue minimum, FixValue maximum);
-    void flip(const FixValue& min, const FixValue& max) noexcept;
+    void flip(const FixValue& min, const FixValue& max);
 
-    [[nodiscard]] std::string toString(int32_t precision = kDecimalPrecision) const;
+    [[nodiscard]] auto toString(int32_t precision = kDecimalPrecision) const -> std::string;
 
     [[nodiscard]]
-    static std::optional<FixValue> parse(std::string_view text);
+    static auto parse(std::string_view text) -> std::optional<FixValue>;
 
-    friend std::ostream& operator<<(std::ostream& stream, FixValue value);
+    friend auto operator << (std::ostream& stream, FixValue value) -> std::ostream&;
 
 private:
-    [[nodiscard]] static RawType fromDouble(double value);
+    [[nodiscard]] static auto fromDouble(double value) -> RawType;
 
     RawType raw_ = 0;
 };

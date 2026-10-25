@@ -14,157 +14,129 @@ class BezierValueCurvePoint;
 
 class Bezier {
 public:
-    Bezier() noexcept = default;
+    std::array<Vec2d, 4> pos_{};
 
-    Bezier(
-        double x0,
-        double y0,
-        double x1,
-        double y1,
-        double x2,
-        double y2,
-        double x3,
-        double y3
-    ) noexcept;
+    static constexpr double kDefaultHitRadius = 6.0;
+    static constexpr int32_t kDefaultCurveLengthResolution = 100;
 
-    Bezier(
-        const Vec2d& p0,
-        const Vec2d& p1,
-        const Vec2d& p2,
-        const Vec2d& p3
-    ) noexcept;
+    Bezier() = default;
 
-    Bezier(
-        const Vec2d& p0,
-        const Vec2d& p1,
-        const Vec2d& p2
-    ) noexcept;
+    Bezier(const Vec2d& p0, const Vec2d& p1, const Vec2d& p2, const Vec2d& p3);
+    Bezier(const Vec2d& p0, const Vec2d& p1, const Vec2d& p2);
+    explicit Bezier(const Vec2d* positions);
+    Bezier(const BezierValueCurvePoint& p0, const BezierValueCurvePoint& p1);
 
-    explicit Bezier(const Vec2d* positions) noexcept;
+    ~Bezier() = default;
 
-    Bezier(
-        const BezierValueCurvePoint& p0,
-        const BezierValueCurvePoint& p1
-    ) noexcept;
+    friend auto operator << (std::ostream& os, const Bezier& bezier) -> std::ostream&;
 
-    ~Bezier() noexcept = default;
+    Bezier(const Bezier&) = default;
 
-    Bezier(const Bezier&) noexcept = default;
-    Bezier& operator=(const Bezier&) noexcept = default;
-    Bezier(Bezier&&) noexcept = default;
-    Bezier& operator=(Bezier&&) noexcept = default;
+    auto operator=(const Bezier&) -> Bezier& = default;
 
-    [[nodiscard]] Vec2d startPos() const noexcept;
-    [[nodiscard]] Vec2d controlPos1() const noexcept;
-    [[nodiscard]] Vec2d controlPos2() const noexcept;
-    [[nodiscard]] Vec2d endPos() const noexcept;
+    Bezier(Bezier&&) = default;
 
-    [[nodiscard]] Vec2d posAtPointIndex(int32_t index) const noexcept;
-    [[nodiscard]] Vec2d posOnCurve(double t) const noexcept;
+    auto operator=(Bezier&&) -> Bezier& = default;
 
-    [[nodiscard]] Rectd bounds() const noexcept;
+    [[nodiscard]] auto startPos() const -> Vec2d;
+    [[nodiscard]] auto controlPos1() const -> Vec2d;
+    [[nodiscard]] auto controlPos2() const -> Vec2d;
+    [[nodiscard]] auto endPos() const -> Vec2d;
 
-    [[nodiscard]] double approximatedCurveLength(
-        int32_t resolution = 100
-    ) const noexcept;
+    [[nodiscard]] auto posAtPointIndex(size_t index) const -> Vec2d;
+    [[nodiscard]] auto posOnCurve(double t) const -> Vec2d;
+    [[nodiscard]] auto bounds() const -> Rectd;
 
-    [[nodiscard]] Vec2d tangent1() const noexcept;
-    [[nodiscard]] Vec2d tangent2() const noexcept;
+    [[nodiscard]] auto approximatedCurveLength(
+        int32_t resolution = kDefaultCurveLengthResolution
+    ) const -> double;
+
+    [[nodiscard]] auto tangent1() const -> Vec2d;
+    [[nodiscard]] auto tangent2() const -> Vec2d;
 
     void set(
         const Vec2d& p0,
         const Vec2d& p1,
         const Vec2d& p2,
         const Vec2d& p3
-    ) noexcept;
+    );
 
     void setQuadratic(
         const Vec2d& p0,
         const Vec2d& p1,
         const Vec2d& p2
-    ) noexcept;
+    );
 
     void set(
-        double x0,
-        double y0,
-        double x1,
-        double y1,
-        double x2,
-        double y2,
-        double x3,
-        double y3
-    ) noexcept;
+        double x0, double y0,
+        double x1, double y1,
+        double x2, double y2,
+        double x3, double y3
+    );
 
-    void setPointAtIndex(
-        int32_t index,
-        const Vec2d& position
-    ) noexcept;
+    void setPointAtIndex(size_t index, const Vec2d& position);
 
     void setHorizontalSegment(
         const Vec2d& left,
         const Vec2d& right,
         const Vec2d& leftFactor,
         const Vec2d& rightFactor
-    ) noexcept;
+    );
 
     void setWithTangents(
         const Vec2d& start,
         const Vec2d& end,
         const Vec2d& tangent1,
         const Vec2d& tangent2
-    ) noexcept;
+    );
 
-    [[nodiscard]] double hit(
+    [[nodiscard]] auto hit(
         const Vec2d& position,
-        double radius = 6.0
-    ) const noexcept;
+        double radius = kDefaultHitRadius
+    ) const -> double;
 
-    [[nodiscard]] bool hitBounds(
+    [[nodiscard]] auto hitBounds(
         const Vec2d& position,
-        double radius = 6.0
-    ) const noexcept;
+        double radius = kDefaultHitRadius
+    ) const -> bool;
 
-    [[nodiscard]] int32_t hitPoint(
+    [[nodiscard]] auto hitPoint(
         const Vec2d& position,
-        double radius = 6.0
-    ) const noexcept;
+        double radius = kDefaultHitRadius
+    ) const -> int32_t;
 
-    [[nodiscard]] bool split(
+    auto split(
         double t,
         Bezier& left,
         Bezier& right
-    ) const noexcept;
+    ) const -> bool;
 
-    [[nodiscard]] bool truncate(
+    auto truncate(
         double start,
         double end,
         Bezier& result
-    ) const noexcept;
+    ) const -> bool;
 
     void buildVec2LUT(
         Vec2d* lut,
         int32_t resolution
-    ) const noexcept;
+    ) const;
 
-    void translate(double x, double y) noexcept;
-    void translate(const Vec2d& offset) noexcept;
+    void translate(double x, double y);
+    void translate(const Vec2d& offset);
+    void translateX(double x);
+    void translateY(double y);
 
-    void translateX(double x) noexcept;
-    void translateY(double y) noexcept;
+    void scale(double x, double y);
+    void scale(const Vec2d& scale);
+    void scaleX(double x);
+    void scaleY(double y);
 
-    void scale(double x, double y) noexcept;
-    void scale(const Vec2d& scale) noexcept;
+    void transformByRect(const Rectd& rect);
 
-    void scaleX(double x) noexcept;
-    void scaleY(double y) noexcept;
+    void approximateQuadraticBezierControlPos(Vec2d& control) const;
 
-    void transformByRect(const Rectd& rect) noexcept;
-
-    void approximateQuadraticBezierControlPos(
-        Vec2d& control
-    ) const noexcept;
-
-    [[nodiscard]] static int32_t arcToBezierPosArray(
+    [[nodiscard]] static auto arcToBezierPosArray(
         const Vec2d& start,
         const Vec2d& radii,
         double rotation,
@@ -173,28 +145,20 @@ public:
         const Vec2d& end,
         int32_t maxSegmentCount,
         Vec2d* output
-    ) noexcept;
+    ) -> int32_t;
 
-    [[nodiscard]]
-    static std::optional<Bezier> fitCubicBezierToPoints(
+    [[nodiscard]] static auto fitCubicBezierToPoints(
         std::span<const Vec2d> points
-    );
-
-    friend std::ostream& operator<<(
-        std::ostream& os,
-        const Bezier& bezier
-    );
+    ) -> std::optional<Bezier>;
 
 private:
-    [[nodiscard]] static double evaluate(
+    [[nodiscard]] static auto evaluate(
         double t,
         double p0,
         double p1,
         double p2,
         double p3
-    ) noexcept;
-
-    Vec2d pos_[4]{};
+    ) -> double;
 };
 
 } // namespace Grain

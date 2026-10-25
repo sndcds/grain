@@ -4,10 +4,11 @@
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
 #include <array>
+#include <cstdint>
 #include <span>
-#include <vector>
 
-using namespace Grain;
+using Grain::Bezier;
+using Grain::Vec2d;
 
 namespace {
 
@@ -30,32 +31,6 @@ void requirePoint(
     );
 }
 
-void requireRect(
-    const Rectd& actual,
-    const Rectd& expected,
-    double tolerance = epsilon
-)
-{
-    REQUIRE_THAT(
-        actual.x,
-        Catch::Matchers::WithinAbs(expected.x, tolerance)
-    );
-
-    REQUIRE_THAT(
-        actual.y,
-        Catch::Matchers::WithinAbs(expected.y, tolerance)
-    );
-
-    REQUIRE_THAT(
-        actual.width,
-        Catch::Matchers::WithinAbs(expected.width, tolerance)
-    );
-
-    REQUIRE_THAT(
-        actual.height,
-        Catch::Matchers::WithinAbs(expected.height, tolerance)
-    );
-}
 
 } // namespace
 
@@ -69,14 +44,16 @@ TEST_CASE("Bezier default constructor", "[Bezier]")
     requirePoint(bezier.endPos(), Vec2d{0.0, 0.0});
 }
 
-TEST_CASE("Bezier constructor from coordinates", "[Bezier]")
+TEST_CASE("Bezier set from coordinates", "[Bezier]")
 {
-    const Bezier bezier{
+    Bezier bezier;
+
+    bezier.set(
         0.0, 1.0,
         2.0, 3.0,
         4.0, 5.0,
         6.0, 7.0
-    };
+    );
 
     requirePoint(bezier.startPos(), Vec2d{0.0, 1.0});
     requirePoint(bezier.controlPos1(), Vec2d{2.0, 3.0});
@@ -198,7 +175,7 @@ TEST_CASE("Bezier bounds", "[Bezier]")
         Vec2d{20.0, 10.0}
     };
 
-    const Rectd bounds = bezier.bounds();
+    const Grain::Rectd bounds = bezier.bounds();
 
     REQUIRE_THAT(
         bounds.x,

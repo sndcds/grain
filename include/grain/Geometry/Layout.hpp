@@ -2,7 +2,8 @@
 
 namespace Grain {
 
-enum class Alignment {
+enum class Alignment : int8_t {
+    No,
     TopLeft,
     Left,
     BottomLeft,
@@ -14,7 +15,7 @@ enum class Alignment {
     BottomRight
 };
 
-enum class FitMode {
+enum class FitMode : int8_t {
     Cover,
     Fit,
     Stretch,

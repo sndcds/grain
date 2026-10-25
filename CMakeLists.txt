@@ -206,12 +206,16 @@ target_sources(
         src/Math/Quantization.cpp
         src/Math/Vec2.cpp
         src/Math/Quadrilateral.cpp
+        src/Math/NumberSeries.cpp
+
+        src/DSP/WeightedSamples.cpp
 
         src/String/String.cpp
         src/String/StringUtf8.cpp
         src/String/Character.cpp
 
         src/Geometry/Bezier.cpp
+        src/Geometry/BezierValueCurve.cpp
 
         src/Graphics/Color.cpp
         src/Graphics/ColorLUT.cpp
@@ -219,6 +223,10 @@ target_sources(
         src/Graphics/GraphicPath.cpp
         src/Graphics/Gradient.cpp
         src/Graphics/Font.cpp
+
+        src/Image/Image.cpp
+        src/Image/ImageAccess.cpp
+        src/Image/ImageTransfer.cpp
 
         src/Input/Input.cpp
 
@@ -263,12 +271,16 @@ target_sources(
         include/grain/Math/Vec3.hpp
         include/grain/Math/Mat3.hpp
         include/grain/Math/Quadrilateral.hpp
+        include/grain/Math/NumberSeries.hpp
+
+        include/grain/DSP/WeightedSamples.hpp
 
         include/grain/Geometry/Size.hpp
         include/grain/Geometry/Rect.hpp
         include/grain/Geometry/RemapRect.hpp
         include/grain/Geometry/RectLayout.hpp
         include/grain/Geometry/Bezier.hpp
+        include/grain/Geometry/BezierValueCurve.hpp
         include/grain/Geometry/Layout.hpp
 
         include/grain/String/String.hpp
@@ -293,6 +305,10 @@ target_sources(
         include/grain/Graphics/GraphicPath.hpp
         include/grain/Graphics/Gradient.hpp
         include/grain/Graphics/Font.hpp
+
+        include/grain/Image/Image.hpp
+        include/grain/Image/ImageAccess.hpp
+        include/grain/Image/ImageTransfer.hpp
 
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp

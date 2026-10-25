@@ -104,12 +104,12 @@ View* App::addView(std::unique_ptr<View> view) {
 */
 
 
-auto App::input() noexcept -> Input& {
+auto App::input() -> Input& {
     return impl_->input_;
 }
 
 
-auto App::input() const noexcept -> const Input& {
+auto App::input() const -> const Input& {
     return impl_->input_;
 }
 
@@ -126,7 +126,7 @@ void App::run() {
 }
 
 
-void App::quit() noexcept {
+void App::quit() {
     impl_->running_ = false;
 
     if (impl_->platform_app_ != nullptr) {

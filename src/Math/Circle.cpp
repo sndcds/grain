@@ -5,15 +5,15 @@
 
 namespace Grain::Circle {
 
-double area(const double radius) noexcept{
+auto area(const double radius) -> double{
     return std::numbers::pi * radius * radius;
 }
 
-double circumference(const double radius) noexcept{
+auto circumference(const double radius) -> double{
     return 2.0 * std::numbers::pi * radius;
 }
 
-double radiusFromArea(const double area) noexcept{
+auto radiusFromArea(const double area) -> double{
     return std::sqrt(area / std::numbers::pi);
 }
 

@@ -25,9 +25,9 @@ public:
 
     virtual ~View();
 
-    auto operator=(const View&) -> View& = delete;
+    auto operator = (const View&) -> View& = delete;
     View(View&&) = delete;
-    auto operator=(View&&) -> View& = delete;
+    auto operator = (View&&) -> View& = delete;
 
 
     [[nodiscard]] auto bounds() const -> const Rectd& { return bounds_; }

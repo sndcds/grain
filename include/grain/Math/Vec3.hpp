@@ -29,46 +29,45 @@ public:
     T y{};
     T z{};
 
-public:
     // Construction
-    constexpr Vec3() noexcept = default;
+    constexpr Vec3() = default;
 
-    constexpr Vec3(T x, T y, T z) noexcept
+    constexpr Vec3(T x, T y, T z)
         : x(x), y(y), z(z) {}
 
-    constexpr Vec3(const Vec3&) noexcept = default;
-    constexpr Vec3(Vec3&&) noexcept = default;
+    constexpr Vec3(const Vec3&) = default;
+    constexpr Vec3(Vec3&&) = default;
 
     template <typename U>
         requires (!std::same_as<U, T>)
-    explicit constexpr Vec3(const Vec3<U>& v) noexcept
+    explicit constexpr Vec3(const Vec3<U>& v)
         : x(static_cast<T>(v.x)),
           y(static_cast<T>(v.y)),
           z(static_cast<T>(v.z)) {}
 
-    explicit Vec3(const char* csv, char delimiter = ',') noexcept {
+    explicit Vec3(const char* csv, char delimiter = ',') {
         setByCSV(csv, delimiter);
     }
 
-    explicit Vec3(const String& csv, char delimiter = ',') noexcept {
+    explicit Vec3(const String& csv, char delimiter = ',') {
         setByCSV(csv, delimiter);
     }
 
-    ~Vec3() noexcept = default;
+    ~Vec3() = default;
 
-    Vec3& operator=(const Vec3&) noexcept = default;
-    Vec3& operator=(Vec3&&) noexcept = default;
+    auto operator = (const Vec3&) -> Vec3& = default;
+    auto operator = (Vec3&&) -> Vec3& = default;
 
     template <typename U>
         requires std::is_convertible_v<U, T>
-    Vec3& operator=(const Vec3<U>& v) noexcept {
+    auto operator = (const Vec3<U>& v) -> Vec3& {
         x = static_cast<T>(v.x);
         y = static_cast<T>(v.y);
         z = static_cast<T>(v.z);
         return *this;
     }
 
-    constexpr T& operator[](std::size_t index) noexcept {
+    constexpr auto operator [] (std::size_t index) -> T& {
         if (index == 0) {
             return x;
         }
@@ -80,7 +79,7 @@ public:
         return z;
     }
 
-    constexpr const T& operator[](std::size_t index) const noexcept {
+    constexpr auto operator [] (std::size_t index) const -> const T& {
         if (index == 0) {
             return x;
         }
@@ -93,125 +92,77 @@ public:
     }
 
     // Comparison
-    [[nodiscard]] constexpr bool operator==(
-        const Vec3&
-    ) const noexcept = default;
+    [[nodiscard]] constexpr auto operator == (const Vec3&) const -> bool = default;
 
-    [[nodiscard]] constexpr bool operator!=(
-        const Vec3& other
-    ) const noexcept {
+    [[nodiscard]] constexpr auto operator != (const Vec3& other) const -> bool {
         return !(*this == other);
     }
 
     // Arithmetic
-    [[nodiscard]] constexpr Vec3 operator-() const noexcept {
+    [[nodiscard]] constexpr auto operator - () const -> Vec3 {
         return {-x, -y, -z};
     }
 
-    [[nodiscard]] constexpr Vec3 operator+(
-        const Vec3& other
-    ) const noexcept {
-        return {
-            x + other.x,
-            y + other.y,
-            z + other.z
-        };
+    [[nodiscard]] constexpr auto operator + (const Vec3& other) const -> Vec3 {
+        return {x + other.x, y + other.y, z + other.z};
     }
 
-    [[nodiscard]] constexpr Vec3 operator-(
-        const Vec3& other
-    ) const noexcept {
-        return {
-            x - other.x,
-            y - other.y,
-            z - other.z
-        };
+    [[nodiscard]] constexpr auto operator - (const Vec3& other) const -> Vec3 {
+        return {x - other.x, y - other.y, z - other.z};
     }
 
-    [[nodiscard]] constexpr Vec3 operator*(
-        const Vec3& other
-    ) const noexcept {
-        return {
-            x * other.x,
-            y * other.y,
-            z * other.z
-        };
+    [[nodiscard]] constexpr auto operator * (const Vec3& other) const -> Vec3 {
+        return {x * other.x, y * other.y, z * other.z};
     }
 
-    [[nodiscard]] constexpr Vec3 operator/(
-        const Vec3& other
-    ) const noexcept {
-        return {
-            x / other.x,
-            y / other.y,
-            z / other.z
-        };
+    [[nodiscard]] constexpr auto operator / (const Vec3& other) const -> Vec3 {
+        return {x / other.x, y / other.y, z / other.z};
     }
 
-    [[nodiscard]] constexpr Vec3 operator*(
-        T scalar
-    ) const noexcept {
-        return {
-            x * scalar,
-            y * scalar,
-            z * scalar
-        };
+    [[nodiscard]] constexpr auto operator * (T scalar) const -> Vec3 {
+        return {x * scalar, y * scalar, z * scalar};
     }
 
-    [[nodiscard]] constexpr Vec3 operator/(
-        T scalar
-    ) const noexcept {
-        return {
-            x / scalar,
-            y / scalar,
-            z / scalar
-        };
+    [[nodiscard]] constexpr auto operator / (T scalar) const -> Vec3 {
+        return {x / scalar, y / scalar, z / scalar};
     }
 
-    constexpr Vec3& operator+=(
-        const Vec3& other
-    ) noexcept {
+    constexpr auto operator += (const Vec3& other) -> Vec3& {
         x += other.x;
         y += other.y;
         z += other.z;
         return *this;
     }
 
-    constexpr Vec3& operator-=(
-        const Vec3& other
-    ) noexcept {
+    constexpr auto operator -= (const Vec3& other) -> Vec3& {
         x -= other.x;
         y -= other.y;
         z -= other.z;
         return *this;
     }
 
-    constexpr Vec3& operator*=(
-        const Vec3& other
-    ) noexcept {
+    constexpr auto operator *= (const Vec3& other) -> Vec3& {
         x *= other.x;
         y *= other.y;
         z *= other.z;
         return *this;
     }
 
-    constexpr Vec3& operator/=(
-        const Vec3& other
-    ) noexcept {
+    constexpr auto operator /= (const Vec3& other) -> Vec3& {
         x /= other.x;
         y /= other.y;
         z /= other.z;
         return *this;
     }
 
-    constexpr Vec3& operator*=(T scalar) noexcept {
+    constexpr auto operator *= (T scalar) -> Vec3& {
         x *= scalar;
         y *= scalar;
         z *= scalar;
         return *this;
     }
 
-    constexpr Vec3& operator/=(T scalar) noexcept {
+    constexpr auto operator /= (T scalar) -> Vec3& {
         x /= scalar;
         y /= scalar;
         z /= scalar;
@@ -219,7 +170,7 @@ public:
     }
 
     // Geometry
-    [[nodiscard]] double length() const noexcept {
+    [[nodiscard]] auto length() const -> double {
         return std::hypot(
             static_cast<double>(x),
             static_cast<double>(y),
@@ -227,13 +178,11 @@ public:
         );
     }
 
-    [[nodiscard]] constexpr auto squaredLength() const noexcept {
+    [[nodiscard]] constexpr auto squaredLength() const {
         return x * x + y * y + z * z;
     }
 
-    [[nodiscard]] double distance(
-        const Vec3& other
-    ) const noexcept {
+    [[nodiscard]] auto distance(const Vec3& other) const -> double {
         return std::hypot(
             static_cast<double>(x - other.x),
             static_cast<double>(y - other.y),
@@ -241,9 +190,7 @@ public:
         );
     }
 
-    [[nodiscard]] constexpr auto squaredDistance(
-        const Vec3& other
-    ) const noexcept {
+    [[nodiscard]] constexpr auto squaredDistance(const Vec3& other) const {
         const auto dx = x - other.x;
         const auto dy = y - other.y;
         const auto dz = z - other.z;
@@ -251,13 +198,8 @@ public:
         return dx * dx + dy * dy + dz * dz;
     }
 
-    [[nodiscard]] constexpr T dot(
-        const Vec3& other
-    ) const noexcept {
-        return
-            x * other.x +
-            y * other.y +
-            z * other.z;
+    [[nodiscard]] constexpr auto dot(const Vec3& other) const -> T {
+        return x * other.x + y * other.y + z * other.z;
     }
 
     /**
@@ -266,9 +208,7 @@ public:
      * Returns a vector perpendicular to this vector
      * and the other vector.
      */
-    [[nodiscard]] constexpr Vec3 cross(
-        const Vec3& other
-    ) const noexcept {
+    [[nodiscard]] constexpr auto cross(const Vec3& other) const -> Vec3 {
         return {
             y * other.z - z * other.y,
             z * other.x - x * other.z,
@@ -279,46 +219,34 @@ public:
     /**
      * Returns the angle to another vector in degrees.
      */
-    [[nodiscard]] double angle(
-        const Vec3& other
-    ) const noexcept {
-        const double denominator =
-            length() * other.length();
-
+    [[nodiscard]] auto angle(const Vec3& other) const -> double {
+        const double denominator = length() * other.length();
         if (denominator == 0.0) {
             return 0.0;
         }
 
-        double value =
-            static_cast<double>(dot(other)) /
-            denominator;
-
+        double value = static_cast<double>(dot(other)) / denominator;
         value = std::clamp(value, -1.0, 1.0);
 
-        return std::acos(value) *
-               180.0 /
-               std::numbers::pi;
+        return std::acos(value) * 180.0 / std::numbers::pi;
     }
 
-    [[nodiscard]] constexpr Vec3 flipped() const noexcept {
+    [[nodiscard]] constexpr auto flipped() const -> Vec3 {
         return {-x, -y, -z};
     }
 
-    [[nodiscard]] constexpr Vec3 reflectedPoint(
-        const Vec3& pivot
-    ) const noexcept {
+    [[nodiscard]] constexpr auto reflectedPoint(const Vec3& pivot) const -> Vec3 {
         return pivot + (pivot - *this);
     }
 
-    [[nodiscard]] Vec3 normalized() const noexcept {
+    [[nodiscard]] auto normalized() const -> Vec3 {
         Vec3 result = *this;
         result.normalize();
         return result;
     }
 
-    void normalize() noexcept {
+    void normalize() {
         const double l = length();
-
         if (l == 0.0) {
             return;
         }
@@ -330,208 +258,178 @@ public:
         z = static_cast<T>(z * scale);
     }
 
-    void setLength(T length) noexcept {
+    void setLength(T length) {
         const double current_length = this->length();
-
         if (current_length == 0.0) {
             return;
         }
 
-        const double scale =
-            static_cast<double>(length) /
-            current_length;
+        const double scale = static_cast<double>(length) / current_length;
 
         x = static_cast<T>(x * scale);
         y = static_cast<T>(y * scale);
         z = static_cast<T>(z * scale);
     }
 
-    [[nodiscard]] bool checkEqual(
-        const Vec3& other,
-        T threshold
-    ) const noexcept {
-        return distance(other) <=
-               static_cast<double>(threshold);
+    [[nodiscard]] auto checkEqual(const Vec3& other, T threshold) const -> bool {
+        return distance(other) <= static_cast<double>(threshold);
     }
 
     // Modification
-    constexpr void set(
-        T x,
-        T y,
-        T z
-    ) noexcept {
+    constexpr void set(T x, T y, T z) {
         this->x = x;
         this->y = y;
         this->z = z;
     }
 
-    constexpr void zero() noexcept {
+    constexpr void zero() {
         x = T{};
         y = T{};
         z = T{};
     }
 
-    constexpr void flip() noexcept {
+    constexpr void flip() {
         x = -x;
         y = -y;
         z = -z;
     }
 
-    constexpr void translateX(T value) noexcept {
+    constexpr void translateX(T value) {
         x += value;
     }
 
-    constexpr void translateY(T value) noexcept {
+    constexpr void translateY(T value) {
         y += value;
     }
 
-    constexpr void translateZ(T value) noexcept {
+    constexpr void translateZ(T value) {
         z += value;
     }
 
-    constexpr void translate(
-        T tx,
-        T ty,
-        T tz
-    ) noexcept {
+    constexpr void translate(T tx, T ty, T tz) {
         x += tx;
         y += ty;
         z += tz;
     }
 
-    constexpr void scaleX(T value) noexcept {
+    constexpr void scaleX(T value) {
         x *= value;
     }
 
-    constexpr void scaleY(T value) noexcept {
+    constexpr void scaleY(T value) {
         y *= value;
     }
 
-    constexpr void scaleZ(T value) noexcept {
+    constexpr void scaleZ(T value) {
         z *= value;
     }
 
-    constexpr void scale(T value) noexcept {
+    constexpr void scale(T value) {
         x *= value;
         y *= value;
         z *= value;
     }
 
-    constexpr void scale(
-        T sx,
-        T sy,
-        T sz
-    ) noexcept {
+    constexpr void scale(T sx, T sy, T sz) {
         x *= sx;
         y *= sy;
         z *= sz;
     }
 
-    void rotateXDegrees(double degrees) noexcept {
+    void rotateXDegrees(double degrees) {
         rotateX(degrees * std::numbers::pi / 180.0);
     }
 
-    void rotateX(double radians) noexcept {
+    void rotateX(double radians) {
         const double c = std::cos(radians);
         const double s = std::sin(radians);
 
         const double new_y =
-            c * static_cast<double>(y) -
-            s * static_cast<double>(z);
+            (c * static_cast<double>(y)) -
+            (s * static_cast<double>(z));
 
         const double new_z =
-            s * static_cast<double>(y) +
-            c * static_cast<double>(z);
+            (s * static_cast<double>(y)) +
+            (c * static_cast<double>(z));
 
         y = static_cast<T>(new_y);
         z = static_cast<T>(new_z);
     }
 
-    void rotateYDegrees(double degrees) noexcept {
+    void rotateYDegrees(double degrees) {
         rotateY(degrees * std::numbers::pi / 180.0);
     }
 
-    void rotateY(double radians) noexcept {
+    void rotateY(double radians) {
         const double c = std::cos(radians);
         const double s = std::sin(radians);
 
         const double new_x =
-            c * static_cast<double>(x) +
-            s * static_cast<double>(z);
+            (c * static_cast<double>(x)) +
+            (s * static_cast<double>(z));
 
         const double new_z =
-            -s * static_cast<double>(x) +
-            c * static_cast<double>(z);
+            (-s * static_cast<double>(x)) +
+            (c * static_cast<double>(z));
 
         x = static_cast<T>(new_x);
         z = static_cast<T>(new_z);
     }
 
-    void rotateZDegrees(double degrees) noexcept {
+    void rotateZDegrees(double degrees) {
         rotateZ(degrees * std::numbers::pi / 180.0);
     }
 
-    void rotateZ(double radians) noexcept {
+    void rotateZ(double radians) {
         const double c = std::cos(radians);
         const double s = std::sin(radians);
 
         const double new_x =
-            c * static_cast<double>(x) -
-            s * static_cast<double>(y);
+            (c * static_cast<double>(x)) -
+            (s * static_cast<double>(y));
 
         const double new_y =
-            s * static_cast<double>(x) +
-            c * static_cast<double>(y);
+            (s * static_cast<double>(x)) +
+            (c * static_cast<double>(y));
 
         x = static_cast<T>(new_x);
         y = static_cast<T>(new_y);
     }
 
-    void setLerp(
-        const Vec3& a,
-        const Vec3& b,
-        double t
-    ) noexcept {
+    void setLerp(const Vec3& a, const Vec3& b, double t) {
         x = static_cast<T>(
             static_cast<double>(a.x) +
-            t * (
+            (t * (
                 static_cast<double>(b.x) -
                 static_cast<double>(a.x)
-            )
+            ))
         );
 
         y = static_cast<T>(
             static_cast<double>(a.y) +
-            t * (
+            (t * (
                 static_cast<double>(b.y) -
                 static_cast<double>(a.y)
-            )
+            ))
         );
 
         z = static_cast<T>(
             static_cast<double>(a.z) +
-            t * (
+            (t * (
                 static_cast<double>(b.z) -
                 static_cast<double>(a.z)
-            )
+            ))
         );
     }
 
-    [[nodiscard]] static Vec3 lerp(
-        const Vec3& a,
-        const Vec3& b,
-        double t
-    ) noexcept {
+    [[nodiscard]] static auto lerp(const Vec3& a, const Vec3& b, double t) -> Vec3 {
         Vec3 result;
         result.setLerp(a, b, t);
         return result;
     }
 
     // CSV
-    bool setByCSV(
-        const char* csv,
-        char delimiter = ','
-    ) noexcept {
+    auto setByCSV(const char* csv, char delimiter = ',') -> bool {
         if (csv == nullptr) {
             return false;
         }
@@ -554,10 +452,7 @@ public:
         return false;
     }
 
-    bool setByCSV(
-        const String& csv,
-        char delimiter = ','
-    ) noexcept {
+    auto setByCSV(const String& csv, char delimiter = ',') -> bool {
         return setByCSV(csv.utf8(), delimiter);
     }
 
@@ -568,19 +463,13 @@ public:
 
 // Scalar multiplication from the left.
 template <typename T>
-[[nodiscard]] constexpr Vec3<T> operator*(
-    T scalar,
-    const Vec3<T>& vector
-) noexcept {
+[[nodiscard]] constexpr auto operator * (T scalar, const Vec3<T>& vector) -> Vec3<T> {
     return vector * scalar;
 }
 
 // Stream output.
 template <typename T>
-std::ostream& operator<<(
-    std::ostream& os,
-    const Vec3<T>& vector
-) {
+auto operator << (std::ostream& os, const Vec3<T>& vector) -> std::ostream& {
     if constexpr (
         std::is_same_v<T, int8_t> ||
         std::is_same_v<T, uint8_t>

@@ -9,7 +9,7 @@ namespace Grain {
 
 class Slider : public Component {
 public:
-    enum class Orientation {
+    enum class Orientation :int8_t {
         Horizontal,
         Vertical
     };
@@ -24,7 +24,7 @@ public:
     );
 
     void draw(GraphicContext& gc) override;
-    bool handleEvent(const Event& event) override;
+    auto handleEvent(const Event& event) -> bool override;
 
     void setBounds(const Rectd& bounds) override;
     void setRange(double min, double max);
@@ -34,7 +34,7 @@ public:
 
     void setTrackColor(const Color& color);
     void setTrackSize(double track_size);
-    [[nodiscard]] double trackSize() const { return track_size_; }
+    [[nodiscard]] auto trackSize() const -> double { return track_size_; }
 
     void setHandleColor(const Color& color);
     void setHandleSize(const Sized& handle_size);
@@ -44,19 +44,19 @@ public:
 
     void setAction(ValueChanged action);
 
-    [[nodiscard]] double min() const { return min_; }
-    [[nodiscard]] double max() const { return max_; }
-    [[nodiscard]] double value() const { return value_; }
-    [[nodiscard]] double step() const { return step_; }
-    [[nodiscard]] double normalizedValue() const;
+    [[nodiscard]] auto min() const -> double { return min_; }
+    [[nodiscard]] auto max() const -> double { return max_; }
+    [[nodiscard]] auto value() const -> double { return value_; }
+    [[nodiscard]] auto step() const -> double { return step_; }
+    [[nodiscard]] auto normalizedValue() const -> double;
 
-    [[nodiscard]] Orientation orientation() const;
+    [[nodiscard]] auto orientation() const -> Orientation;
 
 private:
-    [[nodiscard]] double clampValue(double value) const;
-    [[nodiscard]] double valueFromPosition(const Vec2d& position) const;
-    [[nodiscard]] Rectd handleRect() const;
-    [[nodiscard]] Vec2d handleCenter() const;
+    [[nodiscard]] auto clampValue(double value) const -> double;
+    [[nodiscard]] auto valueFromPosition(const Vec2d& position) const -> double;
+    [[nodiscard]] auto handleRect() const -> Rectd;
+    [[nodiscard]] auto handleCenter() const -> Vec2d;
 
     void updateValueFromPosition(const Vec2d& position);
 

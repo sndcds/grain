@@ -23,7 +23,7 @@ public:
     using Iterator = T*;
     using ConstIterator = const T*;
 
-    List() noexcept = default;
+    List() = default;
 
     explicit List(SizeType capacity) {
         reserve(capacity);
@@ -34,8 +34,9 @@ public:
         deallocate();
     }
 
+
     //--------------------------------------------------------------------------
-    // Copy
+    //  Copy.
     //--------------------------------------------------------------------------
 
     List(const List& other)
@@ -67,7 +68,7 @@ public:
     List(const List&)
         requires (!std::copy_constructible<T>) = delete;
 
-    auto operator=(const List& other) -> List&
+    auto operator = (const List& other) -> List&
         requires std::copy_constructible<T> {
         if (this == &other) {
             return *this;
@@ -79,23 +80,22 @@ public:
         return *this;
     }
 
-    auto operator=(const List&) -> List&
+    auto operator = (const List&) -> List&
         requires (!std::copy_constructible<T>) = delete;
 
+
     //--------------------------------------------------------------------------
-    // Move
+    //  Move.
     //--------------------------------------------------------------------------
 
     List(List&& other) noexcept
-        : data_(other.data_),
-          size_(other.size_),
-          capacity_(other.capacity_) {
+        : data_(other.data_), size_(other.size_), capacity_(other.capacity_) {
         other.data_ = nullptr;
         other.size_ = 0;
         other.capacity_ = 0;
     }
 
-    auto operator=(List&& other) noexcept -> List& {
+    auto operator = (List&& other) noexcept -> List& {
         if (this == &other) {
             return *this;
         }
@@ -114,13 +114,14 @@ public:
         return *this;
     }
 
+
     //--------------------------------------------------------------------------
-    // Capacity
+    //  Capacity.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] auto size() const noexcept -> SizeType { return size_; }
-    [[nodiscard]] auto capacity() const noexcept -> SizeType { return capacity_; }
-    [[nodiscard]] auto empty() const noexcept -> bool { return size_ == 0; }
+    [[nodiscard]] auto size() const -> SizeType { return size_; }
+    [[nodiscard]] auto capacity() const -> SizeType { return capacity_; }
+    [[nodiscard]] auto empty() const -> bool { return size_ == 0; }
 
     void reserve(SizeType new_capacity) {
         if (new_capacity <= capacity_) {
@@ -151,20 +152,31 @@ public:
         capacity_ = new_capacity;
     }
 
+
     //--------------------------------------------------------------------------
-    // Modifiers
+    //  Modifiers.
     //--------------------------------------------------------------------------
 
-    void clear() noexcept {
+    void clear() {
         destroy_elements();
         size_ = 0;
     }
 
-    void pop_back() noexcept {
+    void pop_back() {
         assert(size_ > 0);
 
         --size_;
         std::destroy_at(data_ + size_);
+    }
+
+    void removeAtIndex(SizeType index) {
+        assert(index < size_);
+
+        for (SizeType i = index; i + 1 < size_; ++i) {
+            data_[i] = std::move(data_[i + 1]);
+        }
+
+        pop_back();
     }
 
     void push_back(const T& value)
@@ -198,60 +210,64 @@ public:
         return *element;
     }
 
+
     //--------------------------------------------------------------------------
-    // Element access
+    //  Element access.
     //--------------------------------------------------------------------------
 
-    auto operator[](SizeType index) noexcept -> T& {
+    auto operator [] (SizeType index) -> T& {
         assert(index < size_);
         return data_[index];
     }
 
-    auto operator[](SizeType index) const noexcept -> const T& {
+    auto operator [] (SizeType index) const -> const T& {
         assert(index < size_);
         return data_[index];
     }
 
-    auto front() noexcept -> T& {
+    auto front() -> T& {
         assert(size_ > 0);
         return data_[0];
     }
 
-    auto front() const noexcept -> const T& {
+    auto front() const -> const T& {
         assert(size_ > 0);
         return data_[0];
     }
 
-    auto back() noexcept -> T& {
+    auto back() -> T& {
         assert(size_ > 0);
         return data_[size_ - 1];
     }
 
-    auto back() const noexcept -> const T& {
+    auto back() const -> const T& {
         assert(size_ > 0);
         return data_[size_ - 1];
     }
 
-    //--------------------------------------------------------------------------
-    // Raw storage
-    //--------------------------------------------------------------------------
-
-    auto data() noexcept -> T* { return data_; }
-    auto data() const noexcept -> const T* { return data_; }
 
     //--------------------------------------------------------------------------
-    // Iteration
+    //  Raw storage.
     //--------------------------------------------------------------------------
 
-    auto begin() noexcept -> Iterator { return data_; }
-    auto begin() const noexcept -> ConstIterator { return data_; }
-    auto cbegin() const noexcept -> ConstIterator { return data_; }
-    auto end() noexcept -> Iterator { return data_ + size_; }
-    auto end() const noexcept -> ConstIterator { return data_ + size_; }
-    auto cend() const noexcept -> ConstIterator { return data_ + size_; }
+    auto data() -> T* { return data_; }
+    auto data() const -> const T* { return data_; }
+
 
     //--------------------------------------------------------------------------
-    // Miscellaneous
+    //  Iteration.
+    //--------------------------------------------------------------------------
+
+    auto begin() -> Iterator { return data_; }
+    auto begin() const -> ConstIterator { return data_; }
+    auto cbegin() const -> ConstIterator { return data_; }
+    auto end() -> Iterator { return data_ + size_; }
+    auto end() const -> ConstIterator { return data_ + size_; }
+    auto cend() const -> ConstIterator { return data_ + size_; }
+
+
+    //--------------------------------------------------------------------------
+    //  Miscellaneous.
     //--------------------------------------------------------------------------
 
     void swap(List& other) noexcept {
@@ -264,7 +280,7 @@ public:
 
 private:
     [[nodiscard]]
-    auto growth_capacity() const noexcept -> SizeType {
+    auto growth_capacity() const -> SizeType {
         if (capacity_ == 0) {
             return 8;
         }
@@ -272,11 +288,11 @@ private:
         return capacity_ * 2;
     }
 
-    void destroy_elements() noexcept {
+    void destroy_elements() {
         std::destroy_n(data_, size_);
     }
 
-    void deallocate() noexcept {
+    void deallocate() {
         if (data_ != nullptr) {
             allocator_.deallocate(data_, capacity_);
             data_ = nullptr;

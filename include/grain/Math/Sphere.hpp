@@ -2,10 +2,7 @@
 
 namespace Grain::Sphere {
 
-[[nodiscard]]
-double area(double radius) noexcept;
-
-[[nodiscard]]
-double volume(double radius) noexcept;
+[[nodiscard]] auto area(double radius) -> double;
+[[nodiscard]] auto volume(double radius) -> double;
 
 }

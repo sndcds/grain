@@ -38,9 +38,9 @@ TEST_CASE("GraphicPathPoint default constructor", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{0.0, 0.0});
     requirePoint(point.right, Vec2d{0.0, 0.0});
 
-    REQUIRE_FALSE(point.leftFlag);
-    REQUIRE_FALSE(point.rightFlag);
-    REQUIRE(point.bezierSegmentLength == 0.0);
+    REQUIRE_FALSE(point.left_flag);
+    REQUIRE_FALSE(point.right_flag);
+    REQUIRE(point.bezier_segment_length == 0.0);
 }
 
 
@@ -55,9 +55,9 @@ TEST_CASE("GraphicPathPoint coordinate constructor", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{10.0, 20.0});
     requirePoint(point.right, Vec2d{10.0, 20.0});
 
-    REQUIRE_FALSE(point.leftFlag);
-    REQUIRE_FALSE(point.rightFlag);
-    REQUIRE(point.bezierSegmentLength == 0.0);
+    REQUIRE_FALSE(point.left_flag);
+    REQUIRE_FALSE(point.right_flag);
+    REQUIRE(point.bezier_segment_length == 0.0);
 }
 
 
@@ -73,8 +73,8 @@ TEST_CASE("GraphicPathPoint constructor detects handles", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{5.0, 20.0});
     requirePoint(point.right, Vec2d{15.0, 20.0});
 
-    REQUIRE(point.leftFlag);
-    REQUIRE(point.rightFlag);
+    REQUIRE(point.left_flag);
+    REQUIRE(point.right_flag);
 }
 
 
@@ -86,8 +86,8 @@ TEST_CASE("GraphicPathPoint constructor disables coincident handles", "[GraphicP
         10.0, 20.0
     };
 
-    REQUIRE_FALSE(point.leftFlag);
-    REQUIRE_FALSE(point.rightFlag);
+    REQUIRE_FALSE(point.left_flag);
+    REQUIRE_FALSE(point.right_flag);
 }
 
 
@@ -99,8 +99,8 @@ TEST_CASE("GraphicPathPoint constructor detects handles independently", "[Graphi
         15.0, 20.0
     };
 
-    REQUIRE_FALSE(point.leftFlag);
-    REQUIRE(point.rightFlag);
+    REQUIRE_FALSE(point.left_flag);
+    REQUIRE(point.right_flag);
 }
 
 
@@ -118,8 +118,8 @@ TEST_CASE("GraphicPathPoint explicit flags constructor", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{5.0, 20.0});
     requirePoint(point.right, Vec2d{15.0, 20.0});
 
-    REQUIRE_FALSE(point.leftFlag);
-    REQUIRE(point.rightFlag);
+    REQUIRE_FALSE(point.left_flag);
+    REQUIRE(point.right_flag);
 }
 
 
@@ -137,8 +137,8 @@ TEST_CASE("GraphicPathPoint Vec2 constructor", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{5.0, 20.0});
     requirePoint(point.right, Vec2d{15.0, 20.0});
 
-    REQUIRE(point.leftFlag);
-    REQUIRE_FALSE(point.rightFlag);
+    REQUIRE(point.left_flag);
+    REQUIRE_FALSE(point.right_flag);
 }
 
 
@@ -156,8 +156,8 @@ TEST_CASE("GraphicPathPoint translate by vector", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{8.0, 11.0});
     requirePoint(point.right, Vec2d{18.0, 21.0});
 
-    REQUIRE(point.leftFlag);
-    REQUIRE(point.rightFlag);
+    REQUIRE(point.left_flag);
+    REQUIRE(point.right_flag);
 }
 
 
@@ -175,8 +175,8 @@ TEST_CASE("GraphicPathPoint translate by coordinates", "[GraphicPathPoint]")
     requirePoint(point.left, Vec2d{8.0, 11.0});
     requirePoint(point.right, Vec2d{18.0, 21.0});
 
-    REQUIRE(point.leftFlag);
-    REQUIRE(point.rightFlag);
+    REQUIRE(point.left_flag);
+    REQUIRE(point.right_flag);
 }
 
 

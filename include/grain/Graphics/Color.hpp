@@ -28,7 +28,6 @@ public:
     float blue = 0.0f;
     float alpha = 1.0f;
 
-public:
     constexpr Color() = default;
 
     constexpr Color(
@@ -49,26 +48,24 @@ public:
           blue(grey),
           alpha(alpha) {}
 
-    [[nodiscard]]
-    static constexpr Color black() {
-        return Color(0.0f, 0.0f, 0.0f);
+    [[nodiscard]] static constexpr auto black() -> Color {
+        return {0.0f, 0.0f, 0.0f};
+    }
+
+    [[nodiscard]] static constexpr auto white() -> Color {
+        return {1.0f, 1.0f, 1.0f};
     }
 
     [[nodiscard]]
-    static constexpr Color white() {
-        return Color(1.0f, 1.0f, 1.0f);
-    }
-
-    [[nodiscard]]
-    static constexpr Color transparent() {
-        return Color(0.0f, 0.0f, 0.0f, 0.0f);
+    static constexpr auto transparent() -> Color {
+        return {0.0f, 0.0f, 0.0f, 0.0f};
     }
 
     //--------------------------------------------------------------------------
     //  Approximate black-body color, based on the common temperature-to-RGB
     //  approximation. Temperature is expressed in kelvin.
     //--------------------------------------------------------------------------
-    static Color kelvinColor(float kelvin) {
+    static auto kelvinColor(float kelvin) -> Color {
         const float temperature = std::clamp(kelvin, 1000.0f, 40000.0f);
         const float t = temperature / 100.0f;
 
@@ -78,15 +75,13 @@ public:
 
         if (t <= 66.0f) {
             red = 255.0f;
-            green = 99.4708025861f * std::log(t)
-                  - 161.1195681661f;
+            green = (99.4708025861f * std::log(t)) - 161.1195681661f;
 
             if (t <= 19.0f) {
                 blue = 0.0f;
             }
             else {
-                blue = 138.5177312231f * std::log(t - 10.0f)
-                     - 305.0447927307f;
+                blue = (138.5177312231f * std::log(t - 10.0f)) - 305.0447927307f;
             }
         }
         else {
@@ -95,44 +90,38 @@ public:
             blue = 255.0f;
         }
 
-        return Color(
-            std::clamp(red, 0.0f, 1.0f),
-            std::clamp(green, 0.0f, 1.0f),
-            std::clamp(blue, 0.0f, 1.0f),
+        constexpr float scale = 1.0f / 255.0f;
+
+        return {
+            std::clamp(red * scale, 0.0f, 1.0f),
+            std::clamp(green * scale, 0.0f, 1.0f),
+            std::clamp(blue * scale, 0.0f, 1.0f),
             1.0f
-        );
+        };
     }
 
 
     // Test for exact equality.
-    [[nodiscard]]
-    constexpr bool operator==(const Color&) const = default;
+    [[nodiscard]] constexpr auto operator == (const Color&) const -> bool = default;
 
     // Test for approximate equality.
-    [[nodiscard]]
-    bool isSame(const Color& other, float tolerance = 0.0001f) const;
+    [[nodiscard]] auto isSame(const Color& other, float tolerance = 0.0001f) const -> bool;
 
-    [[nodiscard]]
-    static Color lerp(const Color& a, const Color& b, float t);
+    [[nodiscard]] static auto lerp(const Color& a, const Color& b, float t) -> Color;
 
-    [[nodiscard]]
-    static Color mixboxLerp(const Color& a, const Color& b, float t);
+    [[nodiscard]] static auto mixboxLerp(const Color& a, const Color& b, float t) -> Color;
 
     // Convert to packed RGBA 32-bit representation.
-    [[nodiscard]]
-    uint32_t rgba32() const;
+    [[nodiscard]] auto rgba32() const -> uint32_t;
 
     // Create a color from packed RGBA 32-bit representation.
-    [[nodiscard]]
-    static constexpr Color fromRGBA32(
-        uint32_t value) {
-
-        return Color(
+    [[nodiscard]] static constexpr auto fromRGBA32(uint32_t value) -> Color {
+        return {
             static_cast<float>((value >> 24) & 0xff) / 255.0f,
             static_cast<float>((value >> 16) & 0xff) / 255.0f,
             static_cast<float>((value >> 8) & 0xff) / 255.0f,
             static_cast<float>(value & 0xff) / 255.0f
-        );
+        };
     }
 };
 

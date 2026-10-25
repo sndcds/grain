@@ -4,46 +4,39 @@
 
 namespace Grain::Quantization {
 
-std::uint32_t quantize(
+auto quantize(
     const std::uint32_t value,
-    const unsigned sourceBits,
-    const unsigned targetBits
-) noexcept
-{
-    if (targetBits >= sourceBits) {
+    const unsigned source_bits,
+    const unsigned target_bits
+) -> std::uint32_t {
+    if (target_bits >= source_bits) {
         return value;
     }
 
-    if (targetBits == 0) {
+    if (target_bits == 0) {
         return 0;
     }
 
-    if (sourceBits == 0) {
+    if (source_bits == 0) {
         return 0;
     }
 
-    if (sourceBits >= 32) {
-        const std::uint64_t sourceMax =
-            std::numeric_limits<std::uint32_t>::max();
-
-        const std::uint64_t targetMax =
-            (std::uint64_t{1} << targetBits) - 1;
+    if (source_bits >= 32) {
+        const std::uint64_t source_max = std::numeric_limits<std::uint32_t>::max();
+        const std::uint64_t target_max = (std::uint64_t{1} << target_bits) - 1;
 
         return static_cast<std::uint32_t>(
-            (static_cast<std::uint64_t>(value) * targetMax + sourceMax / 2)
-            / sourceMax
+            (static_cast<std::uint64_t>(value) * target_max + source_max / 2)
+            / source_max
         );
     }
 
-    const std::uint32_t sourceMax =
-        (std::uint32_t{1} << sourceBits) - 1;
-
-    const std::uint32_t targetMax =
-        (std::uint32_t{1} << targetBits) - 1;
+    const std::uint32_t source_max = (std::uint32_t{1} << source_bits) - 1;
+    const std::uint32_t target_max = (std::uint32_t{1} << target_bits) - 1;
 
     return static_cast<std::uint32_t>(
-        (static_cast<std::uint64_t>(value) * targetMax + sourceMax / 2)
-        / sourceMax
+        (static_cast<std::uint64_t>(value) * target_max + source_max / 2)
+        / source_max
     );
 }
 

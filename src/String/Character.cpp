@@ -2,11 +2,11 @@
 
 namespace Grain {
 
-bool isAsciiDigit(char32_t c) noexcept {
+auto isAsciiDigit(char32_t c) -> bool {
     return c >= U'0' && c <= U'9';
 }
 
-bool isAsciiNumericLiteralCharacter(char32_t c) noexcept {
+auto isAsciiNumericLiteralCharacter(char32_t c) -> bool {
     return isAsciiDigit(c) || c == U'-' || c == U'.';
 }
 

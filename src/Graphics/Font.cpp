@@ -43,24 +43,24 @@ Font::Font(const Font* font, float size)
 
 Font::~Font() = default;
 
-Font::Font(Font&& other) = default;
+Font::Font(Font&&) noexcept = default;
 
-Font& Font::operator=(Font&& other) = default;
+auto Font::operator = (Font&&) noexcept -> Font& = default;
 
 
-const char* Font::fontNameUtf8() const {
+auto Font::fontNameUtf8() const -> const char* {
     return platform_->fontNameUtf8();
 }
 
-const char* Font::displayNameUtf8() const {
+auto Font::displayNameUtf8() const -> const char* {
     return platform_->displayNameUtf8();
 }
 
-float Font::size() const {
+auto Font::size() const -> float {
     return platform_->size();
 }
 
-bool Font::isValid() const {
+auto Font::isValid() const -> bool {
     return platform_->isValid();
 }
 
@@ -69,75 +69,72 @@ void Font::set(const String& name, float size) {
 }
 
 
-double Font::ascent() const {
+auto Font::ascent() const -> double {
     return platform_->ascent();
 }
 
-double Font::descent() const {
+auto Font::descent() const -> double {
     return platform_->descent();
 }
 
-double Font::xHeight() const {
+auto Font::xHeight() const -> double {
     return platform_->xHeight();
 }
 
-double Font::capHeight() const {
+auto Font::capHeight() const -> double {
     return platform_->capHeight();
 }
 
-double Font::leading() const {
+auto Font::leading() const -> double {
     return platform_->leading();
 }
 
-double Font::cellHeight() const {
+auto Font::cellHeight() const -> double {
     return platform_->cellHeight();
 }
 
-double Font::lineHeight() const {
+auto Font::lineHeight() const -> double {
     return platform_->lineHeight();
 }
 
-double Font::italicAngle() const {
+auto Font::italicAngle() const -> double {
     return platform_->italicAngle();
 }
 
-double Font::underlinePosition() const {
+auto Font::underlinePosition() const -> double {
     return platform_->underlinePosition();
 }
 
-double Font::underlineThickness() const {
+auto Font::underlineThickness() const -> double {
     return platform_->underlineThickness();
 }
 
-int32_t Font::unitsPerEm() const {
+auto Font::unitsPerEm() const -> int32_t {
     return platform_->unitsPerEm();
 }
 
-int32_t Font::glyphCount() const {
+auto Font::glyphCount() const -> int32_t {
     return platform_->glyphCount();
 }
 
-const Rectd& Font::boundingBox() const {
+auto Font::boundingBox() const -> const Rectd& {
     return platform_->boundingBox();
 }
 
-double Font::glyphAdvanceWidth(
-    const char* symbol,
-    int32_t length
-) const {
+auto Font::glyphAdvanceWidth(const char* symbol, int32_t length) const -> double {
     return platform_->glyphAdvanceWidth(symbol, length);
 }
 
-Sized Font::textDimension(const char* str, int32_t byte_length) const {
+auto Font::textDimension(const char* str, int32_t byte_length) const -> Sized {
     return platform_->textDimension(str, byte_length);
 }
 
-int32_t Font::charIndexAtX(
+auto Font::charIndexAtX(
     const char* str,
     double x,
     double& in_out_delta,
     double& out_cursor_x
-) const {
+) const -> int32_t {
     return platform_->charIndexAtX(
         str,
         x,
@@ -145,7 +142,7 @@ int32_t Font::charIndexAtX(
         out_cursor_x);
 }
 
-[[nodiscard]] void* Font::nativeHandle() const {
+[[nodiscard]] auto Font::nativeHandle() const -> void* {
     return platform_
         ? platform_->nativeHandle()
         : nullptr;

@@ -7,17 +7,14 @@
 #include <memory>
 
 namespace Grain {
-bool String::isAsciiAtIndex(
-    size_type code_point_index,
-    char& out_char) const {
-    const auto offset = byteOffset(code_point_index);
 
+auto String::isAsciiAtIndex(size_type code_point_index, char& out_char) const -> bool {
+    const auto offset = byteOffset(code_point_index);
     if (offset >= data_.size()) {
         return false;
     }
 
     const auto byte = static_cast<unsigned char>(data_[offset]);
-
     if (byte > 0x7F) {
         return false;
     }
@@ -26,12 +23,13 @@ bool String::isAsciiAtIndex(
     return true;
 }
 
+
 //------------------------------------------------------------------------------
-// Construction
+//  Construction.
 //------------------------------------------------------------------------------
 
 String::String(const char* utf8)
-    : data_(utf8 ? utf8 : "") {
+    : data_((utf8 != nullptr) ? utf8 : "") {
 }
 
 String::String(std::string_view utf8)
@@ -42,56 +40,55 @@ String::String(std::string utf8)
     : data_(std::move(utf8)) {
 }
 
-String& String::operator=(const char* utf8) {
-    data_ = utf8 ? utf8 : "";
+auto String::operator = (const char* utf8) -> String& {
+    data_ = (utf8 != nullptr) ? utf8 : "";
     return *this;
 }
 
-String& String::operator=(std::string_view utf8) {
+auto String::operator = (std::string_view utf8) -> String& {
     data_.assign(utf8);
     return *this;
 }
 
+
 //------------------------------------------------------------------------------
-// Basic properties
+//  Basic properties.
 //------------------------------------------------------------------------------
 
-bool String::empty() const {
+auto String::empty() const -> bool {
     return data_.empty();
 }
 
-String::size_type String::length() const {
+auto String::length() const -> String::size_type {
     return StringUtf8::length(data_);
 }
 
-String::size_type String::byteLength() const {
+auto String::byteLength() const -> String::size_type {
     return data_.size();
 }
 
-bool String::isAscii() const {
+auto String::isAscii() const -> bool {
     return StringUtf8::isAscii(data_);
 }
 
-bool String::isValidUtf8(
-    size_type* invalid_byte_index) const {
-    return StringUtf8::isValid(
-        data_,
-        invalid_byte_index);
+auto String::isValidUtf8(size_type* invalid_byte_index) const -> bool {
+    return StringUtf8::isValid(data_, invalid_byte_index);
 }
 
+
 //------------------------------------------------------------------------------
-// Access
+//  Access.
 //------------------------------------------------------------------------------
 
-const char* String::c_str() const {
+auto String::c_str() const -> const char* {
     return data_.c_str();
 }
 
-std::string_view String::view() const {
+auto String::view() const -> std::string_view {
     return data_;
 }
 
-char String::byteAt(size_type index) const {
+auto String::byteAt(size_type index) const -> char {
     if (index >= data_.size()) {
         return '\0';
     }
@@ -99,19 +96,17 @@ char String::byteAt(size_type index) const {
     return data_[index];
 }
 
-char32_t String::codePointAt(size_type index) const {
+auto String::codePointAt(size_type index) const -> char32_t {
     return StringUtf8::codePointAt(data_, index);
 }
 
-String::size_type String::byteOffset(
-    size_type code_point_index) const {
-    return StringUtf8::byteOffset(
-        data_,
-        code_point_index);
+auto String::byteOffset(size_type code_point_index) const -> String::size_type {
+    return StringUtf8::byteOffset(data_, code_point_index);
 }
 
+
 //------------------------------------------------------------------------------
-// Modification
+//  Modification.
 //------------------------------------------------------------------------------
 
 void String::clear() {
@@ -123,7 +118,7 @@ void String::assign(std::string_view utf8) {
 }
 
 void String::assign(const char* utf8) {
-    data_ = utf8 ? utf8 : "";
+    data_ = (utf8 != nullptr) ? utf8 : "";
 }
 
 void String::append(std::string_view utf8) {
@@ -140,17 +135,17 @@ void String::append(const char* utf8) {
     }
 }
 
-String& String::operator+=(std::string_view utf8) {
+auto String::operator += (std::string_view utf8) -> String& {
     append(utf8);
     return *this;
 }
 
-String& String::operator+=(const String& other) {
+auto String::operator += (const String& other) -> String& {
     append(other);
     return *this;
 }
 
-String& String::operator+=(const char* utf8) {
+auto String::operator += (const char* utf8) -> String& {
     if (utf8 != nullptr) {
         data_.append(utf8);
     }
@@ -158,13 +153,8 @@ String& String::operator+=(const char* utf8) {
     return *this;
 }
 
-void String::insert(
-    size_type code_point_index,
-    std::string_view utf8) {
-
-    const size_type byte_index =
-        byteOffset(code_point_index);
-
+void String::insert(size_type code_point_index, std::string_view utf8) {
+    const size_type byte_index = byteOffset(code_point_index);
     if (byte_index == npos) {
         if (code_point_index == length()) {
             data_.append(utf8);
@@ -191,13 +181,8 @@ void String::insertAtCharacterIndex(const char* text, int32_t index) {
 }
 
 
-void String::erase(
-    size_type code_point_index,
-    size_type code_point_count) {
-
-    const size_type start =
-        byteOffset(code_point_index);
-
+void String::erase(size_type code_point_index, size_type code_point_count) {
+    const size_type start = byteOffset(code_point_index);
     if (start == npos) {
         return;
     }
@@ -220,81 +205,65 @@ void String::erase(
 void String::replace(
     size_type code_point_index,
     size_type code_point_count,
-    std::string_view replacement) {
-
-    const size_type start =
-        byteOffset(code_point_index);
-
+    std::string_view replacement
+) {
+    const size_type start = byteOffset(code_point_index);
     if (start == npos) {
         return;
     }
 
-    const size_type end =
-        byteOffset(code_point_index + code_point_count);
+    const size_type end = byteOffset(code_point_index + code_point_count);
 
     const size_type byte_end =
         end == npos
             ? data_.size()
             : end;
 
-    data_.replace(
-        start,
-        byte_end - start,
-        replacement);
+    data_.replace(start, byte_end - start, replacement);
 }
 
+
 //------------------------------------------------------------------------------
-// Substrings
+//  Substrings.
 //------------------------------------------------------------------------------
 
-String String::substr(
+auto String::substr(
     size_type code_point_index,
-    size_type code_point_count) const {
-
-    const size_type start =
-        byteOffset(code_point_index);
-
+    size_type code_point_count
+) const -> String {
+    const size_type start = byteOffset(code_point_index);
     if (start == npos) {
         return {};
     }
 
     if (code_point_count == npos) {
-        return String(
-            std::string_view(data_).substr(start));
+        return {std::string_view(data_).substr(start)};
     }
 
-    const size_type end =
-        byteOffset(code_point_index + code_point_count);
+    const size_type end = byteOffset(code_point_index + code_point_count);
 
     if (end == npos) {
-        return String(
-            std::string_view(data_).substr(start));
+        return {std::string_view(data_).substr(start)};
     }
 
-    return String(
-        std::string_view(data_).substr(
-            start,
-            end - start));
+    return {std::string_view(data_).substr(start,end - start)};
 }
 
+
 //------------------------------------------------------------------------------
-// Searching
+//  Searching.
 //------------------------------------------------------------------------------
 
-String::size_type String::find(
+auto String::find(
     std::string_view needle,
-    size_type code_point_index) const {
-
-    const size_type start =
-        byteOffset(code_point_index);
-
+    size_type code_point_index
+) const -> String::size_type {
+    const size_type start = byteOffset(code_point_index);
     if (start == npos) {
         return npos;
     }
 
-    const size_type byte_index =
-        data_.find(needle, start);
-
+    const size_type byte_index = data_.find(needle, start);
     if (byte_index == npos) {
         return npos;
     }
@@ -302,48 +271,47 @@ String::size_type String::find(
     return codePointIndexFromByteIndex(byte_index);
 }
 
-bool String::contains(
-    std::string_view needle) const {
-    return data_.find(needle) != std::string::npos;
+auto String::contains(std::string_view needle) const -> bool {
+    return data_.contains(needle);
 }
 
-bool String::startsWith(
-    std::string_view prefix) const {
+auto String::startsWith(std::string_view prefix) const -> bool {
     return data_.starts_with(prefix);
 }
 
-bool String::endsWith(
-    std::string_view suffix) const {
+auto String::endsWith(std::string_view suffix) const -> bool {
     return data_.ends_with(suffix);
 }
 
+
 //------------------------------------------------------------------------------
-// Whitespace
+//  Whitespace.
 //------------------------------------------------------------------------------
 
-String::size_type String::leadingWhitespace() const {
-    size_type count = 0;
-
-    while (
-        count < data_.size() &&
-        isAsciiWhitespace(
-            static_cast<unsigned char>(data_[count]))) {
-
-        ++count;
-    }
-
-    return count;
-}
-
-String::size_type String::trailingWhitespace() const {
+auto String::leadingWhitespace() const -> String::size_type {
     size_type count = 0;
 
     while (
         count < data_.size() &&
         isAsciiWhitespace(
             static_cast<unsigned char>(
-                data_[data_.size() - 1 - count]))) {
+                data_[count]))
+    ) {
+        ++count;
+    }
 
+    return count;
+}
+
+auto String::trailingWhitespace() const -> String::size_type {
+    size_type count = 0;
+
+    while (
+        count < data_.size() &&
+        isAsciiWhitespace(
+            static_cast<unsigned char>(
+                data_[data_.size() - 1 - count]))
+    ) {
         ++count;
     }
 
@@ -351,18 +319,14 @@ String::size_type String::trailingWhitespace() const {
 }
 
 void String::trimLeft() {
-    const size_type count =
-        leadingWhitespace();
-
+    const size_type count = leadingWhitespace();
     if (count > 0) {
         data_.erase(0, count);
     }
 }
 
 void String::trimRight() {
-    const size_type count =
-        trailingWhitespace();
-
+    const size_type count = trailingWhitespace();
     if (count > 0) {
         data_.erase(
             data_.size() - count);
@@ -374,23 +338,20 @@ void String::trim() {
     trimRight();
 }
 
+
 //------------------------------------------------------------------------------
-// Comparison
+//  Comparison.
 //------------------------------------------------------------------------------
 
-int String::compare(
-    const String& other) const {
+auto String::compare(const String& other) const -> int {
     return data_.compare(other.data_);
 }
 
-int String::compare(
-    std::string_view other) const {
+auto String::compare(std::string_view other) const -> int {
     return data_.compare(other);
 }
 
-int String::compare(
-    const char* other) const {
-
+auto String::compare(const char* other) const -> int {
     if (other == nullptr) {
         return 1;
     }
@@ -398,19 +359,14 @@ int String::compare(
     return data_.compare(other);
 }
 
-bool String::equalsIgnoreCase(
-    std::string_view other) const {
-
+auto String::equalsIgnoreCase(std::string_view other) const -> bool {
     if (data_.size() != other.size()) {
         return false;
     }
 
     for (size_type i = 0; i < data_.size(); ++i) {
-        const unsigned char lhs =
-            static_cast<unsigned char>(data_[i]);
-
-        const unsigned char rhs =
-            static_cast<unsigned char>(other[i]);
+        const auto lhs = static_cast<unsigned char>(data_[i]);
+        const auto rhs = static_cast<unsigned char>(other[i]);
 
         const unsigned char lhs_lower =
             lhs >= 'A' && lhs <= 'Z'
@@ -431,79 +387,53 @@ bool String::equalsIgnoreCase(
 }
 
 //------------------------------------------------------------------------------
-// Operators
+//  Operators.
 //------------------------------------------------------------------------------
 
-bool operator==(
-    const String& lhs,
-    const String& rhs) {
+auto operator == (const String& lhs, const String& rhs) -> bool {
     return lhs.data_ == rhs.data_;
 }
 
-bool operator==(
-    const String& lhs,
-    const char* rhs) {
-    return lhs.view() ==
-           std::string_view(rhs ? rhs : "");
+auto operator == (const String& lhs, const char* rhs) -> bool {
+    return lhs.view() == std::string_view((rhs != nullptr) ? rhs : "");
 }
 
-bool operator==(
-    const char* lhs,
-    const String& rhs) {
+auto operator == (const char* lhs, const String& rhs) -> bool {
     return rhs == lhs;
 }
 
-bool operator!=(
-    const String& lhs,
-    const String& rhs) {
+auto operator != (const String& lhs, const String& rhs) -> bool {
     return !(lhs == rhs);
 }
 
-bool operator!=(
-    const String& lhs,
-    const char* rhs) {
+auto operator != (const String& lhs, const char* rhs) -> bool {
     return !(lhs == rhs);
 }
 
-bool operator!=(
-    const char* lhs,
-    const String& rhs) {
+auto operator != (const char* lhs, const String& rhs) -> bool {
     return !(lhs == rhs);
 }
 
-bool operator==(
-    const String& lhs,
-    std::string_view rhs) {
-    return lhs.data_ == rhs;
+auto operator == (const String& lhs, std::string_view rhs) -> bool {
+    return std::string_view{lhs.data_} == rhs;
 }
 
-bool operator==(
-    std::string_view lhs,
-    const String& rhs) {
-    return lhs == rhs.data_;
+auto operator == (std::string_view lhs, const String& rhs) -> bool {
+    return lhs == std::string_view{rhs.data_};
 }
 
-bool operator!=(
-    const String& lhs,
-    std::string_view rhs) {
+auto operator != (const String& lhs, std::string_view rhs) -> bool {
     return !(lhs == rhs);
 }
 
-bool operator!=(
-    std::string_view lhs,
-    const String& rhs) {
+auto operator != (std::string_view lhs, const String& rhs) -> bool {
     return !(lhs == rhs);
 }
 
-String operator+(
-    const String& lhs,
-    const String& rhs) {
-
+auto operator + (const String& lhs, const String& rhs) -> String {
     String result;
 
-    result.data_.reserve(
-        lhs.data_.size() +
-        rhs.data_.size());
+    result.data_.reserve(lhs.data_.size() + rhs.data_.size());
 
     result.data_ = lhs.data_;
     result.data_ += rhs.data_;
@@ -511,10 +441,7 @@ String operator+(
     return result;
 }
 
-String operator+(
-    const String& lhs,
-    std::string_view rhs) {
-
+auto operator + (const String& lhs, std::string_view rhs) -> String {
     String result;
 
     result.data_.reserve(
@@ -527,10 +454,7 @@ String operator+(
     return result;
 }
 
-String operator+(
-    std::string_view lhs,
-    const String& rhs) {
-
+auto operator + (std::string_view lhs, const String& rhs) -> String {
     String result;
 
     result.data_.reserve(
@@ -543,59 +467,45 @@ String operator+(
     return result;
 }
 
-String operator+(
-    const String& lhs,
-    const char* rhs) {
-
+auto operator + (const String& lhs, const char* rhs) -> String {
     String result(lhs);
     result.append(rhs);
 
     return result;
 }
 
-String operator+(
-    const char* lhs,
-    const String& rhs) {
-
+auto operator + (const char* lhs, const String& rhs) -> String {
     String result(lhs);
     result.append(rhs);
 
     return result;
 }
 
-std::ostream& operator<<(
-    std::ostream& stream,
-    const String& string) {
-
+auto operator << (std::ostream& stream,const String& string) -> std::ostream& {
     return stream << string.data_;
 }
 
+
 //------------------------------------------------------------------------------
-// Internal helpers
+//  Internal helpers.
 //------------------------------------------------------------------------------
 
-String::size_type String::codePointIndexFromByteIndex(
-    size_type byte_index) const {
-
-    return StringUtf8::codePointIndex(
-        data_,
-        byte_index);
+auto String::codePointIndexFromByteIndex(size_type byte_index) const -> String::size_type {
+    return StringUtf8::codePointIndex(data_, byte_index);
 }
 
-bool String::isAsciiWhitespace(
-    unsigned char byte) {
-
+auto String::isAsciiWhitespace(unsigned char byte) -> bool {
     switch (byte) {
-    case ' ':
-    case '\t':
-    case '\n':
-    case '\r':
-    case '\f':
-    case '\v':
-        return true;
+        case ' ':
+        case '\t':
+        case '\n':
+        case '\r':
+        case '\f':
+        case '\v':
+            return true;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 }
 

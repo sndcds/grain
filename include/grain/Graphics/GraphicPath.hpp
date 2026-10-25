@@ -20,8 +20,8 @@ struct GraphicPathSplitParam {
     double start = 0.0;
     double end = 1.0;
 
-    int32_t startIndex = -1;
-    int32_t endIndex = -1;
+    int32_t start_index = -1;
+    int32_t end_index = -1;
 
     double t0 = 0.0;
     double t1 = 1.0;
@@ -30,58 +30,54 @@ struct GraphicPathSplitParam {
 
 class GraphicPath {
 public:
-    explicit GraphicPath(
-        int32_t pointCapacity = 5
-    ) noexcept;
+    explicit GraphicPath(int32_t pointCapacity = 5);
 
-    ~GraphicPath() noexcept = default;
+    ~GraphicPath() = default;
 
     GraphicPath(const GraphicPath&) = default;
-    GraphicPath& operator=(const GraphicPath&) = default;
+    auto operator = (const GraphicPath&) -> GraphicPath& = default;
 
-    GraphicPath(GraphicPath&&) noexcept = default;
-    GraphicPath& operator=(GraphicPath&&) noexcept = default;
+    GraphicPath(GraphicPath&&) = default;
+    auto operator = (GraphicPath&&) -> GraphicPath& = default;
 
 
     //--------------------------------------------------------------------------
     // State
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] bool isClosed() const noexcept {
+    [[nodiscard]] auto isClosed() const -> bool {
         return closed_;
     }
 
-    void setClosed(bool closed) noexcept {
+    void setClosed(bool closed) {
         closed_ = closed;
-        mustUpdate_ = true;
+        must_update_ = true;
     }
 
-    [[nodiscard]] bool hasPoints() const noexcept;
+    [[nodiscard]] auto hasPoints() const -> bool;
 
-    [[nodiscard]] int32_t pointCount() const noexcept;
+    [[nodiscard]] auto pointCount() const -> int32_t;
 
-    [[nodiscard]] int32_t lastPointIndex() const noexcept {
+    [[nodiscard]] auto lastPointIndex() const -> int32_t {
         return pointCount() - 1;
     }
 
-    [[nodiscard]] int32_t segmentCount() const noexcept;
+    [[nodiscard]] auto segmentCount() const -> int32_t;
 
 
     //--------------------------------------------------------------------------
     // Length
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] double length() noexcept;
+    [[nodiscard]] auto length() -> double;
 
-    void setBezierSegmentResolution(
-        int32_t resolution
-    ) noexcept {
-        bezierSegmentResolution_ = resolution;
-        mustUpdate_ = true;
+    void setBezierSegmentResolution(int32_t resolution) {
+        bezier_segment_resolution_ = resolution;
+        must_update_ = true;
     }
 
-    [[nodiscard]] int32_t bezierSegmentResolution() const noexcept {
-        return bezierSegmentResolution_;
+    [[nodiscard]] auto bezierSegmentResolution() const -> int32_t {
+        return bezier_segment_resolution_;
     }
 
 
@@ -89,57 +85,46 @@ public:
     // Points
     //--------------------------------------------------------------------------
 
-    GraphicPathPoint* pointPtrAtIndex(
-        int32_t index
-    ) noexcept;
+    auto pointPtrAtIndex(int32_t index) -> GraphicPathPoint*;
 
-    const GraphicPathPoint* pointPtrAtIndex(
-        int32_t index
-    ) const noexcept;
+    [[nodiscard]] auto pointPtrAtIndex(int32_t index) const -> const GraphicPathPoint*;
 
-    GraphicPathPoint* lastPointPtr() noexcept;
+    auto lastPointPtr() -> GraphicPathPoint*;
 
-    const GraphicPathPoint* lastPointPtr() const noexcept;
+    [[nodiscard]] auto lastPointPtr() const -> const GraphicPathPoint*;
 
 
     //--------------------------------------------------------------------------
     // Geometry
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] Rectd bounds() noexcept;
+    [[nodiscard]] auto bounds() const -> Rectd;
 
-    bool bounds(
-        Rectd& outBounds
-    ) noexcept;
+    auto bounds(Rectd& outBounds) const -> bool;
 
-    double polygonCentroid(
-        Vec2d& outCentroid
-    ) const noexcept;
+    auto polygonCentroid(Vec2d& outCentroid) const  -> double;
 
-    [[nodiscard]] Vec2d simplePolygonCentroid() const noexcept;
+    [[nodiscard]] auto simplePolygonCentroid() const -> Vec2d;
 
 
     //--------------------------------------------------------------------------
     // Bézier
     //--------------------------------------------------------------------------
 
-    bool bezierAtIndex(
-        int32_t segmentIndex,
-        Bezier& outBezier
-    ) const noexcept;
+    auto bezierAtIndex(int32_t segmentIndex, Bezier& outBezier) const -> bool;
 
-    static bool bezierFromTwoPathPoints(
+    static auto bezierFromTwoPathPoints(
         const GraphicPathPoint* p1,
         const GraphicPathPoint* p2,
         Bezier& outBezier
-    ) noexcept;
+    ) -> bool;
 
 
     //--------------------------------------------------------------------------
     // Modification
     //--------------------------------------------------------------------------
 
-    void clear() noexcept;
+    void clear();
 
     void addPoint(
         double x,
@@ -150,66 +135,36 @@ public:
         bool useRight,
         double rx,
         double ry
-    ) noexcept;
+    );
+
+    void addPoint(const GraphicPathPoint* point);
+
+    void addPoint(const Vec2d& pos);
+
+    void addPoint(double x, double y);
+
+    void addPoint(const Vec2d& pos, const Vec2d& left, const Vec2d& right);
 
     void addPoint(
-        const GraphicPathPoint* point
-    ) noexcept;
+        double x, double y,
+        double lx, double ly,
+        double rx, double ry
+    );
 
-    void addPoint(
-        const Vec2d& pos
-    ) noexcept;
+    void addPointLeft(const Vec2d& pos, const Vec2d& left);
 
-    void addPoint(
-        double x,
-        double y
-    ) noexcept;
+    void addPointLeft(double x, double y, double lx, double ly );
 
-    void addPoint(
-        const Vec2d& pos,
-        const Vec2d& left,
-        const Vec2d& right
-    ) noexcept;
+    void addPointRight(const Vec2d& pos, const Vec2d& right);
 
-    void addPoint(
-        double x,
-        double y,
-        double lx,
-        double ly,
-        double rx,
-        double ry
-    ) noexcept;
-
-    void addPointLeft(
-        const Vec2d& pos,
-        const Vec2d& left
-    ) noexcept;
-
-    void addPointLeft(
-        double x,
-        double y,
-        double lx,
-        double ly
-    ) noexcept;
-
-    void addPointRight(
-        const Vec2d& pos,
-        const Vec2d& right
-    ) noexcept;
-
-    void addPointRight(
-        double x,
-        double y,
-        double rx,
-        double ry
-    ) noexcept;
+    void addPointRight(double x, double y, double rx, double ry);
 
     void addPointByAngleDegrees(
         const Vec2d& pos,
         double angle,
         double leftLength,
         double rightLength
-    ) noexcept;
+    );
 
     void addPointByAngleDegrees(
         double x,
@@ -217,7 +172,7 @@ public:
         double angle,
         double leftLength,
         double rightLength
-    ) noexcept;
+    );
 
     void addPointByAngleDegrees(
         const Vec2d& pos,
@@ -225,7 +180,7 @@ public:
         double leftLength,
         double rightAngle,
         double rightLength
-    ) noexcept;
+    );
 
     void addPointByAngleDegrees(
         double x,
@@ -234,7 +189,7 @@ public:
         double leftLength,
         double rightAngle,
         double rightLength
-    ) noexcept;
+    );
 
 
     //--------------------------------------------------------------------------
@@ -248,56 +203,36 @@ public:
         bool sweepFlag,
         const Vec2d& endPos,
         int32_t maxSegmentCount = 16
-    ) noexcept;
+    );
 
     void addBezier(
         const Vec2d& control1Pos,
         const Vec2d& control2Pos,
         const Vec2d& endPos
-    ) noexcept;
+    );
 
-    void addQuadraticBezier(
-        const Vec2d& controlPos,
-        const Vec2d& endPos
-    ) noexcept;
+    void addQuadraticBezier(const Vec2d& controlPos, const Vec2d& endPos);
 
-    void addSmoothBezier(
-        const Vec2d& control2Pos,
-        const Vec2d& endPos
-    ) noexcept;
+    void addSmoothBezier(const Vec2d& control2Pos, const Vec2d& endPos);
 
-    void addSmoothQuadraticBezier(
-        const Vec2d& endPos
-    ) noexcept;
+    void addSmoothQuadraticBezier(const Vec2d& endPos);
 
 
     //--------------------------------------------------------------------------
     // Control points
     //--------------------------------------------------------------------------
 
-    void setLastLeft(
-        const Vec2d& left
-    ) noexcept;
-
-    void setLastRight(
-        const Vec2d& right
-    ) noexcept;
+    void setLastLeft(const Vec2d& left);
+    void setLastRight(const Vec2d& right);
 
 
     //--------------------------------------------------------------------------
     // Transform
     //--------------------------------------------------------------------------
 
-    void translatePoint(
-        int32_t index,
-        double tx,
-        double ty
-    ) noexcept;
+    void translatePoint(int32_t index, double tx, double ty);
 
-    void rotatePointDegrees(
-        int32_t index,
-        double degrees
-    ) noexcept;
+    void rotatePointDegrees(int32_t index, double degrees);
 
 
     //--------------------------------------------------------------------------
@@ -307,7 +242,7 @@ public:
     void projectToQuadrilateral(
         const Quadrilateral& quadrilateral,
         const Mat3d* matrix = nullptr
-    ) noexcept;
+    );
 
 
     //--------------------------------------------------------------------------
@@ -317,27 +252,24 @@ public:
     void split(
         double start,
         double end,
-        GraphicPathSplitParam& outSplitParam
+        GraphicPathSplitParam& out_split_param
     );
 
 
 private:
-    void update() noexcept;
+    void update();
 
-    void updateLength(
-        int32_t bezierResolution
-    ) noexcept;
+    void updateLength(int32_t bezierResolution);
 
 
-private:
     std::vector<GraphicPathPoint> points_;
 
     bool closed_ = false;
-    bool mustUpdate_ = true;
+    bool must_update_ = true;
 
     double length_ = 0.0;
 
-    int32_t bezierSegmentResolution_ = 20;
+    int32_t bezier_segment_resolution_ = 20;
 };
 
 } // namespace Grain

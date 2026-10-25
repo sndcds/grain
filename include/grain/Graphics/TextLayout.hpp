@@ -9,19 +9,17 @@ public:
     virtual ~TextLayout() = default;
 
     TextLayout(const TextLayout&) = delete;
-    TextLayout& operator=(const TextLayout&) = delete;
+    auto operator = (const TextLayout&) -> TextLayout& = delete;
 
     TextLayout(TextLayout&&) = delete;
-    TextLayout& operator=(TextLayout&&) = delete;
+    auto operator = (TextLayout&&) -> TextLayout& = delete;
 
-    [[nodiscard]] virtual double width() const = 0;
-    [[nodiscard]] virtual double ascent() const = 0;
-    [[nodiscard]] virtual double descent() const = 0;
+    [[nodiscard]] virtual auto width() const -> double = 0;
+    [[nodiscard]] virtual auto ascent() const -> double = 0;
+    [[nodiscard]] virtual auto descent() const -> double = 0;
 
     // Horizontal offset of a string index from the line origin.
-    [[nodiscard]] virtual double offsetForIndex(
-        int32_t index
-    ) const = 0;
+    [[nodiscard]] virtual auto offsetForIndex(int32_t index) const -> double = 0;
 
 protected:
     TextLayout() = default;

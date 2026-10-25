@@ -2,13 +2,8 @@
 
 namespace Grain::Circle {
 
-[[nodiscard]]
-double area(double radius) noexcept;
-
-[[nodiscard]]
-double circumference(double radius) noexcept;
-
-[[nodiscard]]
-double radiusFromArea(double area) noexcept;
+[[nodiscard]] auto area(double radius) -> double;
+[[nodiscard]] auto circumference(double radius) -> double;
+[[nodiscard]] auto radiusFromArea(double area) -> double;
 
 }

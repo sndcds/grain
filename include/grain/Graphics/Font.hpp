@@ -23,52 +23,46 @@ public:
 
     ~Font();
 
-    Font(Font&&);
-    Font& operator=(Font&&);
+    Font(Font&&) noexcept;
+    auto operator = (Font&&) noexcept -> Font&;
 
     Font(const Font&) = delete;
-    Font& operator=(const Font&) = delete;
+    auto operator = (const Font&) -> Font& = delete;
 
-    [[nodiscard]] const char* fontNameUtf8() const;
-    [[nodiscard]] const char* displayNameUtf8() const;
+    [[nodiscard]] auto fontNameUtf8() const -> const char*;
+    [[nodiscard]] auto displayNameUtf8() const -> const char*;
 
-    [[nodiscard]] float size() const;
-    [[nodiscard]] bool isValid() const;
+    [[nodiscard]] auto size() const -> float;
+    [[nodiscard]] auto isValid() const -> bool;
 
     void set(const String& name, float size);
 
-    [[nodiscard]] double ascent() const;
-    [[nodiscard]] double descent() const;
-    [[nodiscard]] double xHeight() const;
-    [[nodiscard]] double capHeight() const;
-    [[nodiscard]] double leading() const;
-    [[nodiscard]] double cellHeight() const;
-    [[nodiscard]] double lineHeight() const;
-    [[nodiscard]] double italicAngle() const;
-    [[nodiscard]] double underlinePosition() const;
-    [[nodiscard]] double underlineThickness() const;
-    [[nodiscard]] int32_t unitsPerEm() const;
-    [[nodiscard]] int32_t glyphCount() const;
-    [[nodiscard]] const Rectd& boundingBox() const;
+    [[nodiscard]] auto ascent() const -> double;
+    [[nodiscard]] auto descent() const -> double;
+    [[nodiscard]] auto xHeight() const -> double;
+    [[nodiscard]] auto capHeight() const -> double;
+    [[nodiscard]] auto leading() const -> double;
+    [[nodiscard]] auto cellHeight() const -> double;
+    [[nodiscard]] auto lineHeight() const -> double;
+    [[nodiscard]] auto italicAngle() const -> double;
+    [[nodiscard]] auto underlinePosition() const -> double;
+    [[nodiscard]] auto underlineThickness() const -> double;
+    [[nodiscard]] auto unitsPerEm() const -> int32_t;
+    [[nodiscard]] auto glyphCount() const -> int32_t;
+    [[nodiscard]] auto boundingBox() const -> const Rectd&;
 
-    [[nodiscard]] double glyphAdvanceWidth(
-        const char* symbol,
-        int32_t length = -1
-    ) const;
+    [[nodiscard]] auto glyphAdvanceWidth(const char* symbol, int32_t length = -1 ) const -> double;
 
-    [[nodiscard]] Sized textDimension(
-        const char* str,
-        int32_t byte_length = -1
-    ) const;
+    [[nodiscard]] auto textDimension(const char* str, int32_t byte_length = -1) const -> Sized;
 
-    [[nodiscard]] int32_t charIndexAtX(
+    [[nodiscard]] auto charIndexAtX(
         const char* str,
         double x,
         double& in_out_delta,
         double& out_cursor_x
-    ) const;
+    ) const -> int32_t;
 
-    [[nodiscard]] void* nativeHandle() const;
+    [[nodiscard]] auto nativeHandle() const -> void*;
 
 private:
     std::unique_ptr<Platform::Font> platform_;

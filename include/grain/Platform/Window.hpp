@@ -28,9 +28,9 @@ class Window;
 class Window {
 public:
     Window(const Window&) = delete;
-    auto operator=(const Window&) -> Window& = delete;
+    auto operator = (const Window&) -> Window& = delete;
     Window(Window&&) = delete;
-    auto operator=(Window&&) -> Window& = delete;
+    auto operator = (Window&&) -> Window& = delete;
 
     virtual ~Window();
 

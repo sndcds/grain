@@ -18,13 +18,11 @@ inline constexpr double kEpsilonFloat = std::numeric_limits<float>::epsilon();
 // Angle
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-constexpr double degreesToRadians(double degrees) noexcept {
+[[nodiscard]] constexpr auto degreesToRadians(double degrees) -> double {
     return degrees * kPi / 180.0;
 }
 
-[[nodiscard]]
-constexpr double radiansToDegrees(double radians) noexcept {
+[[nodiscard]] constexpr auto radiansToDegrees(double radians) -> double {
     return radians * 180.0 / kPi;
 }
 
@@ -33,24 +31,20 @@ constexpr double radiansToDegrees(double radians) noexcept {
 // Interpolation
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-constexpr double lerp(double a, double b, double t) noexcept {
-    return a + t * (b - a);
+[[nodiscard]] constexpr auto lerp(double a, double b, double t) -> double {
+    return a + (t * (b - a));
 }
 
-[[nodiscard]]
-constexpr float lerp(float a, float b, float t) noexcept {
-    return a + t * (b - a);
+[[nodiscard]] constexpr auto lerp(float a, float b, float t) -> float {
+    return a + (t * (b - a));
 }
 
-[[nodiscard]]
-constexpr double inverseLerp(double a, double b, double value) noexcept {
-    return a != b ? (value - a) / (b - a) : 0.0;
+[[nodiscard]] constexpr auto inverseLerp(double a, double b, double value) -> double {
+    return a != b ? (value - a) / (b - a) : 0;
 }
 
-[[nodiscard]]
-constexpr float inverseLerp(float a, float b, float value) noexcept {
-    return a != b ? (value - a) / (b - a) : 0.0f;
+[[nodiscard]] constexpr auto inverseLerp(float a, float b, float value) -> float {
+    return a != b ? (value - a) / (b - a) : 0;
 }
 
 
@@ -58,94 +52,80 @@ constexpr float inverseLerp(float a, float b, float value) noexcept {
 // Remapping
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-constexpr double remap(
-    double inputMin,
-    double inputMax,
-    double outputMin,
-    double outputMax,
+[[nodiscard]] constexpr auto remap(
+    double in_min,
+    double in_max,
+    double out_min,
+    double out_max,
     double value
-) noexcept
-{
-    return inputMin != inputMax
+) -> double {
+    return in_min != in_max
         ? lerp(
-            outputMin,
-            outputMax,
-            inverseLerp(inputMin, inputMax, value)
+            out_min,
+            out_max,
+            inverseLerp(in_min, in_max, value)
         )
-        : outputMin;
+        : out_min;
 }
 
-[[nodiscard]]
-constexpr float remap(
-    float inputMin,
-    float inputMax,
-    float outputMin,
-    float outputMax,
+[[nodiscard]] constexpr auto remap(
+    float in_min,
+    float in_max,
+    float out_min,
+    float out_max,
     float value
-) noexcept
-{
-    return inputMin != inputMax
+) -> float {
+    return in_min != in_max
         ? lerp(
-            outputMin,
-            outputMax,
-            inverseLerp(inputMin, inputMax, value)
+            out_min,
+            out_max,
+            inverseLerp(in_min, in_max, value)
         )
-        : outputMin;
+        : out_min;
 }
 
-[[nodiscard]]
-constexpr double normalize(
+[[nodiscard]] constexpr auto normalize(
     double min,
     double max,
     double value
-) noexcept
-{
+) -> double {
     return inverseLerp(min, max, value);
 }
 
-[[nodiscard]]
-constexpr float normalize(
+[[nodiscard]] constexpr auto normalize(
     float min,
     float max,
     float value
-) noexcept
-{
+) -> float {
     return inverseLerp(min, max, value);
 }
 
-[[nodiscard]]
-constexpr double remapClamped(
-    double inputMin,
-    double inputMax,
-    double outputMin,
-    double outputMax,
+[[nodiscard]] constexpr auto remapClamped(
+    double in_min,
+    double in_max,
+    double out_min,
+    double out_max,
     double value
-) noexcept
-{
-    const double result =
-        remap(inputMin, inputMax, outputMin, outputMax, value);
+) -> double {
+    const double result = remap(in_min, in_max, out_min, out_max, value);
 
-    const double lower = std::min(outputMin, outputMax);
-    const double upper = std::max(outputMin, outputMax);
+    const double lower = std::min(out_min, out_max);
+    const double upper = std::max(out_min, out_max);
 
     return std::clamp(result, lower, upper);
 }
 
-[[nodiscard]]
-constexpr float remapClamped(
-    float inputMin,
-    float inputMax,
-    float outputMin,
-    float outputMax,
+[[nodiscard]] constexpr auto remapClamped(
+    float in_min,
+    float in_max,
+    float out_min,
+    float out_max,
     float value
-) noexcept
-{
-    const float result =
-        remap(inputMin, inputMax, outputMin, outputMax, value);
+) -> float {
+    const float result = remap(in_min, in_max, out_min, out_max, value);
 
-    const float lower = std::min(outputMin, outputMax);
-    const float upper = std::max(outputMin, outputMax);
+    const float lower = std::min(out_min, out_max);
+    const float upper = std::max(out_min, out_max);
 
     return std::clamp(result, lower, upper);
 }
@@ -155,36 +135,32 @@ constexpr float remapClamped(
 // Step functions
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-constexpr double unitStep(
+[[nodiscard]] constexpr auto unitStep(
     double threshold,
     double value
-) noexcept
-{
+) -> double {
     return value < threshold ? 0.0 : 1.0;
 }
 
-[[nodiscard]]
-constexpr float unitStep(
+[[nodiscard]] constexpr auto unitStep(
     float threshold,
     float value
-) noexcept
-{
+) -> float {
     return value < threshold ? 0.0f : 1.0f;
 }
 
-[[nodiscard]]
-constexpr double unitStep(
+[[nodiscard]] constexpr auto unitStep(
     double threshold,
     double range,
     double value
-) noexcept
-{
-    if (value < threshold - range)
-        return 0.0;
+) -> double {
+    if (value < threshold - range) {
+        return 0;
+    }
 
-    if (value > threshold + range)
-        return 1.0;
+    if (value > threshold + range) {
+        return 1;
+    }
 
     return normalize(
         threshold - range,
@@ -193,18 +169,18 @@ constexpr double unitStep(
     );
 }
 
-[[nodiscard]]
-constexpr float unitStep(
+[[nodiscard]] constexpr auto unitStep(
     float threshold,
     float range,
     float value
-) noexcept
-{
-    if (value < threshold - range)
-        return 0.0f;
+) -> float {
+    if (value < threshold - range) {
+        return 0;
+    }
 
-    if (value > threshold + range)
-        return 1.0f;
+    if (value > threshold + range) {
+        return 1;
+    }
 
     return normalize(
         threshold - range,
@@ -218,65 +194,35 @@ constexpr float unitStep(
 // Smooth interpolation
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-constexpr double smoothStep(double t) noexcept {
+[[nodiscard]] constexpr auto smoothStep(double t) -> double {
     return t * t * (3.0 - 2.0 * t);
 }
 
-[[nodiscard]]
-constexpr float smoothStep(float t) noexcept {
-    return t * t * (3.0f - 2.0f * t);
+[[nodiscard]] constexpr auto smoothStep(float t) -> float {
+    return t * t * (3.0f - (2.0f * t));
 }
 
-[[nodiscard]]
-constexpr double smoothStep(
-    double a,
-    double b,
-    double t
-) noexcept
-{
+[[nodiscard]] constexpr auto smoothStep(double a, double b, double t) -> double {
     return lerp(a, b, smoothStep(t));
 }
 
-[[nodiscard]]
-constexpr float smoothStep(
-    float a,
-    float b,
-    float t
-) noexcept
-{
+[[nodiscard]] constexpr auto smoothStep(float a, float b, float t) -> float {
     return lerp(a, b, smoothStep(t));
 }
 
-[[nodiscard]]
-constexpr double smootherStep(double t) noexcept {
-    return t * t * t *
-        (t * (6.0 * t - 15.0) + 10.0);
+[[nodiscard]] constexpr auto smootherStep(double t) -> double {
+    return t * t * t * (t * ((6.0 * t) - 15.0) + 10.0);
 }
 
-[[nodiscard]]
-constexpr float smootherStep(float t) noexcept {
-    return t * t * t *
-        (t * (6.0f * t - 15.0f) + 10.0f);
+[[nodiscard]] constexpr auto smootherStep(float t) -> float {
+    return t * t * t * (t * ((6.0f * t) - 15.0f) + 10.0f);
 }
 
-[[nodiscard]]
-constexpr double smootherStep(
-    double a,
-    double b,
-    double t
-) noexcept
-{
+[[nodiscard]] constexpr auto smootherStep(double a, double b, double t ) -> double {
     return lerp(a, b, smootherStep(t));
 }
 
-[[nodiscard]]
-constexpr float smootherStep(
-    float a,
-    float b,
-    float t
-) noexcept
-{
+[[nodiscard]] constexpr auto smootherStep(float a, float b, float t) -> float {
     return lerp(a, b, smootherStep(t));
 }
 
@@ -285,18 +231,11 @@ constexpr float smootherStep(
 // Wrapping
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-inline double wrap(double value) noexcept {
+[[nodiscard]] inline auto wrap(double value) -> double {
     return value - std::floor(value);
 }
 
-[[nodiscard]]
-inline double wrap(
-    double value,
-    double min,
-    double max
-) noexcept
-{
+[[nodiscard]] inline auto wrap(double value, double min, double max) -> double {
     const double range = max - min;
 
     return min +
@@ -306,117 +245,127 @@ inline double wrap(
         );
 }
 
-[[nodiscard]]
-inline double pingPong(double value) noexcept
-{
+[[nodiscard]] inline auto pingPong(double value) -> double {
     constexpr double period = 2.0;
 
     double x = std::fmod(value, period);
 
-    if (x < 0.0)
+    if (x < 0.0) {
         x += period;
+    }
 
     return 1.0 - std::abs(x - 1.0);
 }
 
 
 //------------------------------------------------------------------------------
-// Ratios
+//
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-inline double quotient(
-    double dividend,
-    double divisor
-) noexcept
-{
+
+static void buildPowLookUpTable(float power, int32_t resolution, float* out_lut) noexcept {
+    if (out_lut && resolution >= 2) {
+        float f = 1.0f / static_cast<float>(resolution - 1);
+        for (int32_t i = 0; i < resolution; i++) {
+            out_lut[i] = std::pow(f * static_cast<float>(i), power);
+        }
+    }
+}
+
+[[nodiscard]] static auto gaussKernel(double x, double sigma_sqr) noexcept -> double {
+    // TODO: Check formula!
+    double p = std::pow(M_E, -((x * x) / (sigma_sqr * 2)));
+    return (1.0 / (std::sqrt(std::numbers::pi * 2 * sigma_sqr))) * p;
+}
+
+[[nodiscard]] static auto sinc(double x) noexcept -> double {
+    return x != 0 ? std::sin(x) / x : 1;
+    // TODO: Check formula!
+    // return x == 0.0 ? 1.0 : std::sin(std::numbers::pi * x) / (std::numbers::pi * x);
+}
+
+[[nodiscard]] static auto bessel(double x) noexcept -> double {
+    double sum = 1.0;
+
+    for (int32_t i = 1; i < 10; i++) {
+        double x_to_i_power = std::pow(x / 2.0, static_cast<double>(i));
+        double factorial = 1.0;
+        for (int32_t j = 1; j <= i; j++) {
+            factorial *= j;
+        }
+        sum += std::pow(x_to_i_power / factorial, 2.0);
+    }
+
+    return sum;
+}
+
+
+//------------------------------------------------------------------------------
+//  Ratios
+//------------------------------------------------------------------------------
+
+[[nodiscard]] inline auto quotient(double dividend, double divisor) -> double {
     return divisor <= kEpsilon
         ? std::numeric_limits<double>::quiet_NaN()
         : dividend / divisor;
 }
 
-[[nodiscard]]
-inline double percent(
-    double part,
-    double full
-) noexcept
-{
+[[nodiscard]] inline auto percent(double part, double full) -> double {
     return full <= kEpsilon
         ? std::numeric_limits<double>::quiet_NaN()
         : part / full * 100.0;
 }
 
-[[nodiscard]]
-inline double xPerY(
-    double x,
-    double y
-) noexcept
-{
+[[nodiscard]] inline auto xPerY(double x, double y) -> double {
     return y <= kEpsilon
         ? std::numeric_limits<double>::quiet_NaN()
         : x / y;
 }
 
-[[nodiscard]]
-inline int64_t xPerYInt(
-    double x,
-    double y
-) noexcept
-{
-    if (y <= kEpsilon)
+[[nodiscard]] inline auto xPerYInt(double x, double y) -> int64_t {
+    if (y <= kEpsilon) {
         return 0;
+    }
 
     return static_cast<int64_t>(std::round(x / y));
 }
 
 
 //------------------------------------------------------------------------------
-// Integer / discrete math
+//  Integer / discrete math
 //------------------------------------------------------------------------------
 
-int64_t greatestCommonDivisor(
-    int64_t a,
-    int64_t b
-) noexcept;
+auto greatestCommonDivisor(int64_t a, int64_t b ) -> int64_t;
 
-int64_t factorial(int32_t n) noexcept;
+auto factorial(int32_t n) -> int64_t;
 
-int64_t sumN(int32_t n) noexcept;
+auto sumN(int32_t n) -> int64_t;
 
-int64_t roundToNearestPowerOfTwo(double value) noexcept;
+auto roundToNearestPowerOfTwo(double value) -> int64_t;
 
-int64_t stepsToReachAtOrAfterInt(
-    int64_t value,
-    int64_t step,
-    int64_t target
-) noexcept;
+auto stepsToReachAtOrAfterInt(int64_t value, int64_t step, int64_t target ) -> int64_t;
 
-int64_t stepsToReachAtOrAfter(
-    double value,
-    double step,
-    double target
-) noexcept;
+auto stepsToReachAtOrAfter(double value, double step, double target) -> int64_t;
 
 
 //------------------------------------------------------------------------------
-// Powers of two
+//  Powers of two
 //------------------------------------------------------------------------------
 
-int32_t nextLog2(int64_t value) noexcept;
+auto nextLog2(int64_t value) -> int32_t;
 
-bool isPowerOfTwo(int64_t value) noexcept;
+auto isPowerOfTwo(int64_t value) -> bool;
 
-int32_t log2IfPowerOfTwo(int64_t value) noexcept;
+auto log2IfPowerOfTwo(int64_t value) -> int32_t;
 
-int64_t nextPowerOfTwo(int64_t value) noexcept;
+auto nextPowerOfTwo(int64_t value) -> int64_t;
 
 
 //------------------------------------------------------------------------------
 // Trigonometry
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-inline double secant(double angle) noexcept {
+[[nodiscard]] inline auto secant(double angle) -> double {
     const double cosine = std::cos(degreesToRadians(angle));
 
     return cosine != 0.0

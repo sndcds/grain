@@ -9,14 +9,7 @@ namespace Grain::Interpolation {
 
 namespace {
 
-double cubicImpl(
-    double p0,
-    double p1,
-    double p2,
-    double p3,
-    double t
-) noexcept
-{
+auto cubicImpl(double p0, double p1, double p2, double p3, double t) -> double {
     // Catmull-Rom spline, tension = 0.5.
     //
     // This is equivalent to:
@@ -30,31 +23,23 @@ double cubicImpl(
 
     const double a = 2.0 * p1;
     const double b = -p0 + p2;
-    const double c = 2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3;
-    const double d = -p0 + 3.0 * p1 - 3.0 * p2 + p3;
+    const double c = (2.0 * p0) - (5.0 * p1) + (4.0 * p2) - p3;
+    const double d = -p0 + (3.0 * p1) - (3.0 * p2) + p3;
 
     return 0.5 * (((d * t + c) * t + b) * t + a);
 }
 
 } // namespace
 
-double cubic(
-    double p0,
-    double p1,
-    double p2,
-    double p3,
-    double t
-) noexcept
-{
+auto cubic(double p0, double p1, double p2, double p3, double t) -> double {
     return cubicImpl(p0, p1, p2, p3, t);
 }
 
-double bicubic(
+auto bicubic(
     std::span<const double, 16> samples,
     double tx,
     double ty
-) noexcept
-{
+) -> double {
     std::array<double, 4> rows{};
 
     for (std::size_t y = 0; y < 4; ++y) {
@@ -78,22 +63,21 @@ double bicubic(
     );
 }
 
-double tricubic(
+auto tricubic(
     std::span<const double, 64> samples,
     double tx,
     double ty,
     double tz
-) noexcept
-{
+) -> double {
     std::array<double, 16> xy{};
 
     for (std::size_t z = 0; z < 4; ++z) {
         const std::size_t zOffset = z * 16;
 
         for (std::size_t y = 0; y < 4; ++y) {
-            const std::size_t offset = zOffset + y * 4;
+            const std::size_t offset = zOffset + (y * 4);
 
-            xy[z * 4 + y] = cubicImpl(
+            xy[(z * 4) + y] = cubicImpl(
                 samples[offset + 0],
                 samples[offset + 1],
                 samples[offset + 2],
@@ -126,11 +110,10 @@ double tricubic(
     );
 }
 
-double nCubic(
+auto nCubic(
     std::span<const double> samples,
     std::span<const double> coordinates
-) noexcept
-{
+) -> double {
     if (coordinates.empty()) {
         return samples.empty() ? 0.0 : samples.front();
     }

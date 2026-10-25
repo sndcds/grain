@@ -9,7 +9,7 @@ namespace Grain {
 
 class ColorLUT {
 public:
-    enum Resolution : int32_t {
+    enum Resolution : int16_t {
         Default = 512,
         Min = 2,
         Max = 8192,
@@ -25,27 +25,27 @@ public:
     ColorLUT(int32_t resolution);
     ~ColorLUT();
 
-    int32_t resolution() const { return resolution_; }
-    int32_t maxResolution() const { return max_resolution_; }
-    int32_t maxIndex() const { return max_index_; }
-    const Color* samplesPtr() const { return samples_; }
-    Color* mutSamplesPtr() const { return samples_; }
+    [[nodiscard]] auto resolution() const -> int32_t { return resolution_; }
+    [[nodiscard]] auto maxResolution() const -> int32_t { return max_resolution_; }
+    [[nodiscard]] auto maxIndex() const -> int32_t { return max_index_; }
+    [[nodiscard]] auto samplesPtr() const -> const Color* { return samples_; }
+    [[nodiscard]] auto mutSamplesPtr() const -> Color* { return samples_; }
 
-    bool setResolution(int32_t resolution);
+    auto setResolution(int32_t resolution) -> bool;
     void setColorAtIndex(int32_t index, const Color& color);
 
-    bool shrink();
+    auto shrink() -> bool;
     void smooth();
     void lookup(float pos, Color& out_color) const;
     void lookup(float pos, float* out_color) const;
 
-    static const ColorLUT *createKelvinLUT(float min_kelvin, float max_kelvin);
+    static auto createKelvinLUT(float min_kelvin, float max_kelvin) -> const ColorLUT *;
 
-    inline static int32_t clampedResolution(int32_t resolution) {
+    static auto clampedResolution(int32_t resolution) -> int32_t {
         return std::clamp(
             resolution,
-            (int32_t)Resolution::Min,
-            (int32_t)Resolution::Max);
+            static_cast<int32_t>(Resolution::Min),
+            static_cast<int32_t>(Resolution::Max));
     }
 };
 

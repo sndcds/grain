@@ -18,12 +18,12 @@ public:
     void draw(GraphicContext& gc) override;
 
     void setTitle(std::string title);
-    [[nodiscard]] const std::string& title() const noexcept;
+    [[nodiscard]] auto title() const noexcept -> const std::string&;
 
     void setAction(Action action);
     void click();
 
-    bool handleEvent(const Event& event) override;
+    auto handleEvent(const Event& event) -> bool override;
 
 
 private:

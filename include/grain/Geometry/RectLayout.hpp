@@ -17,12 +17,11 @@ public:
     using Vec2Type = Vec2<T>;
 
     [[nodiscard]]
-    static constexpr RectType fitRect(
+    static constexpr auto fitRect(
         const RectType& source,
         const RectType& destination,
         FitMode mode
-    ) noexcept
-    {
+    ) -> RectType {
         if (mode == FitMode::Stretch) {
             return destination;
         }
@@ -67,11 +66,7 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType centeredSquare(
-        const RectType& rect
-    ) noexcept
-    {
+    [[nodiscard]] static constexpr auto centeredSquare(const RectType& rect) -> RectType {
         const T size = std::min(
             std::abs(rect.width),
             std::abs(rect.height)
@@ -85,15 +80,13 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType paddedRect(
+    [[nodiscard]] static constexpr auto paddedRect(
         const RectType& rect,
         T top,
         T right,
         T bottom,
         T left
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + left,
             rect.y + top,
@@ -102,14 +95,12 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType rectInRectNormalized(
+    [[nodiscard]] static constexpr auto rectInRectNormalized(
         const RectType& container,
         const RectType& rect,
         double horizontal,
         double vertical
-    ) noexcept
-    {
+    ) -> RectType {
         const double x =
             static_cast<double>(container.x) +
             (horizontal *
@@ -130,12 +121,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr Vec2Type alignedPos(
+    [[nodiscard]] static constexpr auto alignedPos(
         const RectType& rect,
         Alignment alignment
-    ) noexcept
-    {
+    ) -> Vec2Type {
         switch (alignment) {
             case Alignment::TopLeft:
                 return {rect.x, rect.y};
@@ -187,13 +176,15 @@ public:
                     rect.x + rect.width,
                     rect.y + rect.height
                 };
+
+            case Alignment::No:
+                break;
         }
 
         return {rect.x, rect.y};
     }
 
-    [[nodiscard]]
-    static constexpr RectType cellRect(
+    [[nodiscard]] static constexpr auto cellRect(
         const RectType& rect,
         int columnCount,
         int rowCount,
@@ -204,8 +195,7 @@ public:
         int columnSpan = 1,
         int rowSpan = 1,
         bool round = false
-    ) noexcept
-    {
+    ) -> RectType {
         columnCount = std::max(columnCount, 1);
         rowCount = std::max(rowCount, 1);
         columnSpan = std::max(columnSpan, 1);
@@ -273,14 +263,12 @@ public:
         return {x, y, width, height};
     }
 
-    [[nodiscard]]
-    static constexpr RectType alignedRect(
+    [[nodiscard]] static constexpr auto alignedRect(
         const RectType& container,
         Alignment alignment,
         T width,
         T height
-    ) noexcept
-    {
+    ) -> RectType {
         T x = container.x;
         T y = container.y;
 
@@ -303,6 +291,7 @@ public:
                 x = container.x +
                     container.width - width;
                 break;
+            default: ;
         }
 
         switch (alignment) {
@@ -324,21 +313,22 @@ public:
                 y = container.y +
                     container.height - height;
                 break;
+
+            case Alignment::No:
+                break;
         }
 
         return {x, y, width, height};
     }
 
-    [[nodiscard]]
-    static constexpr RectType edgeAlignedRectRelative(
+    [[nodiscard]] static constexpr auto edgeAlignedRectRelative(
         const RectType& rect,
         Alignment alignment,
         T top,
         T right,
         T bottom,
         T left
-    ) noexcept
-    {
+    ) -> RectType {
         T x = left;
         T y = top;
         T width = rect.width - left - right;
@@ -394,19 +384,18 @@ public:
                 break;
 
             case Alignment::Center:
+            case Alignment::No:
                 break;
         }
 
         return {x, y, width, height};
     }
 
-    [[nodiscard]]
-    static constexpr RectType innerRect(
+    [[nodiscard]] static constexpr auto innerRect(
         const RectType& rect,
         T padding,
         T aspectRatio
-    ) noexcept
-    {
+    ) -> RectType {
         const T availableWidth =
             std::max(T{}, rect.width - padding * T{2});
 
@@ -439,22 +428,18 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType inset(
+    [[nodiscard]] static constexpr auto inset(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return inset(rect, amount, amount, amount, amount);
     }
 
-    [[nodiscard]]
-    static constexpr RectType inset(
+    [[nodiscard]] static constexpr auto inset(
         const RectType& rect,
         T horizontal,
         T vertical
-    ) noexcept
-    {
+    ) -> RectType {
         return inset(
             rect,
             vertical,
@@ -464,15 +449,13 @@ public:
         );
     }
 
-    [[nodiscard]]
-    static constexpr RectType inset(
+    [[nodiscard]] static constexpr auto inset(
         const RectType& rect,
         T top,
         T right,
         T bottom,
         T left
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + left,
             rect.y + top,
@@ -481,12 +464,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType insetLeft(
+    [[nodiscard]] static constexpr auto insetLeft(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + amount,
             rect.y,
@@ -495,12 +476,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType insetRight(
+    [[nodiscard]] static constexpr auto insetRight(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y,
@@ -509,12 +488,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType insetTop(
+    [[nodiscard]] static constexpr auto insetTop(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y + amount,
@@ -523,12 +500,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType insetBottom(
+    [[nodiscard]] static constexpr auto insetBottom(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y,
@@ -537,30 +512,24 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType insetHorizontal(
+    [[nodiscard]] static constexpr auto insetHorizontal(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return inset(rect, amount, T{0});
     }
 
-    [[nodiscard]]
-    static constexpr RectType insetVertical(
+    [[nodiscard]] static constexpr auto insetVertical(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return inset(rect, T{0}, amount);
     }
 
-    [[nodiscard]]
-    static constexpr RectType expand(
+    [[nodiscard]] static constexpr auto expand(
         const RectType& rect,
         T amount
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x - amount,
             rect.y - amount,
@@ -569,12 +538,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType setWidthFromCenter(
+    [[nodiscard]] static constexpr auto setWidthFromCenter(
         const RectType& rect,
         T width
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + ((rect.width - width) / T{2}),
             rect.y,
@@ -583,12 +550,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType setWidthFromMax(
+    [[nodiscard]] static constexpr auto setWidthFromMax(
         const RectType& rect,
         T width
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + rect.width - width,
             rect.y,
@@ -597,12 +562,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType setHeightFromCenter(
+    [[nodiscard]] static constexpr auto setHeightFromCenter(
         const RectType& rect,
         T height
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y + ((rect.height - height) / T{2}),
@@ -611,12 +574,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType setHeightFromMax(
+    [[nodiscard]] static constexpr auto setHeightFromMax(
         const RectType& rect,
         T height
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y + rect.height - height,
@@ -625,13 +586,11 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType setSizeFromCenter(
+    [[nodiscard]] static constexpr auto setSizeFromCenter(
         const RectType& rect,
         T width,
         T height
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + ((rect.width - width) / T{2}),
             rect.y + ((rect.height - height) / T{2}),
@@ -640,13 +599,11 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType translate(
+    [[nodiscard]] static constexpr auto translate(
         const RectType& rect,
         T x,
         T y
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x + x,
             rect.y + y,
@@ -655,12 +612,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType scale(
+    [[nodiscard]] static constexpr auto scale(
         const RectType& rect,
         T factor
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x * factor,
             rect.y * factor,
@@ -669,13 +624,11 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType scale(
+    [[nodiscard]] static constexpr auto scale(
         const RectType& rect,
         T xFactor,
         T yFactor
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x * xFactor,
             rect.y * yFactor,
@@ -684,12 +637,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType scaleSize(
+    [[nodiscard]] static constexpr auto scaleSize(
         const RectType& rect,
         T factor
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y,
@@ -698,13 +649,11 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType scaleSize(
+    [[nodiscard]] static constexpr auto scaleSize(
         const RectType& rect,
         T xFactor,
         T yFactor
-    ) noexcept
-    {
+    ) -> RectType {
         return {
             rect.x,
             rect.y,
@@ -713,12 +662,10 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType scaleCentered(
+    [[nodiscard]] static constexpr auto scaleCentered(
         const RectType& rect,
         T factor
-    ) noexcept
-    {
+    ) -> RectType {
         const T width = rect.width * factor;
         const T height = rect.height * factor;
 
@@ -730,13 +677,11 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr RectType alignInRect(
+    [[nodiscard]] static constexpr auto alignInRect(
         const RectType& source,
         Alignment alignment,
         const RectType& container
-    ) noexcept
-    {
+    ) -> RectType {
         return alignedRect(
             container,
             alignment,
@@ -745,11 +690,7 @@ public:
         );
     }
 
-    [[nodiscard]]
-    static constexpr RectType makePositiveSize(
-        RectType rect
-    ) noexcept
-    {
+    [[nodiscard]] static constexpr auto makePositiveSize(RectType rect) -> RectType {
         if (rect.width < T{}) {
             rect.x += rect.width;
             rect.width = -rect.width;
@@ -763,11 +704,7 @@ public:
         return rect;
     }
 
-    [[nodiscard]]
-    static constexpr RectType avoidNegativeSize(
-        RectType rect
-    ) noexcept
-    {
+    [[nodiscard]] static constexpr auto avoidNegativeSize(RectType rect) -> RectType {
         if (rect.width < T{}) {
             rect.width = T{};
         }
@@ -779,13 +716,11 @@ public:
         return rect;
     }
 
-    [[nodiscard]]
-    static constexpr RectType makeValidForArea(
+    [[nodiscard]] static constexpr auto makeValidForArea(
         RectType rect,
         T width,
         T height
-    ) noexcept
-    {
+    ) -> RectType {
         if (width <= T{} || height <= T{}) {
             return {};
         }

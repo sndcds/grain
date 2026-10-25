@@ -1,34 +1,30 @@
 #pragma once
 
-#include <cstdint>
+#include <array>
 
 namespace Grain::Polynomial {
 
-[[nodiscard]]
-int32_t solveQuadratic(
+[[nodiscard]] auto solveQuadratic(
     double a,
     double b,
     double c,
-    double (&outValues)[2]
-) noexcept;
+    std::array<double, 2>& out_values
+) -> int32_t;
 
-[[nodiscard]]
-int32_t solveCubic(
+[[nodiscard]] auto solveCubic(
     double a,
     double b,
     double c,
     double d,
-    double (&outValues)[3]
-) noexcept;
+    std::array<double, 3>& out_values
+) -> int32_t;
 
-[[nodiscard]]
-int32_t solveCubicBezier(
+[[nodiscard]] auto solveCubicBezier(
     double p0,
     double p1,
     double p2,
     double p3,
     double p,
-    double (&outValues)[3]
-) noexcept;
-
+    std::array<double, 3>& out_values
+) -> int32_t;
 }

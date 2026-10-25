@@ -4,14 +4,8 @@
 
 namespace Grain::Optics {
 
-double angleOfView(
-    const double sensorSize,
-    const double focalLength
-) noexcept
-{
-    return 2.0 * std::atan(
-        sensorSize / (2.0 * focalLength)
-    );
+auto angleOfView(const double sensor_size, const double focal_length) -> double {
+    return 2.0 * std::atan(sensor_size / (2.0 * focal_length));
 }
 
 }

@@ -62,7 +62,7 @@ TEST_CASE("Line construction", "[Line]")
 
     SECTION("from coordinates")
     {
-        Lined line(1.0, 2.0, 3.0, 4.0);
+        Lined line({1.0, 2.0}, {3.0, 4.0});
 
         REQUIRE(line.p1() == Vec2d(1.0, 2.0));
         REQUIRE(line.p2() == Vec2d(3.0, 4.0));

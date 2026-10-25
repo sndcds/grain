@@ -17,18 +17,15 @@ public:
 
     Canvas(const Canvas&) = delete;
 
-    Canvas& operator=(const Canvas&) = delete;
+    auto operator = (const Canvas&) -> Canvas& = delete;
 
     Canvas(Canvas&&) = delete;
 
-    Canvas& operator=(Canvas&&) = delete;
+    auto operator = (Canvas&&) -> Canvas& = delete;
 
     virtual void clear(Color color) = 0;
 
-    virtual void fillRect(
-        const Rect& rect,
-        Color color
-        ) = 0;
+    virtual void fillRect(const Rect& rect, Color color) = 0;
 
 protected:
     Canvas() = default;

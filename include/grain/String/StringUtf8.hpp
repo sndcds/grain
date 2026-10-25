@@ -14,36 +14,39 @@ public:
     static constexpr size_type npos = std::string_view::npos;
 
     //--------------------------------------------------------------------------
-    // Validation
+    //  Validation.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] static bool isValid(
+    [[nodiscard]] static auto isValid(
         std::string_view data,
-        size_type* invalid_byte_index = nullptr) noexcept;
+        size_type* invalid_byte_index = nullptr
+    ) -> bool;
 
-    [[nodiscard]] static bool isAscii(
-        std::string_view data) noexcept;
+    [[nodiscard]] static auto isAscii(std::string_view data) -> bool;
+
 
     //--------------------------------------------------------------------------
-    // Code-point access
+    //  Code-point access.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] static size_type length(
-        std::string_view data) noexcept;
+    [[nodiscard]] static auto length(std::string_view data) -> size_type;
 
-    [[nodiscard]] static bool decode(
+    [[nodiscard]] static auto decode(
         std::string_view data,
         size_type byte_index,
         char32_t& code_point,
-        size_type& sequence_length) noexcept;
+        size_type& sequence_length
+    ) -> bool;
 
-    [[nodiscard]] static char32_t codePointAt(
+    [[nodiscard]] static auto codePointAt(
         std::string_view data,
-        size_type code_point_index) noexcept;
+        size_type code_point_index
+    ) -> char32_t;
 
-    [[nodiscard]] static size_type byteOffset(
+    [[nodiscard]] static auto byteOffset(
         std::string_view data,
-        size_type code_point_index) noexcept;
+        size_type code_point_index
+    ) -> size_type;
 
     /**
      * Returns the code-point index corresponding to a byte offset.
@@ -52,19 +55,18 @@ public:
      * or to data.size(). If it points into the middle of a sequence,
      * npos is returned.
      */
-    [[nodiscard]] static size_type codePointIndex(
+    [[nodiscard]] static auto codePointIndex(
         std::string_view data,
-        size_type byte_index) noexcept;
+        size_type byte_index
+    ) -> size_type;
+
 
     //--------------------------------------------------------------------------
-    // UTF-8 sequence helpers
+    //  UTF-8 sequence helpers.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]] static bool isContinuationByte(
-        unsigned char byte) noexcept;
-
-    [[nodiscard]] static size_type sequenceLength(
-        unsigned char first_byte) noexcept;
+    [[nodiscard]] static auto isContinuationByte(unsigned char byte) -> bool;
+    [[nodiscard]] static auto sequenceLength(unsigned char first_byte) -> size_type;
 };
 
 } // namespace Grain

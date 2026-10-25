@@ -9,13 +9,13 @@ TEST_CASE("Input: key down", "[Input]") {
 
     Event event;
     event.type_ = EventType::KeyDown;
-    event.key_ = Key::A;
+    event.key_ = KeyCode::A;
 
     input.processEvent(event);
 
-    REQUIRE(input.isKeyDown(Key::A));
-    REQUIRE(input.wasKeyPressed(Key::A));
-    REQUIRE_FALSE(input.wasKeyReleased(Key::A));
+    REQUIRE(input.isKeyDown(KeyCode::A));
+    REQUIRE(input.wasKeyPressed(KeyCode::A));
+    REQUIRE_FALSE(input.wasKeyReleased(KeyCode::A));
 }
 
 TEST_CASE("Input: key press is only reported once", "[Input]") {
@@ -23,19 +23,18 @@ TEST_CASE("Input: key press is only reported once", "[Input]") {
 
     Event event;
     event.type_ = EventType::KeyDown;
-    event.key_ = Key::A;
+    event.key_ = KeyCode::A;
 
     input.processEvent(event);
 
-    REQUIRE(input.isKeyDown(Key::A));
-    REQUIRE(input.wasKeyPressed(Key::A));
+    REQUIRE(input.isKeyDown(KeyCode::A));
+    REQUIRE(input.wasKeyPressed(KeyCode::A));
 
-    // A second KeyDown while the key is already down
-    // must not create another "pressed" event.
+    // Repeated KeyDown events must not create another press transition.
     input.processEvent(event);
 
-    REQUIRE(input.isKeyDown(Key::A));
-    REQUIRE(input.wasKeyPressed(Key::A));
+    REQUIRE(input.isKeyDown(KeyCode::A));
+    REQUIRE(input.wasKeyPressed(KeyCode::A));
 }
 
 TEST_CASE("Input: beginFrame clears transient key state", "[Input]") {
@@ -43,68 +42,63 @@ TEST_CASE("Input: beginFrame clears transient key state", "[Input]") {
 
     Event event;
     event.type_ = EventType::KeyDown;
-    event.key_ = Key::A;
+    event.key_ = KeyCode::A;
 
     input.processEvent(event);
 
-    REQUIRE(input.isKeyDown(Key::A));
-    REQUIRE(input.wasKeyPressed(Key::A));
+    REQUIRE(input.isKeyDown(KeyCode::A));
+    REQUIRE(input.wasKeyPressed(KeyCode::A));
 
     input.beginFrame();
 
-    // The key is still physically down...
-    REQUIRE(input.isKeyDown(Key::A));
-
-    // ...but the press only happened in the previous frame.
-    REQUIRE_FALSE(input.wasKeyPressed(Key::A));
-    REQUIRE_FALSE(input.wasKeyReleased(Key::A));
+    REQUIRE(input.isKeyDown(KeyCode::A));
+    REQUIRE_FALSE(input.wasKeyPressed(KeyCode::A));
+    REQUIRE_FALSE(input.wasKeyReleased(KeyCode::A));
 }
 
 TEST_CASE("Input: key up", "[Input]") {
     Input input;
 
-    Event keyDown;
-    keyDown.type_ = EventType::KeyDown;
-    keyDown.key_ = Key::A;
+    Event key_down;
+    key_down.type_ = EventType::KeyDown;
+    key_down.key_ = KeyCode::A;
 
-    Event keyUp;
-    keyUp.type_ = EventType::KeyUp;
-    keyUp.key_ = Key::A;
+    Event key_up;
+    key_up.type_ = EventType::KeyUp;
+    key_up.key_ = KeyCode::A;
 
-    input.processEvent(keyDown);
+    input.processEvent(key_down);
     input.beginFrame();
+    input.processEvent(key_up);
 
-    input.processEvent(keyUp);
-
-    REQUIRE_FALSE(input.isKeyDown(Key::A));
-    REQUIRE_FALSE(input.wasKeyPressed(Key::A));
-    REQUIRE(input.wasKeyReleased(Key::A));
+    REQUIRE_FALSE(input.isKeyDown(KeyCode::A));
+    REQUIRE_FALSE(input.wasKeyPressed(KeyCode::A));
+    REQUIRE(input.wasKeyReleased(KeyCode::A));
 }
 
 TEST_CASE("Input: beginFrame clears transient release state", "[Input]") {
     Input input;
 
-    Event keyDown;
-    keyDown.type_ = EventType::KeyDown;
-    keyDown.key_ = Key::A;
+    Event key_down;
+    key_down.type_ = EventType::KeyDown;
+    key_down.key_ = KeyCode::A;
 
-    Event keyUp;
-    keyUp.type_ = EventType::KeyUp;
-    keyUp.key_ = Key::A;
+    Event key_up;
+    key_up.type_ = EventType::KeyUp;
+    key_up.key_ = KeyCode::A;
 
-    input.processEvent(keyDown);
+    input.processEvent(key_down);
+    input.beginFrame();
+    input.processEvent(key_up);
+
+    REQUIRE_FALSE(input.isKeyDown(KeyCode::A));
+    REQUIRE(input.wasKeyReleased(KeyCode::A));
+
     input.beginFrame();
 
-    input.processEvent(keyUp);
-
-    REQUIRE_FALSE(input.isKeyDown(Key::A));
-    REQUIRE(input.wasKeyReleased(Key::A));
-
-    input.beginFrame();
-
-    REQUIRE_FALSE(input.isKeyDown(Key::A));
-    REQUIRE_FALSE(input.wasKeyPressed(Key::A));
-    REQUIRE_FALSE(input.wasKeyReleased(Key::A));
+    REQUIRE_FALSE(input.isKeyDown(KeyCode::A));
+    REQUIRE_FALSE(input.wasKeyPressed(KeyCode::A));
+    REQUIRE_FALSE(input.wasKeyReleased(KeyCode::A));
 }
 
 TEST_CASE("Input: mouse button down", "[Input]") {
@@ -118,38 +112,27 @@ TEST_CASE("Input: mouse button down", "[Input]") {
 
     REQUIRE(input.isMouseButtonDown(MouseButton::Left));
     REQUIRE(input.wasMouseButtonPressed(MouseButton::Left));
-    REQUIRE_FALSE(
-        input.wasMouseButtonReleased(MouseButton::Left)
-    );
+    REQUIRE_FALSE(input.wasMouseButtonReleased(MouseButton::Left));
 }
 
 TEST_CASE("Input: mouse button up", "[Input]") {
     Input input;
 
-    Event buttonDown;
-    buttonDown.type_ = EventType::MouseButtonDown;
-    buttonDown.mouse_button_ = MouseButton::Left;
+    Event button_down;
+    button_down.type_ = EventType::MouseButtonDown;
+    button_down.mouse_button_ = MouseButton::Left;
 
-    Event buttonUp;
-    buttonUp.type_ = EventType::MouseButtonUp;
-    buttonUp.mouse_button_ = MouseButton::Left;
+    Event button_up;
+    button_up.type_ = EventType::MouseButtonUp;
+    button_up.mouse_button_ = MouseButton::Left;
 
-    input.processEvent(buttonDown);
+    input.processEvent(button_down);
     input.beginFrame();
+    input.processEvent(button_up);
 
-    input.processEvent(buttonUp);
-
-    REQUIRE_FALSE(
-        input.isMouseButtonDown(MouseButton::Left)
-    );
-
-    REQUIRE_FALSE(
-        input.wasMouseButtonPressed(MouseButton::Left)
-    );
-
-    REQUIRE(
-        input.wasMouseButtonReleased(MouseButton::Left)
-    );
+    REQUIRE_FALSE(input.isMouseButtonDown(MouseButton::Left));
+    REQUIRE_FALSE(input.wasMouseButtonPressed(MouseButton::Left));
+    REQUIRE(input.wasMouseButtonReleased(MouseButton::Left));
 }
 
 TEST_CASE("Input: beginFrame clears transient mouse state", "[Input]") {
@@ -167,12 +150,8 @@ TEST_CASE("Input: beginFrame clears transient mouse state", "[Input]") {
     input.beginFrame();
 
     REQUIRE(input.isMouseButtonDown(MouseButton::Left));
-    REQUIRE_FALSE(
-        input.wasMouseButtonPressed(MouseButton::Left)
-    );
-    REQUIRE_FALSE(
-        input.wasMouseButtonReleased(MouseButton::Left)
-    );
+    REQUIRE_FALSE(input.wasMouseButtonPressed(MouseButton::Left));
+    REQUIRE_FALSE(input.wasMouseButtonReleased(MouseButton::Left));
 }
 
 } // namespace Grain::Tests

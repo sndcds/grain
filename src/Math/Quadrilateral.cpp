@@ -4,6 +4,7 @@
 //  This file is part of GrainLib, see <https://grain.one>.
 //
 
+#include <algorithm>
 #include <grain/Math/Quadrilateral.hpp>
 
 #include <algorithm>
@@ -13,7 +14,7 @@
 namespace Grain {
 
 //------------------------------------------------------------------------------
-// Construction
+//  Construction.
 //------------------------------------------------------------------------------
 
 Quadrilateral::Quadrilateral(
@@ -21,24 +22,24 @@ Quadrilateral::Quadrilateral(
     const Vec2d& p2,
     const Vec2d& p3,
     const Vec2d& p4
-) noexcept {
+) {
     set(p1, p2, p3, p4);
 }
 
 Quadrilateral::Quadrilateral(
     const Vec2d& min,
     const Vec2d& max
-) noexcept {
+) {
     setByMinMax(min, max);
 }
 
-Quadrilateral::Quadrilateral(const Rectd& rect) noexcept {
+Quadrilateral::Quadrilateral(const Rectd& rect) {
     setByRect(rect);
 }
 
 
 //------------------------------------------------------------------------------
-// Points
+//  Points.
 //------------------------------------------------------------------------------
 
 void Quadrilateral::set(
@@ -46,7 +47,7 @@ void Quadrilateral::set(
     const Vec2d& p2,
     const Vec2d& p3,
     const Vec2d& p4
-) noexcept {
+) {
     points_[0] = p1;
     points_[1] = p2;
     points_[2] = p3;
@@ -56,10 +57,7 @@ void Quadrilateral::set(
     solvePerspective();
 }
 
-void Quadrilateral::setPoint(
-    std::size_t index,
-    const Vec2d& point
-) noexcept {
+void Quadrilateral::setPoint(std::size_t index, const Vec2d& point) {
     if (index >= points_.size()) {
         return;
     }
@@ -70,10 +68,7 @@ void Quadrilateral::setPoint(
     solvePerspective();
 }
 
-void Quadrilateral::setByMinMax(
-    const Vec2d& min,
-    const Vec2d& max
-) noexcept {
+void Quadrilateral::setByMinMax(const Vec2d& min, const Vec2d& max) {
     set(
         Vec2d(min.x, min.y),
         Vec2d(max.x, min.y),
@@ -82,7 +77,7 @@ void Quadrilateral::setByMinMax(
     );
 }
 
-void Quadrilateral::setByRect(const Rectd& rect) noexcept {
+void Quadrilateral::setByRect(const Rectd& rect) {
     set(
         Vec2d(rect.x, rect.y),
         Vec2d(rect.right(), rect.y),
@@ -93,10 +88,10 @@ void Quadrilateral::setByRect(const Rectd& rect) noexcept {
 
 
 //------------------------------------------------------------------------------
-// Geometry
+//  Geometry.
 //------------------------------------------------------------------------------
 
-double Quadrilateral::area() const noexcept {
+auto Quadrilateral::area() const -> double {
     const double diagonal1 = points_[0].distance(points_[2]);
     const double diagonal2 = points_[1].distance(points_[3]);
 
@@ -118,7 +113,7 @@ double Quadrilateral::area() const noexcept {
     return 0.25 * std::sqrt(std::max(0.0, value));
 }
 
-bool Quadrilateral::isSimple() const noexcept {
+auto Quadrilateral::isSimple() const -> bool {
     if (!valid_) {
         return false;
     }
@@ -158,7 +153,7 @@ bool Quadrilateral::isSimple() const noexcept {
     return false;
 }
 
-bool Quadrilateral::isConvex() const noexcept {
+auto Quadrilateral::isConvex() const -> bool {
     bool hasPositive = false;
     bool hasNegative = false;
 
@@ -185,7 +180,7 @@ bool Quadrilateral::isConvex() const noexcept {
     return true;
 }
 
-double Quadrilateral::flattestAngle() const noexcept {
+auto Quadrilateral::flattestAngle() const -> double {
     double maxAngle = 0.0;
 
     for (std::size_t i = 0; i < 4; ++i) {
@@ -198,32 +193,23 @@ double Quadrilateral::flattestAngle() const noexcept {
 
         const double angle = 180.0 - v1.angle(v2);
 
-        if (angle > maxAngle) {
-            maxAngle = angle;
-        }
+        maxAngle = std::max(angle, maxAngle);
     }
 
     return maxAngle;
 }
 
-bool Quadrilateral::contains(const Vec2d& point) const noexcept {
+auto Quadrilateral::contains(const Vec2d& point) const -> bool {
     if (!valid_) {
         return false;
     }
 
     constexpr double epsilon = 1e-12;
 
-    const double s1 =
-        (points_[1] - points_[0]).cross(point - points_[0]);
-
-    const double s2 =
-        (points_[2] - points_[1]).cross(point - points_[1]);
-
-    const double s3 =
-        (points_[3] - points_[2]).cross(point - points_[2]);
-
-    const double s4 =
-        (points_[0] - points_[3]).cross(point - points_[3]);
+    const double s1 = (points_[1] - points_[0]).cross(point - points_[0]);
+    const double s2 = (points_[2] - points_[1]).cross(point - points_[1]);
+    const double s3 = (points_[3] - points_[2]).cross(point - points_[2]);
+    const double s4 = (points_[0] - points_[3]).cross(point - points_[3]);
 
     const bool hasPositive =
         s1 > epsilon ||
@@ -240,60 +226,46 @@ bool Quadrilateral::contains(const Vec2d& point) const noexcept {
     return !(hasPositive && hasNegative);
 }
 
-Vec2d Quadrilateral::centroid() const noexcept {
-    const Vec2d triangle1 =
-        (points_[0] + points_[1] + points_[2]) / 3.0;
-
-    const Vec2d triangle2 =
-        (points_[2] + points_[3] + points_[0]) / 3.0;
-
+auto Quadrilateral::centroid() const -> Vec2d {
+    const Vec2d triangle1 = (points_[0] + points_[1] + points_[2]) / 3.0;
+    const Vec2d triangle2 = (points_[2] + points_[3] + points_[0]) / 3.0;
     return (triangle1 + triangle2) * 0.5;
 }
 
 
 //------------------------------------------------------------------------------
-// Parametric coordinates
+//  Parametric coordinates.
 //------------------------------------------------------------------------------
 
-Vec2d Quadrilateral::project(
-    double u,
-    double v
-) const noexcept {
+auto Quadrilateral::project(double u, double v) const -> Vec2d {
     const double denominator =
         can_project_perspective_
             ? (g_ * u) + (h_ * v) + 1.0
             : 1.0;
 
     if (std::abs(denominator) <= std::numeric_limits<double>::epsilon()) {
-        return Vec2d(
+        return {
             std::numeric_limits<double>::quiet_NaN(),
             std::numeric_limits<double>::quiet_NaN()
-        );
+        };
     }
 
-    return Vec2d(
+    return {
         ((a_ * u + b_ * v) / denominator) + points_[0].x,
         ((d_ * u + e_ * v) / denominator) + points_[0].y
-    );
+    };
 }
 
-Vec2d Quadrilateral::project(const Vec2d& uv) const noexcept {
+auto Quadrilateral::project(const Vec2d& uv) const -> Vec2d {
     return project(uv.x, uv.y);
 }
 
-bool Quadrilateral::project(
-    const Vec2d& uv,
-    Vec2d& result
-) const noexcept {
+auto Quadrilateral::project(const Vec2d& uv, Vec2d& result) const -> bool {
     result = project(uv);
     return std::isfinite(result.x) && std::isfinite(result.y);
 }
 
-bool Quadrilateral::map(
-    double x,
-    double y,
-    Vec2d& result
-) const noexcept {
+auto Quadrilateral::map(double x, double y, Vec2d& result) const -> bool {
     const double dx = x - points_[0].x;
     const double dy = y - points_[0].y;
 
@@ -324,24 +296,20 @@ bool Quadrilateral::map(
     return std::isfinite(u) && std::isfinite(v);
 }
 
-Vec2d Quadrilateral::map(const Vec2d& position) const noexcept {
+auto Quadrilateral::map(const Vec2d& position) const -> Vec2d {
     Vec2d result;
 
     if (!map(position.x, position.y, result)) {
-        return Vec2d(
+        return {
             std::numeric_limits<double>::quiet_NaN(),
             std::numeric_limits<double>::quiet_NaN()
-        );
+        };
     }
 
     return result;
 }
 
-Vec2d Quadrilateral::map(
-    double x,
-    double y
-) const noexcept
-{
+auto Quadrilateral::map(double x, double y) const -> Vec2d {
     Vec2d result;
 
     if (!map(x, y, result)) {
@@ -352,10 +320,7 @@ Vec2d Quadrilateral::map(
     return result;
 }
 
-void Quadrilateral::projectPoints(
-    Vec2d* points,
-    std::size_t count
-) const noexcept {
+void Quadrilateral::projectPoints(Vec2d* points, std::size_t count) const {
     if (points == nullptr) {
         return;
     }
@@ -367,17 +332,17 @@ void Quadrilateral::projectPoints(
 
 
 //------------------------------------------------------------------------------
-// Lines
+//  Lines.
 //------------------------------------------------------------------------------
 
-Lined Quadrilateral::horizontalLine(double v) const noexcept {
+Lined Quadrilateral::horizontalLine(double v) const {
     return Lined(
         project(0.0, v),
         project(1.0, v)
     );
 }
 
-Lined Quadrilateral::verticalLine(double u) const noexcept {
+Lined Quadrilateral::verticalLine(double u) const {
     return Lined(
         project(u, 0.0),
         project(u, 1.0)
@@ -386,11 +351,10 @@ Lined Quadrilateral::verticalLine(double u) const noexcept {
 
 
 //------------------------------------------------------------------------------
-// Bézier helpers
+//  Bézier helpers.
 //------------------------------------------------------------------------------
 
-std::array<Vec2d, 12>
-Quadrilateral::bezierCirclePoints() const noexcept {
+auto  Quadrilateral::bezierCirclePoints() const -> std::array<Vec2d, 12> {
     constexpr double kappa = 0.551915024494;
 
     const double a = 0.0;
@@ -422,10 +386,10 @@ Quadrilateral::bezierCirclePoints() const noexcept {
 
 
 //------------------------------------------------------------------------------
-// Transformation
+//  Transformation.
 //------------------------------------------------------------------------------
 
-void Quadrilateral::remap(const RemapRectd& rect) noexcept {
+void Quadrilateral::remap(const RemapRectd& rect) {
     for (Vec2d& point : points_) {
         rect.mapInPlace(point);
     }
@@ -436,10 +400,10 @@ void Quadrilateral::remap(const RemapRectd& rect) noexcept {
 
 
 //------------------------------------------------------------------------------
-// Perspective transformation
+//  Perspective transformation.
 //------------------------------------------------------------------------------
 
-bool Quadrilateral::solvePerspective() noexcept {
+auto Quadrilateral::solvePerspective() -> bool {
     can_project_perspective_ = false;
 
     const double x1 = points_[0].x;

@@ -11,7 +11,7 @@ namespace {
 using RawType = FixValue::RawType;
 
 // Return the magnitude without overflowing for the minimum signed value.
-constexpr std::uint64_t magnitude(RawType value) {
+constexpr auto magnitude(RawType value) -> std::uint64_t {
     if (value >= 0) {
         return static_cast<std::uint64_t>(value);
     }
@@ -19,7 +19,7 @@ constexpr std::uint64_t magnitude(RawType value) {
     return static_cast<std::uint64_t>(-(value + 1)) + 1;
 }
 
-constexpr RawType clampRaw(__int128 value) {
+constexpr auto clampRaw(__int128 value) -> RawType {
     if (value < static_cast<__int128>(FixValue::kMinRaw)) {
         return FixValue::kMinRaw;
     }
@@ -33,7 +33,7 @@ constexpr RawType clampRaw(__int128 value) {
 
 // Round to the nearest multiple of factor, with half values rounded away
 // from zero. factor must be positive.
-constexpr RawType roundToMultiple(RawType value, RawType factor) {
+constexpr auto roundToMultiple(RawType value, RawType factor) -> RawType {
     if (factor <= 1) {
         return value;
     }
@@ -46,15 +46,12 @@ constexpr RawType roundToMultiple(RawType value, RawType factor) {
         return quotient * factor;
     }
 
-    const RawType roundedQuotient =
-        quotient + (value < 0 ? -1 : 1);
+    const RawType rounded_quotient = quotient + (value < 0 ? -1 : 1);
 
-    return clampRaw(
-        static_cast<__int128>(roundedQuotient) * factor
-    );
+    return clampRaw(static_cast<__int128>(rounded_quotient) * factor);
 }
 
-constexpr RawType precisionFactor(int precision) {
+constexpr auto precisionFactor(int precision) -> RawType {
     RawType factor = 1;
 
     for (int i = precision; i < FixValue::kDecimalPrecision; ++i) {
@@ -64,27 +61,33 @@ constexpr RawType precisionFactor(int precision) {
     return factor;
 }
 
-bool isWhitespace(char c) {
-    return c == ' ' || c == '\t' || c == '\n' ||
-           c == '\r' || c == '\f' || c == '\v';
+auto isWhitespace(char c) -> bool {
+    return
+        c == ' ' ||
+        c == '\t' ||
+        c == '\n' ||
+        c == '\r' ||
+        c == '\f' ||
+        c == '\v';
 }
 
 } // namespace
 
-// MARK: - Conversion
 
-FixValue::RawType FixValue::fromDouble(double value) {
+//------------------------------------------------------------------------------
+//  Conversion.
+//------------------------------------------------------------------------------
+
+auto FixValue::fromDouble(double value) -> FixValue::RawType {
     if (std::isnan(value)) {
         return 0;
     }
 
-    if (value >= static_cast<double>(kMaxRaw) /
-                     static_cast<double>(kScale)) {
+    if (value >= static_cast<double>(kMaxRaw) / static_cast<double>(kScale)) {
         return kMaxRaw;
     }
 
-    if (value <= static_cast<double>(kMinRaw) /
-                     static_cast<double>(kScale)) {
+    if (value <= static_cast<double>(kMinRaw) / static_cast<double>(kScale)) {
         return kMinRaw;
     }
 
@@ -97,7 +100,7 @@ FixValue::RawType FixValue::fromDouble(double value) {
     return static_cast<RawType>(std::round(scaled));
 }
 
-bool FixValue::setDouble(double value) {
+auto FixValue::setDouble(double value) -> bool {
     if (!std::isfinite(value)) {
         return false;
     }
@@ -106,14 +109,16 @@ bool FixValue::setDouble(double value) {
     return true;
 }
 
-bool FixValue::setInt64(int64_t value) {
+auto FixValue::setInt64(int64_t value) -> bool {
     raw_ = clampRaw(static_cast<__int128>(value) * kScale);
     return true;
 }
 
-// MARK: - Arithmetic
+//------------------------------------------------------------------------------
+//  Arithmetic.
+//------------------------------------------------------------------------------
 
-FixValue FixValue::operator*(FixValue other) const {
+auto FixValue::operator * (FixValue other) const -> FixValue {
     const __int128 product =
         static_cast<__int128>(raw_) *
         static_cast<__int128>(other.raw_);
@@ -128,7 +133,7 @@ FixValue FixValue::operator*(FixValue other) const {
     return fromRaw(clampRaw(rounded));
 }
 
-FixValue FixValue::operator/(FixValue other) const {
+auto FixValue::operator / (FixValue other) const -> FixValue {
     if (other.raw_ == 0) {
         return {};
     }
@@ -136,27 +141,30 @@ FixValue FixValue::operator/(FixValue other) const {
     const __int128 numerator =
         static_cast<__int128>(raw_) * kScale;
 
-    const __int128 denominator =
+    const auto denominator =
         static_cast<__int128>(other.raw_);
 
-    const __int128 halfDenominator =
+    const __int128 half_denominator =
         denominator < 0 ? -denominator / 2 : denominator / 2;
 
     const __int128 adjusted =
         numerator >= 0
-            ? numerator + (denominator > 0 ? halfDenominator : -halfDenominator)
-            : numerator + (denominator > 0 ? -halfDenominator : halfDenominator);
+            ? numerator + (denominator > 0 ? half_denominator : -half_denominator)
+            : numerator + (denominator > 0 ? -half_denominator : half_denominator);
 
     return fromRaw(clampRaw(adjusted / denominator));
 }
 
-// MARK: - Rounding and mathematics
 
-FixValue FixValue::round() const {
+//------------------------------------------------------------------------------
+//  Rounding and mathematics.
+//------------------------------------------------------------------------------
+
+auto FixValue::round() const -> FixValue {
     return fromRaw(roundToMultiple(raw_, kScale));
 }
 
-FixValue FixValue::sqrt() const {
+auto FixValue::sqrt() const -> FixValue {
     if (raw_ < 0) {
         return {};
     }
@@ -178,7 +186,7 @@ void FixValue::clamp(FixValue minimum, FixValue maximum) {
 }
 
 
-void FixValue::flip(const FixValue& min, const FixValue& max) noexcept {
+void FixValue::flip(const FixValue& min, const FixValue& max) {
     if (raw_ > max.raw_) {
         raw_ = min.raw_ + (raw_ - max.raw_);
     }
@@ -189,10 +197,10 @@ void FixValue::flip(const FixValue& min, const FixValue& max) noexcept {
 
 
 //------------------------------------------------------------------------------
-//  Parsing
+//  Parsing.
 //------------------------------------------------------------------------------
 
-bool FixValue::set(std::string_view text) {
+auto FixValue::set(std::string_view text) -> bool {
     std::size_t pos = 0;
 
     while (pos < text.size() && isWhitespace(text[pos])) {
@@ -206,55 +214,55 @@ bool FixValue::set(std::string_view text) {
         ++pos;
     }
 
-    bool hasIntegerDigits = false;
-    bool hasFractionDigits = false;
-    bool hasDecimalPoint = false;
+    bool has_integer_digits = false;
+    bool has_fraction_digits = false;
+    bool has_decimal_point = false;
 
-    std::uint64_t integerPart = 0;
-    std::uint64_t fractionalPart = 0;
-    int fractionalDigits = 0;
-    int nextDigit = -1;
+    std::uint64_t integer_part = 0;
+    std::uint64_t fractional_part = 0;
+    int fractional_digits = 0;
+    int next_digit = -1;
 
-    constexpr std::uint64_t maxIntegerPart =
-        static_cast<std::uint64_t>(kMaxRaw / kScale);
+    constexpr auto max_integer_part = static_cast<std::uint64_t>(kMaxRaw / kScale);
 
     for (; pos < text.size(); ++pos) {
         const char c = text[pos];
 
         if (c >= '0' && c <= '9') {
-            const unsigned digit = static_cast<unsigned>(c - '0');
+            const auto digit = static_cast<unsigned>(c - '0');
 
-            if (!hasDecimalPoint) {
-                hasIntegerDigits = true;
+            if (!has_decimal_point) {
+                has_integer_digits = true;
 
-                if (integerPart > (maxIntegerPart - digit) / 10) {
+                if (integer_part > (max_integer_part - digit) / 10) {
                     return false;
                 }
 
-                integerPart = integerPart * 10 + digit;
-            } else {
-                hasFractionDigits = true;
+                integer_part = (integer_part * 10) + digit;
+            }
+            else {
+                has_fraction_digits = true;
 
-                if (fractionalDigits < kDecimalPrecision) {
-                    fractionalPart = fractionalPart * 10 + digit;
-                    ++fractionalDigits;
-                } else if (nextDigit < 0) {
-                    nextDigit = static_cast<int>(digit);
+                if (fractional_digits < kDecimalPrecision) {
+                    fractional_part = (fractional_part * 10) + digit;
+                    ++fractional_digits;
+                } else if (next_digit < 0) {
+                    next_digit = static_cast<int>(digit);
                 }
             }
 
             continue;
         }
 
-        if (c == '.' && !hasDecimalPoint) {
-            hasDecimalPoint = true;
+        if (c == '.' && !has_decimal_point) {
+            has_decimal_point = true;
             continue;
         }
 
         break;
     }
 
-    if (!hasIntegerDigits && !hasFractionDigits) {
+    if (!has_integer_digits && !has_fraction_digits) {
         return false;
     }
 
@@ -266,17 +274,17 @@ bool FixValue::set(std::string_view text) {
         return false;
     }
 
-    while (fractionalDigits < kDecimalPrecision) {
-        fractionalPart *= 10;
-        ++fractionalDigits;
+    while (fractional_digits < kDecimalPrecision) {
+        fractional_part *= 10;
+        ++fractional_digits;
     }
 
     __int128 result =
-        static_cast<__int128>(integerPart) * kScale +
-        static_cast<__int128>(fractionalPart);
+        (static_cast<__int128>(integer_part) * kScale) +
+        static_cast<__int128>(fractional_part);
 
     // Round excess fractional digits to nine decimal places.
-    if (nextDigit >= 5) {
+    if (next_digit >= 5) {
         ++result;
     }
 
@@ -292,7 +300,7 @@ bool FixValue::set(std::string_view text) {
     return true;
 }
 
-std::optional<FixValue> FixValue::parse(std::string_view text) {
+auto FixValue::parse(std::string_view text) -> std::optional<FixValue> {
     FixValue result;
 
     if (!result.set(text)) {
@@ -302,34 +310,33 @@ std::optional<FixValue> FixValue::parse(std::string_view text) {
     return result;
 }
 
-// MARK: - Formatting
+//------------------------------------------------------------------------------
+//  Formatting.
+//------------------------------------------------------------------------------
 
-std::string FixValue::toString(int32_t precision) const {
+auto FixValue::toString(int32_t precision) const -> std::string {
     precision = std::clamp(precision, 0, kDecimalPrecision);
 
     const RawType factor = precisionFactor(precision);
-    const RawType roundedRaw = roundToMultiple(raw_, factor);
-    const std::uint64_t absolute = magnitude(roundedRaw);
+    const RawType rounded_raw = roundToMultiple(raw_, factor);
+    const std::uint64_t absolute = magnitude(rounded_raw);
 
-    const std::uint64_t integerPart =
-        absolute / static_cast<std::uint64_t>(kScale);
-
-    const std::uint64_t fractionalPart =
-        absolute % static_cast<std::uint64_t>(kScale);
+    const std::uint64_t integer_part = absolute / static_cast<std::uint64_t>(kScale);
+    const std::uint64_t fractional_part = absolute % static_cast<std::uint64_t>(kScale);
 
     std::string result;
 
-    if (roundedRaw < 0) {
+    if (rounded_raw < 0) {
         result.push_back('-');
     }
 
-    result += std::to_string(integerPart);
+    result += std::to_string(integer_part);
 
     if (precision == 0) {
         return result;
     }
 
-    std::string fraction = std::to_string(fractionalPart);
+    std::string fraction = std::to_string(fractional_part);
     fraction.insert(0, kDecimalPrecision - fraction.size(), '0');
     fraction.resize(static_cast<std::size_t>(precision));
 
@@ -345,7 +352,7 @@ std::string FixValue::toString(int32_t precision) const {
     return result;
 }
 
-std::ostream& operator<<(std::ostream& stream, FixValue value) {
+auto operator << (std::ostream& stream, FixValue value) -> std::ostream& {
     return stream << value.toString();
 }
 

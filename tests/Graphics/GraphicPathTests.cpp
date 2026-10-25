@@ -237,8 +237,8 @@ TEST_CASE(
         Vec2d{10.0, 20.0}
     );
 
-    REQUIRE_FALSE(point->leftFlag);
-    REQUIRE_FALSE(point->rightFlag);
+    REQUIRE_FALSE(point->left_flag);
+    REQUIRE_FALSE(point->right_flag);
 }
 
 TEST_CASE(
@@ -292,8 +292,8 @@ TEST_CASE(
         Vec2d{15.0, 20.0}
     );
 
-    REQUIRE(point->leftFlag);
-    REQUIRE(point->rightFlag);
+    REQUIRE(point->left_flag);
+    REQUIRE(point->right_flag);
 }
 
 TEST_CASE(
@@ -315,8 +315,8 @@ TEST_CASE(
 
     REQUIRE(point != nullptr);
 
-    REQUIRE_FALSE(point->leftFlag);
-    REQUIRE(point->rightFlag);
+    REQUIRE_FALSE(point->left_flag);
+    REQUIRE(point->right_flag);
 
     requirePoint(
         point->left,
@@ -365,8 +365,8 @@ TEST_CASE(
         source.right
     );
 
-    REQUIRE(point->leftFlag == source.leftFlag);
-    REQUIRE(point->rightFlag == source.rightFlag);
+    REQUIRE(point->left_flag == source.left_flag);
+    REQUIRE(point->right_flag == source.right_flag);
 }
 
 TEST_CASE(
@@ -413,8 +413,8 @@ TEST_CASE(
         Vec2d{5.0, 15.0}
     );
 
-    REQUIRE(point->leftFlag);
-    REQUIRE_FALSE(point->rightFlag);
+    REQUIRE(point->left_flag);
+    REQUIRE_FALSE(point->right_flag);
 }
 
 TEST_CASE(
@@ -443,8 +443,8 @@ TEST_CASE(
         Vec2d{15.0, 25.0}
     );
 
-    REQUIRE_FALSE(point->leftFlag);
-    REQUIRE(point->rightFlag);
+    REQUIRE_FALSE(point->left_flag);
+    REQUIRE(point->right_flag);
 }
 
 //------------------------------------------------------------------------------
@@ -484,8 +484,8 @@ TEST_CASE(
         Vec2d{20.0, 20.0}
     );
 
-    REQUIRE(point->leftFlag);
-    REQUIRE(point->rightFlag);
+    REQUIRE(point->left_flag);
+    REQUIRE(point->right_flag);
 }
 
 TEST_CASE(
@@ -707,8 +707,8 @@ TEST_CASE(
     REQUIRE(start != nullptr);
     REQUIRE(end != nullptr);
 
-    REQUIRE(start->rightFlag);
-    REQUIRE(end->leftFlag);
+    REQUIRE(start->right_flag);
+    REQUIRE(end->left_flag);
 
     requirePoint(
         start->right,
@@ -947,7 +947,7 @@ TEST_CASE(
     const auto* point = path.lastPointPtr();
 
     REQUIRE(point != nullptr);
-    REQUIRE(point->leftFlag);
+    REQUIRE(point->left_flag);
 
     requirePoint(
         point->left,
@@ -971,7 +971,7 @@ TEST_CASE(
     const auto* point = path.lastPointPtr();
 
     REQUIRE(point != nullptr);
-    REQUIRE(point->rightFlag);
+    REQUIRE(point->right_flag);
 
     requirePoint(
         point->right,
@@ -1549,8 +1549,8 @@ TEST_CASE(
         Catch::Matchers::WithinAbs(0.75, epsilon)
     );
 
-    REQUIRE(split.startIndex == 0);
-    REQUIRE(split.endIndex == 0);
+    REQUIRE(split.start_index == 0);
+    REQUIRE(split.end_index == 0);
 
     REQUIRE_THAT(
         split.t0,
@@ -1584,8 +1584,8 @@ TEST_CASE(
 
     REQUIRE(split.valid);
 
-    REQUIRE(split.startIndex == 0);
-    REQUIRE(split.endIndex == 1);
+    REQUIRE(split.start_index == 0);
+    REQUIRE(split.end_index == 1);
 
     REQUIRE_THAT(
         split.t0,

@@ -1,15 +1,15 @@
 #include "grain/String/StringUtf8.hpp"
 
+#include <algorithm>
+#include <string_view>
+
 namespace Grain {
 
 //------------------------------------------------------------------------------
-// Validation
+//  Validation.
 //------------------------------------------------------------------------------
 
-bool StringUtf8::isValid(
-    std::string_view data,
-    size_type* invalid_byte_index) noexcept {
-
+auto StringUtf8::isValid(std::string_view data, size_type* invalid_byte_index) -> bool {
     size_type byte_index = 0;
 
     while (byte_index < data.size()) {
@@ -22,7 +22,7 @@ bool StringUtf8::isValid(
             code_point,
             sequence_length)) {
 
-            if (invalid_byte_index) {
+            if (invalid_byte_index != nullptr) {
                 *invalid_byte_index = byte_index;
             }
 
@@ -32,32 +32,25 @@ bool StringUtf8::isValid(
         byte_index += sequence_length;
     }
 
-    if (invalid_byte_index) {
+    if (invalid_byte_index != nullptr) {
         *invalid_byte_index = npos;
     }
 
     return true;
 }
 
-bool StringUtf8::isAscii(
-    std::string_view data) noexcept {
-
-    for (const unsigned char byte : data) {
-        if (byte >= 0x80) {
-            return false;
-        }
-    }
-
-    return true;
+auto StringUtf8::isAscii(std::string_view data) -> bool {
+    return std::ranges::all_of(data, [](unsigned char byte) -> bool {
+        return byte < 0x80;
+    });
 }
 
+
 //------------------------------------------------------------------------------
-// Code-point access
+//  Code-point access.
 //------------------------------------------------------------------------------
 
-StringUtf8::size_type StringUtf8::length(
-    std::string_view data) noexcept {
-
+auto StringUtf8::length(std::string_view data) -> StringUtf8::size_type {
     size_type count = 0;
     size_type byte_index = 0;
 
@@ -83,21 +76,18 @@ StringUtf8::size_type StringUtf8::length(
     return count;
 }
 
-bool StringUtf8::decode(
+auto StringUtf8::decode(
     std::string_view data,
     size_type byte_index,
     char32_t& code_point,
-    size_type& sequence_length) noexcept {
-
+    size_type& sequence_length
+) -> bool {
     if (byte_index >= data.size()) {
         return false;
     }
 
-    const auto first =
-        static_cast<unsigned char>(data[byte_index]);
-
-    const size_type length =
-        sequenceLength(first);
+    const auto first = static_cast<unsigned char>(data[byte_index]);
+    const size_type length = sequenceLength(first);
 
     if (length == 0 ||
         byte_index + length > data.size()) {
@@ -113,27 +103,24 @@ bool StringUtf8::decode(
     char32_t value = 0;
 
     switch (length) {
-    case 2:
-        value = first & 0x1f;
-        break;
+        case 2:
+            value = first & 0x1f;
+            break;
 
-    case 3:
-        value = first & 0x0f;
-        break;
+        case 3:
+            value = first & 0x0f;
+            break;
 
-    case 4:
-        value = first & 0x07;
-        break;
+        case 4:
+            value = first & 0x07;
+            break;
 
-    default:
-        return false;
+        default:
+            return false;
     }
 
     for (size_type i = 1; i < length; ++i) {
-        const auto byte =
-            static_cast<unsigned char>(
-                data[byte_index + i]);
-
+        const auto byte =static_cast<unsigned char>(data[byte_index + i]);
         if (!isContinuationByte(byte)) {
             return false;
         }
@@ -164,13 +151,8 @@ bool StringUtf8::decode(
     return true;
 }
 
-char32_t StringUtf8::codePointAt(
-    std::string_view data,
-    size_type code_point_index) noexcept {
-
-    const size_type byte_index =
-        byteOffset(data, code_point_index);
-
+auto StringUtf8::codePointAt(std::string_view data,size_type code_point_index) -> char32_t {
+    const size_type byte_index = byteOffset(data, code_point_index);
     if (byte_index == npos) {
         return replacementCharacter;
     }
@@ -189,10 +171,10 @@ char32_t StringUtf8::codePointAt(
     return code_point;
 }
 
-StringUtf8::size_type StringUtf8::byteOffset(
+auto StringUtf8::byteOffset(
     std::string_view data,
-    size_type code_point_index) noexcept {
-
+    size_type code_point_index
+) -> StringUtf8::size_type {
     if (code_point_index == 0) {
         return 0;
     }
@@ -226,10 +208,10 @@ StringUtf8::size_type StringUtf8::byteOffset(
                : npos;
 }
 
-StringUtf8::size_type StringUtf8::codePointIndex(
+auto StringUtf8::codePointIndex(
     std::string_view data,
-    size_type byte_index) noexcept {
-
+    size_type byte_index
+) -> StringUtf8::size_type {
     if (byte_index > data.size()) {
         return npos;
     }
@@ -273,24 +255,18 @@ StringUtf8::size_type StringUtf8::codePointIndex(
     }
 
     // data.size() is a valid boundary.
-    return current_byte == byte_index
-               ? code_point_index
-               : npos;
+    return current_byte == byte_index ? code_point_index : npos;
 }
 
 //------------------------------------------------------------------------------
-// UTF-8 sequence helpers
+//  UTF-8 sequence helpers.
 //------------------------------------------------------------------------------
 
-bool StringUtf8::isContinuationByte(
-    unsigned char byte) noexcept {
-
+auto StringUtf8::isContinuationByte( unsigned char byte) -> bool {
     return (byte & 0xc0) == 0x80;
 }
 
-StringUtf8::size_type StringUtf8::sequenceLength(
-    unsigned char first_byte) noexcept {
-
+auto StringUtf8::sequenceLength(unsigned char first_byte) -> StringUtf8::size_type {
     if (first_byte < 0x80) {
         return 1;
     }

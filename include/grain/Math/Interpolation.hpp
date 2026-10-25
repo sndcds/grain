@@ -14,13 +14,7 @@ namespace Grain::Interpolation {
  *   t = 0 -> p1
  *   t = 1 -> p2
  */
-double cubic(
-    double p0,
-    double p1,
-    double p2,
-    double p3,
-    double t
-) noexcept;
+auto cubic(double p0, double p1, double p2, double p3, double t) -> double;
 
 /**
  * Bicubic interpolation of a 4x4 sample grid.
@@ -32,11 +26,11 @@ double cubic(
  * `tx` and `ty` are the interpolation positions between the
  * middle samples in x and y.
  */
-double bicubic(
+auto bicubic(
     std::span<const double, 16> samples,
     double tx,
     double ty
-) noexcept;
+) -> double;
 
 /**
  * Tricubic interpolation of a 4x4x4 sample grid.
@@ -48,12 +42,12 @@ double bicubic(
  * `tx`, `ty` and `tz` are the interpolation positions between
  * the middle samples in each dimension.
  */
-double tricubic(
+auto tricubic(
     std::span<const double, 64> samples,
     double tx,
     double ty,
     double tz
-) noexcept;
+) -> double;
 
 /**
  * N-dimensional cubic interpolation.
@@ -70,9 +64,9 @@ double tricubic(
  * `dimensions` contains the size of the coordinate vector.
  * The number of samples must be exactly 4^dimensions.size().
  */
-double nCubic(
+auto nCubic(
     std::span<const double> samples,
     std::span<const double> coordinates
-) noexcept;
+) -> double;
 
 } // namespace Grain::Interpolation

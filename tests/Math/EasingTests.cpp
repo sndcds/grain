@@ -3,10 +3,11 @@
 
 #include <grain/Math/Easing.hpp>
 
+#include <array>
 #include <cmath>
 #include <numbers>
+#include <string>
 #include <string_view>
-#include <vector>
 
 namespace Grain::Easing::Tests {
 
@@ -19,49 +20,50 @@ constexpr double kLooseTolerance = 1e-10;
 
 struct EasingFunction {
     Type type;
-    double (*function)(double) noexcept;
+    double (*function)(double);
 };
 
-constexpr EasingFunction allFunctions[] = {
-    {Type::InSine, easeInSine},
-    {Type::OutSine, easeOutSine},
-    {Type::InOutSine, easeInOutSine},
 
-    {Type::InQuad, easeInQuad},
-    {Type::OutQuad, easeOutQuad},
-    {Type::InOutQuad, easeInOutQuad},
+constexpr std::array all_functions{
+    EasingFunction{Type::InSine, easeInSine},
+    EasingFunction{Type::OutSine, easeOutSine},
+    EasingFunction{Type::InOutSine, easeInOutSine},
 
-    {Type::InCubic, easeInCubic},
-    {Type::OutCubic, easeOutCubic},
-    {Type::InOutCubic, easeInOutCubic},
+    EasingFunction{Type::InQuad, easeInQuad},
+    EasingFunction{Type::OutQuad, easeOutQuad},
+    EasingFunction{Type::InOutQuad, easeInOutQuad},
 
-    {Type::InQuart, easeInQuart},
-    {Type::OutQuart, easeOutQuart},
-    {Type::InOutQuart, easeInOutQuart},
+    EasingFunction{Type::InCubic, easeInCubic},
+    EasingFunction{Type::OutCubic, easeOutCubic},
+    EasingFunction{Type::InOutCubic, easeInOutCubic},
 
-    {Type::InQuint, easeInQuint},
-    {Type::OutQuint, easeOutQuint},
-    {Type::InOutQuint, easeInOutQuint},
+    EasingFunction{Type::InQuart, easeInQuart},
+    EasingFunction{Type::OutQuart, easeOutQuart},
+    EasingFunction{Type::InOutQuart, easeInOutQuart},
 
-    {Type::InExpo, easeInExpo},
-    {Type::OutExpo, easeOutExpo},
-    {Type::InOutExpo, easeInOutExpo},
+    EasingFunction{Type::InQuint, easeInQuint},
+    EasingFunction{Type::OutQuint, easeOutQuint},
+    EasingFunction{Type::InOutQuint, easeInOutQuint},
 
-    {Type::InCirc, easeInCirc},
-    {Type::OutCirc, easeOutCirc},
-    {Type::InOutCirc, easeInOutCirc},
+    EasingFunction{Type::InExpo, easeInExpo},
+    EasingFunction{Type::OutExpo, easeOutExpo},
+    EasingFunction{Type::InOutExpo, easeInOutExpo},
 
-    {Type::InBack, easeInBack},
-    {Type::OutBack, easeOutBack},
-    {Type::InOutBack, easeInOutBack},
+    EasingFunction{Type::InCirc, easeInCirc},
+    EasingFunction{Type::OutCirc, easeOutCirc},
+    EasingFunction{Type::InOutCirc, easeInOutCirc},
 
-    {Type::InElastic, easeInElastic},
-    {Type::OutElastic, easeOutElastic},
-    {Type::InOutElastic, easeInOutElastic},
+    EasingFunction{Type::InBack, easeInBack},
+    EasingFunction{Type::OutBack, easeOutBack},
+    EasingFunction{Type::InOutBack, easeInOutBack},
 
-    {Type::InBounce, easeInBounce},
-    {Type::OutBounce, easeOutBounce},
-    {Type::InOutBounce, easeInOutBounce},
+    EasingFunction{Type::InElastic, easeInElastic},
+    EasingFunction{Type::OutElastic, easeOutElastic},
+    EasingFunction{Type::InOutElastic, easeInOutElastic},
+
+    EasingFunction{Type::InBounce, easeInBounce},
+    EasingFunction{Type::OutBounce, easeOutBounce},
+    EasingFunction{Type::InOutBounce, easeInOutBounce},
 };
 
 } // namespace
@@ -69,7 +71,7 @@ constexpr EasingFunction allFunctions[] = {
 
 TEST_CASE("Easing functions have correct boundary values",
           "[Math][Easing]") {
-    for (const auto& easing : allFunctions) {
+    for (const auto& easing : all_functions) {
         SECTION(std::string(typeName(easing.type))) {
             REQUIRE_THAT(
                 easing.function(0.0),
@@ -97,7 +99,7 @@ TEST_CASE("Easing evaluate dispatches to the correct function",
         1.0
     };
 
-    for (const auto& easing : allFunctions) {
+    for (const auto& easing : all_functions) {
         SECTION(std::string(typeName(easing.type))) {
             for (const double t : values) {
                 REQUIRE_THAT(

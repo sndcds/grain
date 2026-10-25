@@ -10,27 +10,22 @@ namespace Grain {
 template <typename T>
 class RemapRect {
 public:
-    constexpr RemapRect() noexcept = default;
+    constexpr RemapRect() = default;
 
     explicit RemapRect(
         const Rect<T>& source,
         const Rect<T>& destination,
         bool flipY = false
-    ) noexcept
-    {
+    ) {
         set(source, destination, flipY);
     }
 
+
     //--------------------------------------------------------------------------
-    // Setup
+    //  Setup.
     //--------------------------------------------------------------------------
 
-    void set(
-        const Rect<T>& source,
-        const Rect<T>& destination,
-        bool flipY = false
-    ) noexcept
-    {
+    void set(const Rect<T>& source, const Rect<T>& destination, bool flipY = false) {
         source_ = source;
         destination_ = destination;
 
@@ -58,152 +53,106 @@ public:
         }
     }
 
-    [[nodiscard]]
-    RemapRect inverse() const noexcept {
-        return RemapRect(
-            destination_,
-            source_
-        );
+    [[nodiscard]] auto inverse() const -> RemapRect {
+        return RemapRect(destination_, source_);
     }
 
 
     //--------------------------------------------------------------------------
-    // Source / destination
+    //  Source / destination.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    const Rect<T>& source() const noexcept {
+    [[nodiscard]] auto source() const -> const Rect<T>& {
         return source_;
     }
 
-    [[nodiscard]]
-    const Rect<T>& destination() const noexcept {
+    [[nodiscard]] auto destination() const -> const Rect<T>& {
         return destination_;
     }
 
+
     //--------------------------------------------------------------------------
-    // Mapping
+    //  Mapping.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    T mapX(T x) const noexcept {
+    [[nodiscard]] auto mapX(T x) const -> T {
         return static_cast<T>(
-            (static_cast<double>(x) -
-             static_cast<double>(source_.x)) *
-            scaleX_ +
+            ((static_cast<double>(x) - static_cast<double>(source_.x)) * scaleX_) +
             static_cast<double>(destination_.x)
         );
     }
 
-    [[nodiscard]]
-    T mapY(T y) const noexcept {
+    [[nodiscard]] auto mapY(T y) const -> T {
         return static_cast<T>(
-            (static_cast<double>(y) -
-             static_cast<double>(source_.y)) *
-            scaleY_ +
+            ((static_cast<double>(y) - static_cast<double>(source_.y)) * scaleY_) +
             static_cast<double>(destination_.y)
         );
     }
 
-    [[nodiscard]]
-    T inverseMapX(T x) const noexcept {
+    [[nodiscard]] auto inverseMapX(T x) const -> T {
         return static_cast<T>(
-            (static_cast<double>(x) -
-             static_cast<double>(destination_.x)) /
-            scaleX_ +
+            ((static_cast<double>(x) - static_cast<double>(destination_.x)) / scaleX_) +
             static_cast<double>(source_.x)
         );
     }
 
-    [[nodiscard]]
-    T inverseMapY(T y) const noexcept {
+    [[nodiscard]] auto inverseMapY(T y) const -> T {
         return static_cast<T>(
-            (static_cast<double>(y) -
-             static_cast<double>(destination_.y)) /
-            scaleY_ +
+            ((static_cast<double>(y) - static_cast<double>(destination_.y)) / scaleY_) +
             static_cast<double>(source_.y)
         );
     }
 
+
     //--------------------------------------------------------------------------
-    // Vec2
+    //  Vec2.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    Vec2<T> map(const Vec2<T>& point) const noexcept {
-        return {
-            mapX(point.x),
-            mapY(point.y)
-        };
+    [[nodiscard]] auto map(const Vec2<T>& point) const -> Vec2<T> {
+        return {mapX(point.x), mapY(point.y)};
     }
 
-    [[nodiscard]]
-    Vec2<T> inverseMap(const Vec2<T>& point) const noexcept {
-        return {
-            inverseMapX(point.x),
-            inverseMapY(point.y)
-        };
+    [[nodiscard]] auto inverseMap(const Vec2<T>& point) const -> Vec2<T> {
+        return {inverseMapX(point.x), inverseMapY(point.y)};
     }
 
-    void map(Vec2<T>& point) const noexcept {
+    void map(Vec2<T>& point) const {
         point = map(static_cast<const Vec2<T>&>(point));
     }
 
-    void mapInPlace(Vec2<T>& point) const noexcept {
+    void mapInPlace(Vec2<T>& point) const {
         point.x =
             static_cast<T>(
-                (static_cast<double>(point.x) -
-                 static_cast<double>(source_.x)) *
-                scaleX_ +
+                ((static_cast<double>(point.x) - static_cast<double>(source_.x)) * scaleX_) +
                 static_cast<double>(destination_.x)
             );
 
         point.y =
             static_cast<T>(
-                (static_cast<double>(point.y) -
-                 static_cast<double>(source_.y)) *
-                scaleY_ +
+                ((static_cast<double>(point.y) - static_cast<double>(source_.y)) * scaleY_) +
                 static_cast<double>(destination_.y)
             );
     }
 
-    void inverseMap(Vec2<T>& point) const noexcept {
-        point = inverseMap(
-            static_cast<const Vec2<T>&>(point)
-        );
+    void inverseMap(Vec2<T>& point) const {
+        point = inverseMap(static_cast<const Vec2<T>&>(point));
     }
 
-    void map(
-        const Vec2<T>& point,
-        Vec2<T>& result
-    ) const noexcept
-    {
+    void map(const Vec2<T>& point, Vec2<T>& result) const {
         result = map(point);
     }
 
-    void inverseMap(
-        const Vec2<T>& point,
-        Vec2<T>& result
-    ) const noexcept
-    {
+    void inverseMap(const Vec2<T>& point, Vec2<T>& result) const {
         result = inverseMap(point);
     }
 
     //--------------------------------------------------------------------------
-    // Rect
+    //  Rect.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    Rect<T> map(const Rect<T>& rect) const noexcept {
-        const Vec2<T> min{
-            rect.x,
-            rect.y
-        };
-
-        const Vec2<T> max{
-            rect.x + rect.width,
-            rect.y + rect.height
-        };
+    [[nodiscard]] auto map(const Rect<T>& rect) const -> Rect<T> {
+        const Vec2<T> min{rect.x, rect.y};
+        const Vec2<T> max{rect.x + rect.width, rect.y + rect.height};
 
         const auto mappedMin = map(min);
         const auto mappedMax = map(max);
@@ -216,17 +165,9 @@ public:
         };
     }
 
-    [[nodiscard]]
-    Rect<T> inverseMap(const Rect<T>& rect) const noexcept {
-        const Vec2<T> min{
-            rect.x,
-            rect.y
-        };
-
-        const Vec2<T> max{
-            rect.x + rect.width,
-            rect.y + rect.height
-        };
+    [[nodiscard]] auto inverseMap(const Rect<T>& rect) const -> Rect<T> {
+        const Vec2<T> min{rect.x, rect.y};
+        const Vec2<T> max{rect.x + rect.width, rect.y + rect.height };
 
         const auto mappedMin = inverseMap(min);
         const auto mappedMax = inverseMap(max);
@@ -239,29 +180,23 @@ public:
         };
     }
 
-    void map(Rect<T>& rect) const noexcept {
+    void map(Rect<T>& rect) const {
         rect = map(static_cast<const Rect<T>&>(rect));
     }
 
-    void inverseMap(Rect<T>& rect) const noexcept {
+    void inverseMap(Rect<T>& rect) const {
         rect = inverseMap(
             static_cast<const Rect<T>&>(rect)
         );
     }
 
+
     //--------------------------------------------------------------------------
-    // Scale
+    //  Scale.
     //--------------------------------------------------------------------------
 
-    [[nodiscard]]
-    double scaleX() const noexcept {
-        return scaleX_;
-    }
-
-    [[nodiscard]]
-    double scaleY() const noexcept {
-        return scaleY_;
-    }
+    [[nodiscard]] auto scaleX() const -> double { return scaleX_; }
+    [[nodiscard]] auto scaleY() const -> double { return scaleY_; }
 
 private:
     Rect<T> source_{};
@@ -273,7 +208,7 @@ private:
 
 
 //------------------------------------------------------------------------------
-// Standard types
+//  Standard types.
 //------------------------------------------------------------------------------
 
 using RemapRectf = RemapRect<float>;

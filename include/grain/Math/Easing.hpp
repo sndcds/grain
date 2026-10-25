@@ -1,11 +1,12 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <string_view>
 
 namespace Grain::Easing {
 
-enum class Type {
+enum class Type : uint8_t {
     InSine,
     OutSine,
     InOutSine,
@@ -44,155 +45,105 @@ enum class Type {
 
     InBounce,
     OutBounce,
-    InOutBounce
+    InOutBounce,
+
+    Count
 };
 
-inline constexpr std::size_t typeCount = 30;
+inline constexpr std::size_t kTypeCount = static_cast<std::size_t>(Type::Count);
 
-[[nodiscard]]
-double evaluate(Type type, double t) noexcept;
+[[nodiscard]] auto evaluate(Type type, double t) -> double;
 
-[[nodiscard]]
-std::string_view typeName(Type type) noexcept;
+[[nodiscard]] auto typeName(Type type) -> std::string_view;
 
 
 //------------------------------------------------------------------------------
 // Sine
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInSine(double t) noexcept;
-
-[[nodiscard]]
-double easeOutSine(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutSine(double t) noexcept;
+[[nodiscard]] auto easeInSine(double t) -> double;
+[[nodiscard]] auto easeOutSine(double t) -> double;
+[[nodiscard]] auto easeInOutSine(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Quadratic
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInQuad(double t) noexcept;
-
-[[nodiscard]]
-double easeOutQuad(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutQuad(double t) noexcept;
+[[nodiscard]] auto easeInQuad(double t) -> double;
+[[nodiscard]] auto easeOutQuad(double t) -> double;
+[[nodiscard]] auto easeInOutQuad(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Cubic
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInCubic(double t) noexcept;
-
-[[nodiscard]]
-double easeOutCubic(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutCubic(double t) noexcept;
+[[nodiscard]] auto easeInCubic(double t) -> double;
+[[nodiscard]] auto easeOutCubic(double t) -> double;
+[[nodiscard]] auto easeInOutCubic(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Quartic
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInQuart(double t) noexcept;
-
-[[nodiscard]]
-double easeOutQuart(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutQuart(double t) noexcept;
+[[nodiscard]] auto easeInQuart(double t) -> double;
+[[nodiscard]] auto easeOutQuart(double t) -> double;
+[[nodiscard]] auto easeInOutQuart(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Quintic
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInQuint(double t) noexcept;
-
-[[nodiscard]]
-double easeOutQuint(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutQuint(double t) noexcept;
+[[nodiscard]] auto easeInQuint(double t) -> double;
+[[nodiscard]] auto easeOutQuint(double t) -> double;
+[[nodiscard]] auto easeInOutQuint(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Exponential
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInExpo(double t) noexcept;
-
-[[nodiscard]]
-double easeOutExpo(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutExpo(double t) noexcept;
+[[nodiscard]] auto easeInExpo(double t) -> double;
+[[nodiscard]] auto easeOutExpo(double t) -> double;
+[[nodiscard]] auto easeInOutExpo(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Circular
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInCirc(double t) noexcept;
-
-[[nodiscard]]
-double easeOutCirc(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutCirc(double t) noexcept;
+[[nodiscard]] auto easeInCirc(double t) -> double;
+[[nodiscard]] auto easeOutCirc(double t) -> double;
+[[nodiscard]] auto easeInOutCirc(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Back
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInBack(double t) noexcept;
-
-[[nodiscard]]
-double easeOutBack(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutBack(double t) noexcept;
+[[nodiscard]] auto easeInBack(double t) -> double;
+[[nodiscard]] auto easeOutBack(double t) -> double;
+[[nodiscard]] auto easeInOutBack(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Elastic
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInElastic(double t) noexcept;
-
-[[nodiscard]]
-double easeOutElastic(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutElastic(double t) noexcept;
+[[nodiscard]] auto easeInElastic(double t) -> double;
+[[nodiscard]] auto easeOutElastic(double t) -> double;
+[[nodiscard]] auto easeInOutElastic(double t) -> double;
 
 
 //------------------------------------------------------------------------------
 // Bounce
 //------------------------------------------------------------------------------
 
-[[nodiscard]]
-double easeInBounce(double t) noexcept;
-
-[[nodiscard]]
-double easeOutBounce(double t) noexcept;
-
-[[nodiscard]]
-double easeInOutBounce(double t) noexcept;
+[[nodiscard]] auto easeInBounce(double t) -> double;
+[[nodiscard]] auto easeOutBounce(double t) -> double;
+[[nodiscard]] auto easeInOutBounce(double t) -> double;
 
 }

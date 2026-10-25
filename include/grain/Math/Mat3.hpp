@@ -7,42 +7,41 @@
 #include <numbers>
 #include <cmath>
 #include <cstddef>
-#include <limits>
+#include <array>
 
 namespace Grain {
 
 template <ScalarType T>
 class Mat3 {
 public:
-    constexpr Mat3() noexcept
+    constexpr Mat3()
         : data_{
-            {T(1), T(0), T(0)},
-            {T(0), T(1), T(0)},
-            {T(0), T(0), T(1)}
+            std::array<T, 3>{T{1}, T{0}, T{0}},
+            std::array<T, 3>{T{0}, T{1}, T{0}},
+            std::array<T, 3>{T{0}, T{0}, T{1}}
         }
     {
     }
+
 
     constexpr Mat3(
         T m00, T m01, T m02,
         T m10, T m11, T m12,
         T m20, T m21, T m22
-    ) noexcept
+    )
         : data_{
-            {m00, m01, m02},
-            {m10, m11, m12},
-            {m20, m21, m22}
+            std::array<T, 3>{m00, m01, m02},
+            std::array<T, 3>{m10, m11, m12},
+            std::array<T, 3>{m20, m21, m22}
         }
     {
     }
 
-    [[nodiscard]]
-    static constexpr Mat3 identity() noexcept {
+    [[nodiscard]] static constexpr auto identity() -> Mat3 {
         return {};
     }
 
-    [[nodiscard]]
-    static constexpr Mat3 translation(T x, T y) noexcept {
+    [[nodiscard]] static constexpr auto translation(T x, T y) -> Mat3 {
         return {
             T(1), T(0), x,
             T(0), T(1), y,
@@ -50,8 +49,7 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr Mat3 scaling(T x, T y) noexcept {
+    [[nodiscard]] static constexpr auto scaling(T x, T y) -> Mat3 {
         return {
             x,    T(0), T(0),
             T(0), y,    T(0),
@@ -59,13 +57,11 @@ public:
         };
     }
 
-    [[nodiscard]]
-    static constexpr Mat3 scaling(T scale) noexcept {
+    [[nodiscard]] static constexpr auto scaling(T scale) -> Mat3 {
         return scaling(scale, scale);
     }
 
-    [[nodiscard]]
-    static Mat3 rotation(T radians) noexcept {
+    [[nodiscard]] static auto rotation(T radians) -> Mat3 {
         const T c = std::cos(radians);
         const T s = std::sin(radians);
 
@@ -76,7 +72,7 @@ public:
         };
     }
 
-    static Mat3 rotationDegrees(T degrees) {
+    static auto rotationDegrees(T degrees) -> Mat3 {
         const T radians = degrees * std::numbers::pi / 180.0;
         const T c = std::cos(radians);
         const T s = std::sin(radians);
@@ -88,29 +84,28 @@ public:
         };
     }
 
-    constexpr T& operator()(std::size_t row, std::size_t column) noexcept {
+    constexpr auto operator () (std::size_t row, std::size_t column) -> T& {
         return data_[row][column];
     }
 
-    constexpr T operator()(std::size_t row, std::size_t column) const noexcept {
+    constexpr auto operator () (std::size_t row, std::size_t column) const -> T {
         return data_[row][column];
     }
 
-    constexpr T* data() noexcept {
+    constexpr auto data() -> T* {
         return &data_[0][0];
     }
 
-    constexpr const T* data() const noexcept {
+    constexpr auto data() const -> const T* {
         return &data_[0][0];
     }
 
-    constexpr Mat3& operator*=(const Mat3& other) noexcept {
+    constexpr auto operator *= (const Mat3& other) -> Mat3& {
         *this = *this * other;
         return *this;
     }
 
-    [[nodiscard]]
-    constexpr Mat3 operator*(const Mat3& other) const noexcept {
+    [[nodiscard]] constexpr auto operator * (const Mat3& other) const -> Mat3 {
         Mat3 result{};
 
         for (std::size_t row = 0; row < 3; ++row) {
@@ -125,8 +120,7 @@ public:
         return result;
     }
 
-    [[nodiscard]]
-    constexpr Vec2<T> transform(const Vec2<T>& v) const noexcept {
+    [[nodiscard]] constexpr auto transform(const Vec2<T>& v) const -> Vec2<T> {
         return {
             data_[0][0] * v.x +
             data_[0][1] * v.y +
@@ -138,8 +132,7 @@ public:
         };
     }
 
-    [[nodiscard]]
-    constexpr Vec3<T> transform(const Vec3<T>& v) const noexcept {
+    [[nodiscard]] constexpr auto transform(const Vec3<T>& v) const -> Vec3<T> {
         return {
             data_[0][0] * v.x +
             data_[0][1] * v.y +
@@ -155,8 +148,7 @@ public:
         };
     }
 
-    [[nodiscard]]
-    constexpr T determinant() const noexcept {
+    [[nodiscard]]constexpr auto determinant() const -> T {
         return
             data_[0][0] * (
                 data_[1][1] * data_[2][2] -
@@ -172,21 +164,20 @@ public:
             );
     }
 
-    constexpr void transpose() noexcept {
+    constexpr void transpose() {
         std::swap(data_[0][1], data_[1][0]);
         std::swap(data_[0][2], data_[2][0]);
         std::swap(data_[1][2], data_[2][1]);
     }
 
-    [[nodiscard]]
-    constexpr Mat3 transposed() const noexcept {
+    [[nodiscard]] constexpr auto transposed() const -> Mat3 {
         Mat3 result = *this;
         result.transpose();
         return result;
     }
 
 private:
-    T data_[3][3];
+    std::array<std::array<T, 3>, 3> data_{};
 };
 
 using Mat3f = Mat3<float>;

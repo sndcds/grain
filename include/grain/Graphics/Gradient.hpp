@@ -3,13 +3,14 @@
 #include <grain/Graphics/Color.hpp>
 
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 namespace Grain {
 
 class ColorLUT;
 
-enum class GradientBlendMode : int32_t {
+enum class GradientBlendMode : int8_t {
     RGB = 0,
     Mixbox
 };
@@ -30,105 +31,66 @@ public:
 
     ~GradientStop() = default;
 
-    bool operator<(const GradientStop& other) const {
+    auto operator < (const GradientStop& other) const -> bool {
         return pos_ < other.pos_;
     }
 
-    bool operator==(const GradientStop& other) const {
+    auto operator == (const GradientStop& other) const -> bool {
         return pos_ == other.pos_;
     }
 
-    bool operator!=(const GradientStop& other) const {
+    auto operator != (const GradientStop& other) const -> bool {
         return !(*this == other);
     }
 
-    bool operator>(const GradientStop& other) const {
+    auto operator > (const GradientStop& other) const -> bool {
         return pos_ > other.pos_;
     }
 
-    bool operator>=(const GradientStop& other) const {
+    auto operator >= (const GradientStop& other) const -> bool {
         return pos_ >= other.pos_;
     }
 
-    bool operator<=(const GradientStop& other) const {
+    auto operator <= (const GradientStop& other) const -> bool {
         return pos_ <= other.pos_;
     }
 
     void init();
 
-    [[nodiscard]]
-    float pos() const {
-        return pos_;
-    }
+    [[nodiscard]] auto pos() const -> float { return pos_; }
 
-    [[nodiscard]]
-    Color color(int32_t part) const {
+    [[nodiscard]] auto color(int32_t part) const -> Color {
         return part >= 0 && part <= 1
             ? colors_[part]
             : Color(0, 0, 0, 0);
     }
-
-    [[nodiscard]]
-    Color leftColor() const {
-        return colors_[0];
-    }
-
-    [[nodiscard]]
-    Color rightColor() const {
+    [[nodiscard]] auto leftColor() const -> Color { return colors_[0]; }
+    [[nodiscard]] auto rightColor() const -> Color {
         return two_colored_ ? colors_[1] : colors_[0];
     }
 
-    [[nodiscard]]
-    bool isSelected() const {
-        return selected_;
-    }
+    [[nodiscard]] auto isSelected() const -> bool { return selected_; }
+    [[nodiscard]] auto isTwoColored() const -> bool { return two_colored_; }
+    [[nodiscard]] auto isSecondActive() const -> bool { return second_active_; }
 
-    [[nodiscard]]
-    bool isTwoColored() const {
-        return two_colored_;
-    }
+    [[nodiscard]] auto stepCount() const -> int32_t { return step_count_; }
+    [[nodiscard]] auto blendMode() const -> GradientBlendMode { return blend_mode_; }
 
-    [[nodiscard]]
-    bool isSecondActive() const {
-        return second_active_;
-    }
+    [[nodiscard]] auto rememberedPos() const -> float { return remembered_pos_; }
 
-    [[nodiscard]]
-    int32_t stepCount() const {
-        return step_count_;
-    }
+    auto setPos(float pos) -> bool;
 
-    [[nodiscard]]
-    GradientBlendMode blendMode() const {
-        return blend_mode_;
-    }
+    auto setColor(int32_t part, const Color& color) -> bool;
 
-    [[nodiscard]]
-    float rememberedPos() const {
-        return remembered_pos_;
-    }
-
-    bool setPos(float pos);
-
-    bool setColor(int32_t part, const Color& color);
-
-    bool setStepCount(int32_t step_count);
+    auto setStepCount(int32_t step_count) -> bool;
 
     void setBlendMode(GradientBlendMode blend_mode) {
         blend_mode_ = blend_mode;
     }
 
-    void select() {
-        selected_ = true;
-    }
-
-    void deselect() {
-        selected_ = false;
-    }
-
-    void toggleSelection() {
-        selected_ = !selected_;
-    }
+    void select() { selected_ = true; }
+    void deselect() { selected_ = false; }
+    void toggleSelection() { selected_ = !selected_; }
 
     void remember() {
         remembered_pos_ = pos_;
@@ -137,14 +99,15 @@ public:
 protected:
     float pos_ = 0.0f;
 
-    Color colors_[2] = {
-        {0, 0, 0, 1},
-        {0, 0, 0, 1}
-    };
+    std::array<Color, 2> colors_ = {{
+        {0.0f, 0.0f, 0.0f, 1.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f}
+    }};
 
-    int32_t level_curve_values_[6] = {
+    std::array<int32_t, 6> level_curve_values_ = {
         0, 5000, 0, 5000, 10000, 10000
     };
+
 
     int32_t step_count_ = 0;
     bool two_colored_ = false;
@@ -175,7 +138,7 @@ public:
         Magma,
         Plasma,
 
-        First = Fast,
+        First = 0,
         Last = Plasma
     };
 
@@ -184,21 +147,19 @@ public:
     ~Gradient();
 
     Gradient(const Gradient&) = delete;
-    Gradient& operator=(const Gradient&) = delete;
+    auto operator=(const Gradient&) -> Gradient& = delete;
 
-    static Gradient* createByPreset(Preset preset, bool flip = false);
+    static auto createByPreset(Preset preset, bool flip = false) -> Gradient*;
 
     void set(const Gradient* gradient);
 
-    [[nodiscard]]
-    ColorSpace colorSpace() const {
+    [[nodiscard]] auto colorSpace() const -> ColorSpace {
         return color_space_;
     }
 
     void setColorSpace(ColorSpace color_space);
 
-    [[nodiscard]]
-        GradientBlendMode blendMode() const {
+    [[nodiscard]] auto blendMode() const -> GradientBlendMode {
         return blend_mode_;
     }
 
@@ -218,51 +179,43 @@ public:
         int32_t resolution = 16
     );
 
-    [[nodiscard]]
-    bool hasStops() const {
+    [[nodiscard]] auto hasStops() const -> bool {
         return !stops_.empty();
     }
 
-    [[nodiscard]]
-    bool canAccessStop(int32_t index) const {
-        return index >= 0 &&
-               index < static_cast<int32_t>(stops_.size());
+    [[nodiscard]] auto canAccessStop(int32_t index) const -> bool {
+        return index >= 0 && std::cmp_less(index ,stops_.size());
     }
 
-    [[nodiscard]]
-    int32_t stopCount() const {
+    [[nodiscard]] auto stopCount() const -> int32_t {
         return static_cast<int32_t>(stops_.size());
     }
 
-    [[nodiscard]]
-    int32_t lastStopIndex() const {
+    [[nodiscard]] auto lastStopIndex() const -> int32_t {
         return stopCount() - 1;
     }
 
-    [[nodiscard]]
-    int32_t selectedStopCount() const;
+    [[nodiscard]] auto selectedStopCount() const -> int32_t;
 
-    [[nodiscard]]
-    int32_t firstSelectedStopIndex() const;
+    [[nodiscard]] auto firstSelectedStopIndex() const -> int32_t;
 
-    [[nodiscard]]
-    int32_t lastSelectedStopIndex() const;
+    [[nodiscard]] auto lastSelectedStopIndex() const -> int32_t;
 
-    int32_t selectedStopIndices(
+    auto selectedStopIndices(
         int32_t* out_first_index,
         int32_t* out_last_index
-    ) const;
+    ) const -> int32_t;
 
     void selectAllStops();
     void deselectAllStops();
     void revertStopSelection();
     void selectStopEach(int32_t step);
 
-    bool stepSelectedStops(int32_t step_count);
+    auto stepSelectedStops(int32_t step_count) -> bool;
 
     void removeAllStops();
     void removeStop(int32_t index);
-    int32_t removeSelectedStops();
+    auto removeSelectedStops() -> int32_t;
 
     void addStop(float pos, const Color& color);
 
@@ -270,11 +223,9 @@ public:
 
     void addStop(GradientStop& stop);
 
-    [[nodiscard]]
-    GradientStop* mutStopPtrAtIndex(int32_t index);
+    [[nodiscard]] auto mutStopPtrAtIndex(int32_t index) -> GradientStop*;
 
-    [[nodiscard]]
-    const GradientStop* stopPtrAtIndex(int32_t index) const;
+    [[nodiscard]] auto stopPtrAtIndex(int32_t index) const -> const GradientStop*;
 
     void colorAtIndex(int32_t index, int32_t part, Color& out_color) const;
 
@@ -282,40 +233,38 @@ public:
 
     void rightColorAtIndex(int32_t index, Color& out_color) const;
 
-    bool lookupColor(float pos, Color& out_color);
+    auto lookupColor(float pos, Color& out_color) -> bool;
 
-    bool lookupColorValues(float pos, float* out_values);
+    auto lookupColorValues(float pos, float* out_values) -> bool;
 
-    bool setColorAtIndex(int32_t index, int32_t part, const Color& color);
+    auto setColorAtIndex(int32_t index, int32_t part, const Color& color) -> bool;
 
     void rememberSelectedStops();
 
-    bool moveSelectedStops(float delta);
+    auto moveSelectedStops(float delta) -> bool;
 
-    bool setColorOfSelectedStops(const Color& color);
+    auto setColorOfSelectedStops(const Color& color) -> bool;
 
-    bool setStepCountOfSelectedStops(int32_t step_count);
+    auto setStepCountOfSelectedStops(int32_t step_count) -> bool;
 
-    bool setColorModeOfSetectedStops(bool two_colored);
+    auto setColorModeOfSetectedStops(bool two_colored) -> bool;
 
     // Invalidates sorted-stop and LUT caches.
     void needsUpdate(bool flag = true);
 
-    bool reset();
-    bool flip();
-    bool distribute();
-    bool stretch();
+    auto reset() -> bool;
+    auto flip() -> bool;
+    auto distribute() -> bool;
+    auto stretch() -> bool;
 
     void sortStops();
 
-    [[nodiscard]]
-    ColorLUT* lutPtr() {
+    [[nodiscard]] auto lutPtr() -> ColorLUT* {
         updateLUT();
         return lut_;
     }
 
-    [[nodiscard]]
-    int32_t lutResolution() const {
+    [[nodiscard]] auto lutResolution() const -> int32_t {
         return lut_resolution_;
     }
 
@@ -323,7 +272,7 @@ public:
 
     bool updateLUT();
 
-    bool lookupFromLUT(float pos, Color& out_color);
+    auto lookupFromLUT(float pos, Color& out_color) -> bool;
 
 private:
     void _init();

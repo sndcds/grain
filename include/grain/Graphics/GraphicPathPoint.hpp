@@ -10,62 +10,40 @@ class Quadrilateral;
 class GraphicPathPoint {
 public:
     GraphicPathPoint() = default;
+    GraphicPathPoint(double x, double y);
+    GraphicPathPoint(double x, double y, double lx, double ly, double rx, double ry);
 
     GraphicPathPoint(
-        double x,
-        double y
-    ) noexcept;
-
-    GraphicPathPoint(
-        double x,
-        double y,
-        double lx,
-        double ly,
-        double rx,
-        double ry
-    ) noexcept;
-
-    GraphicPathPoint(
-        double x,
-        double y,
-        bool leftFlag,
-        double lx,
-        double ly,
-        bool rightFlag,
-        double rx,
-        double ry
-    ) noexcept;
+        double x, double y,
+        bool leftFlag, double lx, double ly,
+        bool rightFlag, double rx, double ry
+    );
 
     GraphicPathPoint(
         const Vec2d& anchor,
-        bool leftFlag,
-        const Vec2d& left,
-        bool rightFlag,
-        const Vec2d& right
-    ) noexcept;
+        bool leftFlag, const Vec2d& left,
+        bool rightFlag, const Vec2d& right
+    );
 
     ~GraphicPathPoint() = default;
 
     GraphicPathPoint(const GraphicPathPoint&) = default;
-    GraphicPathPoint& operator=(const GraphicPathPoint&) = default;
+    auto operator = (const GraphicPathPoint&) -> GraphicPathPoint& = default;
 
-    GraphicPathPoint(GraphicPathPoint&&) noexcept = default;
-    GraphicPathPoint& operator=(GraphicPathPoint&&) noexcept = default;
+    GraphicPathPoint(GraphicPathPoint&&) = default;
+    auto operator = (GraphicPathPoint&&) -> GraphicPathPoint& = default;
 
 
     //--------------------------------------------------------------------------
     // Transform
     //--------------------------------------------------------------------------
 
-    void translate(const Vec2d& offset) noexcept;
+    void translate(const Vec2d& offset);
 
-    void translate(
-        double x,
-        double y
-    ) noexcept;
+    void translate(double x, double y);
 
-    void rotate(double radians) noexcept;
-    void rotateDegrees(double degrees) noexcept;
+    void rotate(double radians);
+    void rotateDegrees(double degrees);
 
 
     //--------------------------------------------------------------------------
@@ -75,7 +53,7 @@ public:
     void projectToQuadrilateral(
         const Quadrilateral& quadrilateral,
         const Mat3d* matrix = nullptr
-    ) noexcept;
+    );
 
 
     //--------------------------------------------------------------------------
@@ -86,10 +64,10 @@ public:
     Vec2d left;
     Vec2d right;
 
-    bool leftFlag = false;
-    bool rightFlag = false;
+    bool left_flag = false;
+    bool right_flag = false;
 
-    double bezierSegmentLength = 0.0;
+    double bezier_segment_length = 0.0;
 };
 
 } // namespace Grain

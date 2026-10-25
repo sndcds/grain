@@ -28,154 +28,150 @@ public:
     T x{};
     T y{};
 
-public:
     // Construction
-    constexpr Vec2() noexcept = default;
-    constexpr Vec2(T x, T y) noexcept
+    constexpr Vec2() = default;
+    constexpr Vec2(T x, T y)
         : x(x), y(y) {}
 
-    constexpr Vec2(const Vec2&) noexcept = default;
-    constexpr Vec2(Vec2&&) noexcept = default;
+    constexpr Vec2(const Vec2&) = default;
+    constexpr Vec2(Vec2&&) = default;
 
     template <typename U>
         requires (!std::same_as<U, T>)
-    explicit constexpr Vec2(const Vec2<U>& v) noexcept
+    explicit constexpr Vec2(const Vec2<U>& v)
         : x(static_cast<T>(v.x)),
           y(static_cast<T>(v.y)) {}
 
-    explicit Vec2(const char* csv, char delimiter = ',') noexcept {
+    explicit Vec2(const char* csv, char delimiter = ',') {
         setByCSV(csv, delimiter);
     }
 
-    explicit Vec2(const String& csv, char delimiter = ',') noexcept {
+    explicit Vec2(const String& csv, char delimiter = ',') {
         setByCSV(csv, delimiter);
     }
 
-    ~Vec2() noexcept = default;
+    ~Vec2() = default;
 
-    Vec2& operator=(const Vec2&) noexcept = default;
-    Vec2& operator=(Vec2&&) noexcept = default;
+    auto operator = (const Vec2&) -> Vec2& = default;
+    auto operator = (Vec2&&) -> Vec2& = default;
 
     template <typename U>
         requires std::is_convertible_v<U, T>
-    Vec2& operator=(const Vec2<U>& v) noexcept {
+    auto operator = (const Vec2<U>& v) -> Vec2& {
         x = static_cast<T>(v.x);
         y = static_cast<T>(v.y);
         return *this;
     }
 
 
-    constexpr T& operator[](std::size_t index) noexcept {
+    constexpr auto operator [] (std::size_t index) -> T& {
         return index == 0 ? x : y;
     }
 
-    constexpr const T& operator[](std::size_t index) const noexcept {
+    constexpr auto operator [] (std::size_t index) const -> const T& {
         return index == 0 ? x : y;
     }
 
     // Comparison
-    [[nodiscard]] constexpr bool operator==(const Vec2&) const noexcept = default;
+    [[nodiscard]] constexpr auto operator == (const Vec2&) const -> bool = default;
 
-    [[nodiscard]] constexpr bool operator!=(const Vec2& other) const noexcept {
+    [[nodiscard]] constexpr auto operator != (const Vec2& other) const -> bool {
         return !(*this == other);
     }
 
     // Arithmetic
-    [[nodiscard]] constexpr Vec2 operator-() const noexcept {
+    [[nodiscard]] constexpr auto operator - () const -> Vec2 {
         return {-x, -y};
     }
 
-    [[nodiscard]] constexpr Vec2 operator+(const Vec2& other) const noexcept {
+    [[nodiscard]] constexpr auto operator + (const Vec2& other) const -> Vec2 {
         return {x + other.x, y + other.y};
     }
 
-    [[nodiscard]] constexpr Vec2 operator-(const Vec2& other) const noexcept {
+    [[nodiscard]] constexpr auto operator - (const Vec2& other) const -> Vec2 {
         return {x - other.x, y - other.y};
     }
 
-    [[nodiscard]] constexpr Vec2 operator*(const Vec2& other) const noexcept {
+    [[nodiscard]] constexpr auto operator * (const Vec2& other) const -> Vec2 {
         return {x * other.x, y * other.y};
     }
 
-    [[nodiscard]] constexpr Vec2 operator/(const Vec2& other) const noexcept {
+    [[nodiscard]] constexpr auto operator / (const Vec2& other) const -> Vec2 {
         return {x / other.x, y / other.y};
     }
 
-    [[nodiscard]] constexpr Vec2 operator*(T scalar) const noexcept {
+    [[nodiscard]] constexpr auto operator * (T scalar) const -> Vec2 {
         return {x * scalar, y * scalar};
     }
 
-    [[nodiscard]] constexpr Vec2 operator/(T scalar) const noexcept {
+    [[nodiscard]] constexpr auto operator / (T scalar) const -> Vec2 {
         return {x / scalar, y / scalar};
     }
 
-    constexpr Vec2& operator+=(const Vec2& other) noexcept {
+    constexpr auto operator += (const Vec2& other) -> Vec2& {
         x += other.x;
         y += other.y;
         return *this;
     }
 
-    constexpr Vec2& operator-=(const Vec2& other) noexcept {
+    constexpr auto operator -= (const Vec2& other) -> Vec2& {
         x -= other.x;
         y -= other.y;
         return *this;
     }
 
-    constexpr Vec2& operator*=(const Vec2& other) noexcept {
+    constexpr auto operator *= (const Vec2& other) -> Vec2& {
         x *= other.x;
         y *= other.y;
         return *this;
     }
 
-    constexpr Vec2& operator/=(const Vec2& other) noexcept {
+    constexpr auto operator /= (const Vec2& other) -> Vec2& {
         x /= other.x;
         y /= other.y;
         return *this;
     }
 
-    constexpr Vec2& operator*=(T scalar) noexcept {
+    constexpr auto operator *= (T scalar) -> Vec2& {
         x *= scalar;
         y *= scalar;
         return *this;
     }
 
-    constexpr Vec2& operator/=(T scalar) noexcept {
+    constexpr auto operator /= (T scalar) -> Vec2& {
         x /= scalar;
         y /= scalar;
         return *this;
     }
 
     // Geometry
-    [[nodiscard]] double length() const noexcept {
+    [[nodiscard]] auto length() const -> double {
         return std::hypot(
             static_cast<double>(x),
             static_cast<double>(y)
         );
     }
 
-    [[nodiscard]] constexpr auto squaredLength() const noexcept {
-        return x * x + y * y;
+    [[nodiscard]] constexpr auto squaredLength() const {
+        return (x * x) + (y * y);
     }
 
-    [[nodiscard]] double distance(const Vec2& other) const noexcept {
+    [[nodiscard]] auto distance(const Vec2& other) const -> double {
         return std::hypot(
             static_cast<double>(x - other.x),
             static_cast<double>(y - other.y)
         );
     }
 
-    [[nodiscard]] constexpr auto squaredDistance(
-        const Vec2& other
-    ) const noexcept
-    {
+    [[nodiscard]] constexpr auto squaredDistance(const Vec2& other) const {
         const auto dx = x - other.x;
         const auto dy = y - other.y;
 
-        return dx * dx + dy * dy;
+        return (dx * dx) + (dy * dy);
     }
 
-    [[nodiscard]] constexpr T dot(const Vec2& other) const noexcept {
-        return x * other.x + y * other.y;
+    [[nodiscard]] constexpr auto dot(const Vec2& other) const -> T {
+        return (x * other.x) + (y * other.y);
     }
 
     /**
@@ -183,46 +179,41 @@ public:
      *
      * Returns the scalar z-component of the 3D cross product.
      */
-    [[nodiscard]] constexpr T cross(const Vec2& other) const noexcept {
-        return x * other.y - y * other.x;
+    [[nodiscard]] constexpr auto cross(const Vec2& other) const -> T {
+        return (x * other.y) - (y * other.x);
     }
 
     /**
      * Returns the angle to another vector in degrees.
      */
-    [[nodiscard]] double angle(const Vec2& other) const noexcept {
+    [[nodiscard]] auto angle(const Vec2& other) const -> double {
         const double denominator = length() * other.length();
 
         if (denominator == 0.0) {
             return 0.0;
         }
 
-        double value =
-            static_cast<double>(dot(other)) / denominator;
-
+        double value = static_cast<double>(dot(other)) / denominator;
         value = std::clamp(value, -1.0, 1.0);
 
         return std::acos(value) * 180.0 / std::numbers::pi;
     }
 
-    [[nodiscard]] constexpr Vec2 flipped() const noexcept {
+    [[nodiscard]] constexpr auto flipped() const -> Vec2 {
         return {-x, -y};
     }
 
-    [[nodiscard]] constexpr Vec2 reflectedPoint(
-        const Vec2& pivot
-    ) const noexcept
-    {
+    [[nodiscard]] constexpr auto reflectedPoint(const Vec2& pivot) const -> Vec2 {
         return pivot + (pivot - *this);
     }
 
-    [[nodiscard]] Vec2 normalized() const noexcept {
+    [[nodiscard]] auto normalized() const -> Vec2 {
         Vec2 result = *this;
         result.normalize();
         return result;
     }
 
-    void normalize() noexcept {
+    void normalize() {
         const double l = length();
 
         if (l == 0.0) {
@@ -235,7 +226,7 @@ public:
         y = static_cast<T>(y * scale);
     }
 
-    void setLength(T length) noexcept {
+    void setLength(T length) {
         const double current_length = this->length();
 
         if (current_length == 0.0) {
@@ -249,97 +240,88 @@ public:
         y = static_cast<T>(y * scale);
     }
 
-    [[nodiscard]] bool checkEqual(
-        const Vec2& other,
-        T threshold
-    ) const noexcept
-    {
+    [[nodiscard]] auto checkEqual(const Vec2& other, T threshold) const -> bool {
         return distance(other) <= static_cast<double>(threshold);
     }
 
     // Modification
-    constexpr void set(T newX, T newY) noexcept {
+    constexpr void set(T newX, T newY) {
         this->x = newX;
         this->y = newY;
     }
 
-    constexpr void zero() noexcept {
+    constexpr void zero() {
         x = T{};
         y = T{};
     }
 
-    constexpr void flip() noexcept {
+    constexpr void flip() {
         x = -x;
         y = -y;
     }
 
-    constexpr void translateX(T value) noexcept {
+    constexpr void translateX(T value) {
         x += value;
     }
 
-    constexpr void translateY(T value) noexcept {
+    constexpr void translateY(T value) {
         y += value;
     }
 
-    constexpr void translate(Vec2 t) noexcept {
+    constexpr void translate(Vec2 t) {
         x += t.x;
         y += t.y;
     }
 
-    constexpr void translate(T tx, T ty) noexcept {
+    constexpr void translate(T tx, T ty) {
         x += tx;
         y += ty;
     }
 
-    constexpr void scaleX(T value) noexcept {
+    constexpr void scaleX(T value) {
         x *= value;
     }
 
-    constexpr void scaleY(T value) noexcept {
+    constexpr void scaleY(T value) {
         y *= value;
     }
 
-    constexpr void scale(T value) noexcept {
+    constexpr void scale(T value) {
         x *= value;
         y *= value;
     }
 
-    constexpr void scale(T sx, T sy) noexcept {
+    constexpr void scale(T sx, T sy) {
         x *= sx;
         y *= sy;
     }
 
-    constexpr void scale(const Vec2<T>& pivot, T value) noexcept {
+    constexpr void scale(const Vec2<T>& pivot, T value) {
         x = pivot.x + ((x - pivot.x) * value);
         y = pivot.y + ((y - pivot.y) * value);
     }
 
-    constexpr void scale(const Vec2<T>& pivot, T sx, T sy) noexcept {
+    constexpr void scale(const Vec2<T>& pivot, T sx, T sy) {
         x = pivot.x + ((x - pivot.x) * sx);
         y = pivot.y + ((y - pivot.y) * sy);
     }
 
-    void rotate(double radians) noexcept {
+    void rotate(double radians) {
         const double c = std::cos(radians);
         const double s = std::sin(radians);
 
-        const double new_x =
-            c * static_cast<double>(x) -
-            s * static_cast<double>(y);
-
-        const double new_y =
-            s * static_cast<double>(x) +
-            c * static_cast<double>(y);
+        const double new_x = (c * static_cast<double>(x)) - (s * static_cast<double>(y));
+        const double new_y = (s * static_cast<double>(x)) + (c * static_cast<double>(y));
 
         x = static_cast<T>(new_x);
         y = static_cast<T>(new_y);
     }
 
-    void rotateDegrees(double degrees) noexcept {
+    void rotateDegrees(double degrees) {
         rotate(degrees * std::numbers::pi / 180.0);
     }
 
-    void rotate(const Vec2& pivot, double radians) noexcept {
+    void rotate(const Vec2& pivot, double radians) {
         x -= pivot.x;
         y -= pivot.y;
 
@@ -349,46 +331,23 @@ public:
         y += pivot.y;
     }
 
-    void rotateDegrees(const Vec2& pivot, double degrees) noexcept {
+    void rotateDegrees(const Vec2& pivot, double degrees) {
         rotate(pivot, degrees * std::numbers::pi / 180.0);
     }
 
-    void setLerp(
-        const Vec2& a,
-        const Vec2& b,
-        double t
-    ) noexcept
-    {
-        x = static_cast<T>(
-            static_cast<double>(a.x) +
-            t * (static_cast<double>(b.x) -
-                 static_cast<double>(a.x))
-        );
-
-        y = static_cast<T>(
-            static_cast<double>(a.y) +
-            t * (static_cast<double>(b.y) -
-                 static_cast<double>(a.y))
-        );
+    void setLerp(const Vec2& a, const Vec2& b, double t) {
+        x = static_cast<T>(static_cast<double>(a.x) + (t * (static_cast<double>(b.x) - static_cast<double>(a.x))));
+        y = static_cast<T>(static_cast<double>(a.y) + (t * (static_cast<double>(b.y) - static_cast<double>(a.y))));
     }
 
-    [[nodiscard]] static Vec2 lerp(
-        const Vec2& a,
-        const Vec2& b,
-        double t
-    ) noexcept
-    {
+    [[nodiscard]] static auto lerp(const Vec2& a, const Vec2& b, double t) -> Vec2 {
         Vec2 result;
         result.setLerp(a, b, t);
         return result;
     }
 
     // CSV
-    bool setByCSV(
-        const char* csv,
-        char delimiter = ','
-    ) noexcept
-    {
+    auto setByCSV(const char* csv, char delimiter = ',') -> bool {
         if (csv == nullptr) {
             return false;
         }
@@ -408,11 +367,7 @@ public:
         return false;
     }
 
-    bool setByCSV(
-        const String& csv,
-        char delimiter = ','
-    ) noexcept
-    {
+    bool setByCSV(const String& csv, char delimiter = ',') {
         return setByCSV(csv.utf8(), delimiter);
     }
 
@@ -423,20 +378,13 @@ public:
 
 // Scalar multiplication from the left.
 template <typename T>
-[[nodiscard]] constexpr Vec2<T> operator*(
-    T scalar,
-    const Vec2<T>& vector
-) noexcept
-{
+[[nodiscard]] constexpr auto operator * (T scalar, const Vec2<T>& vector) -> Vec2<T> {
     return vector * scalar;
 }
 
 // Stream output.
 template <typename T>
-std::ostream& operator<<(
-    std::ostream& os,
-    const Vec2<T>& vector
-) {
+auto operator << (std::ostream& os, const Vec2<T>& vector) -> std::ostream& {
     if constexpr (
         std::is_same_v<T, int8_t> ||
         std::is_same_v<T, uint8_t>

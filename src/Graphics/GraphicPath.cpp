@@ -11,10 +11,7 @@
 namespace Grain {
 
 
-GraphicPath::GraphicPath(
-    int32_t pointCapacity
-) noexcept
-{
+GraphicPath::GraphicPath(int32_t pointCapacity) {
     points_.reserve(
         static_cast<std::size_t>(
             std::max(pointCapacity, 5)
@@ -27,17 +24,17 @@ GraphicPath::GraphicPath(
 // State
 //------------------------------------------------------------------------------
 
-bool GraphicPath::hasPoints() const noexcept {
+auto GraphicPath::hasPoints() const -> bool {
     return !points_.empty();
 }
 
 
-int32_t GraphicPath::pointCount() const noexcept {
+auto GraphicPath::pointCount() const -> int32_t {
     return static_cast<int32_t>(points_.size());
 }
 
 
-int32_t GraphicPath::segmentCount() const noexcept {
+auto GraphicPath::segmentCount() const -> int32_t {
     const int32_t count = pointCount();
 
     if (count < 2) {
@@ -52,19 +49,19 @@ int32_t GraphicPath::segmentCount() const noexcept {
 // Length
 //------------------------------------------------------------------------------
 
-double GraphicPath::length() noexcept {
+auto GraphicPath::length() -> double {
     update();
     return length_;
 }
 
 
-void GraphicPath::update() noexcept {
-    if (!mustUpdate_) {
+void GraphicPath::update() {
+    if (!must_update_) {
         return;
     }
 
-    updateLength(bezierSegmentResolution_);
-    mustUpdate_ = false;
+    updateLength(bezier_segment_resolution_);
+    must_update_ = false;
 }
 
 
@@ -72,10 +69,7 @@ void GraphicPath::update() noexcept {
 // Points
 //------------------------------------------------------------------------------
 
-GraphicPathPoint* GraphicPath::pointPtrAtIndex(
-    int32_t index
-) noexcept
-{
+auto GraphicPath::pointPtrAtIndex(int32_t index) -> GraphicPathPoint* {
     if (index < 0 || index >= pointCount()) {
         return nullptr;
     }
@@ -84,10 +78,7 @@ GraphicPathPoint* GraphicPath::pointPtrAtIndex(
 }
 
 
-const GraphicPathPoint* GraphicPath::pointPtrAtIndex(
-    int32_t index
-) const noexcept
-{
+auto GraphicPath::pointPtrAtIndex(int32_t index) const -> const GraphicPathPoint* {
     if (index < 0 || index >= pointCount()) {
         return nullptr;
     }
@@ -96,7 +87,7 @@ const GraphicPathPoint* GraphicPath::pointPtrAtIndex(
 }
 
 
-GraphicPathPoint* GraphicPath::lastPointPtr() noexcept {
+auto GraphicPath::lastPointPtr() -> GraphicPathPoint* {
     if (points_.empty()) {
         return nullptr;
     }
@@ -105,7 +96,7 @@ GraphicPathPoint* GraphicPath::lastPointPtr() noexcept {
 }
 
 
-const GraphicPathPoint* GraphicPath::lastPointPtr() const noexcept {
+auto GraphicPath::lastPointPtr() const -> const GraphicPathPoint* {
     if (points_.empty()) {
         return nullptr;
     }
@@ -118,10 +109,7 @@ const GraphicPathPoint* GraphicPath::lastPointPtr() const noexcept {
 // Geometry
 //------------------------------------------------------------------------------
 
-double GraphicPath::polygonCentroid(
-    Vec2d& outCentroid
-) const noexcept
-{
+auto GraphicPath::polygonCentroid(Vec2d& outCentroid) const -> double {
     outCentroid.zero();
 
     const int32_t count = pointCount();
@@ -157,7 +145,7 @@ double GraphicPath::polygonCentroid(
 }
 
 
-Vec2d GraphicPath::simplePolygonCentroid() const noexcept {
+auto GraphicPath::simplePolygonCentroid() const -> Vec2d {
     if (points_.empty()) {
         return {};
     }
@@ -175,17 +163,14 @@ Vec2d GraphicPath::simplePolygonCentroid() const noexcept {
 }
 
 
-Rectd GraphicPath::bounds() noexcept {
+auto GraphicPath::bounds() const -> Rectd {
     Rectd result;
     bounds(result);
     return result;
 }
 
 
-bool GraphicPath::bounds(
-    Rectd& outBounds
-) noexcept
-{
+auto GraphicPath::bounds(Rectd& outBounds ) const -> bool {
     if (!hasPoints()) {
         outBounds.zero();
         return false;
@@ -224,11 +209,7 @@ bool GraphicPath::bounds(
 // Bézier
 //------------------------------------------------------------------------------
 
-bool GraphicPath::bezierAtIndex(
-    int32_t segmentIndex,
-    Bezier& outBezier
-) const noexcept
-{
+auto GraphicPath::bezierAtIndex(int32_t segmentIndex, Bezier& outBezier) const -> bool {
     const int32_t lastIndex = lastPointIndex();
 
     if (segmentIndex < 0) {
@@ -255,20 +236,19 @@ bool GraphicPath::bezierAtIndex(
 }
 
 
-bool GraphicPath::bezierFromTwoPathPoints(
+auto GraphicPath::bezierFromTwoPathPoints(
     const GraphicPathPoint* p1,
     const GraphicPathPoint* p2,
     Bezier& outBezier
-) noexcept
-{
-    if (!p1 || !p2) {
+) -> bool {
+    if ((p1 == nullptr) || (p2 == nullptr)) {
         return false;
     }
 
     outBezier.set(
         p1->anchor,
-        p1->rightFlag ? p1->right : p1->anchor,
-        p2->leftFlag ? p2->left : p2->anchor,
+        p1->right_flag ? p1->right : p1->anchor,
+        p2->left_flag ? p2->left : p2->anchor,
         p2->anchor
     );
 
@@ -280,14 +260,11 @@ bool GraphicPath::bezierFromTwoPathPoints(
 // Length calculation
 //------------------------------------------------------------------------------
 
-void GraphicPath::updateLength(
-    int32_t bezierResolution
-) noexcept
-{
+void GraphicPath::updateLength(int32_t bezierResolution) {
     length_ = 0.0;
 
     for (auto& point : points_) {
-        point.bezierSegmentLength = 0.0;
+        point.bezier_segment_length = 0.0;
     }
 
     const int32_t count = segmentCount();
@@ -307,7 +284,7 @@ void GraphicPath::updateLength(
         const int32_t destinationIndex =
             (i + 1) % pointCount();
 
-        points_[destinationIndex].bezierSegmentLength =
+        points_[destinationIndex].bezier_segment_length =
             segmentLength;
 
         length_ += segmentLength;
@@ -319,182 +296,84 @@ void GraphicPath::updateLength(
 // Modification
 //------------------------------------------------------------------------------
 
-void GraphicPath::clear() noexcept {
+void GraphicPath::clear() {
     points_.clear();
     length_ = 0.0;
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
 void GraphicPath::addPoint(
-    double x,
-    double y,
-    bool useLeft,
-    double lx,
-    double ly,
-    bool useRight,
-    double rx,
-    double ry
-) noexcept
-{
+    double x, double y,
+    bool useLeft, double lx, double ly,
+    bool useRight, double rx, double ry
+) {
     points_.emplace_back(
-        x,
-        y,
-        useLeft,
-        lx,
-        ly,
-        useRight,
-        rx,
-        ry
+        x, y,
+        useLeft, lx, ly,
+        useRight, rx, ry
     );
 
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
-void GraphicPath::addPoint(
-    const GraphicPathPoint* point
-) noexcept
-{
-    if (!point) {
+void GraphicPath::addPoint(const GraphicPathPoint* point) {
+    if (point == nullptr) {
         return;
     }
 
     points_.push_back(*point);
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
-void GraphicPath::addPoint(
-    const Vec2d& pos
-) noexcept
-{
+void GraphicPath::addPoint(const Vec2d& pos) {
     points_.emplace_back(pos.x, pos.y);
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
-void GraphicPath::addPoint(
-    double x,
-    double y
-) noexcept
-{
+void GraphicPath::addPoint(double x, double y){
     points_.emplace_back(x, y);
-    mustUpdate_ = true;
+    must_update_ = true;
+}
+
+
+void GraphicPath::addPoint(const Vec2d& pos, const Vec2d& left, const Vec2d& right) {
+    points_.emplace_back(pos, true, left, true, right);
+    must_update_ = true;
 }
 
 
 void GraphicPath::addPoint(
-    const Vec2d& pos,
-    const Vec2d& left,
-    const Vec2d& right
-) noexcept
-{
-    points_.emplace_back(
-        pos,
-        true,
-        left,
-        true,
-        right
-    );
-
-    mustUpdate_ = true;
+    double x, double y,
+    double lx, double ly,
+    double rx, double ry
+) {
+    addPoint(x, y, true, lx, ly, true, rx, ry);
 }
 
 
-void GraphicPath::addPoint(
-    double x,
-    double y,
-    double lx,
-    double ly,
-    double rx,
-    double ry
-) noexcept
-{
-    addPoint(
-        x,
-        y,
-        true,
-        lx,
-        ly,
-        true,
-        rx,
-        ry
-    );
+void GraphicPath::addPointLeft(const Vec2d& pos, const Vec2d& left) {
+    points_.emplace_back(pos, true, left, false, Vec2d());
+    must_update_ = true;
 }
 
 
-void GraphicPath::addPointLeft(
-    const Vec2d& pos,
-    const Vec2d& left
-) noexcept
-{
-    points_.emplace_back(
-        pos,
-        true,
-        left,
-        false,
-        Vec2d()
-    );
-
-    mustUpdate_ = true;
+void GraphicPath::addPointLeft(double x, double y, double lx, double ly) {
+    addPoint(x, y, true, lx, ly, false, 0.0, 0.0);
 }
 
 
-void GraphicPath::addPointLeft(
-    double x,
-    double y,
-    double lx,
-    double ly
-) noexcept
-{
-    addPoint(
-        x,
-        y,
-        true,
-        lx,
-        ly,
-        false,
-        0.0,
-        0.0
-    );
+void GraphicPath::addPointRight(const Vec2d& pos, const Vec2d& right) {
+    points_.emplace_back(pos, false, Vec2d(), true, right);
+    must_update_ = true;
 }
 
 
-void GraphicPath::addPointRight(
-    const Vec2d& pos,
-    const Vec2d& right
-) noexcept
-{
-    points_.emplace_back(
-        pos,
-        false,
-        Vec2d(),
-        true,
-        right
-    );
-
-    mustUpdate_ = true;
-}
-
-
-void GraphicPath::addPointRight(
-    double x,
-    double y,
-    double rx,
-    double ry
-) noexcept
-{
-    addPoint(
-        x,
-        y,
-        false,
-        0.0,
-        0.0,
-        true,
-        rx,
-        ry
-    );
+void GraphicPath::addPointRight(double x,double y, double rx, double ry) {
+    addPoint(x, y, false, 0.0, 0.0, true, rx, ry);
 }
 
 
@@ -507,8 +386,7 @@ void GraphicPath::addPointByAngleDegrees(
     double angle,
     double leftLength,
     double rightLength
-) noexcept
-{
+) {
     Vec2d left(-leftLength, 0.0);
     left.rotateDegrees(angle);
 
@@ -532,8 +410,7 @@ void GraphicPath::addPointByAngleDegrees(
     double angle,
     double leftLength,
     double rightLength
-) noexcept
-{
+) {
     Vec2d left(-leftLength, 0.0);
     left.rotate(angle);
 
@@ -557,8 +434,7 @@ void GraphicPath::addPointByAngleDegrees(
     double leftLength,
     double rightAngle,
     double rightLength
-) noexcept
-{
+) {
     Vec2d left(-leftLength, 0.0);
     left.rotateDegrees(leftAngle);
 
@@ -583,8 +459,7 @@ void GraphicPath::addPointByAngleDegrees(
     double leftLength,
     double rightAngle,
     double rightLength
-) noexcept
-{
+) {
     Vec2d left(-leftLength, 0.0);
     left.rotate(leftAngle);
 
@@ -613,8 +488,7 @@ void GraphicPath::addArcAsBezier(
     bool sweepFlag,
     const Vec2d& endPos,
     int32_t maxSegmentCount
-) noexcept
-{
+) {
     constexpr int32_t maxSegments = 16;
 
     if (points_.empty()) {
@@ -630,7 +504,7 @@ void GraphicPath::addArcAsBezier(
 
     const Vec2d startPos = points_.back().anchor;
 
-    Vec2d positions[maxSegments * 3 + 1];
+    std::array<Vec2d, maxSegments * 3 + 1> positions{};
 
     const int32_t segmentCount =
         Bezier::arcToBezierPosArray(
@@ -641,7 +515,7 @@ void GraphicPath::addArcAsBezier(
             sweepFlag,
             endPos,
             maxSegmentCount,
-            positions
+            positions.data()
         );
 
     if (segmentCount <= 0) {
@@ -649,7 +523,7 @@ void GraphicPath::addArcAsBezier(
     }
 
     points_.back().right = positions[1];
-    points_.back().rightFlag = true;
+    points_.back().right_flag = true;
 
     int32_t positionIndex = 3;
 
@@ -668,7 +542,7 @@ void GraphicPath::addArcAsBezier(
         positions[positionIndex - 1]
     );
 
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
@@ -676,8 +550,7 @@ void GraphicPath::addBezier(
     const Vec2d& control1Pos,
     const Vec2d& control2Pos,
     const Vec2d& endPos
-) noexcept
-{
+) {
     if (points_.empty()) {
         return;
     }
@@ -687,11 +560,7 @@ void GraphicPath::addBezier(
 }
 
 
-void GraphicPath::addQuadraticBezier(
-    const Vec2d& controlPos,
-    const Vec2d& endPos
-) noexcept
-{
+void GraphicPath::addQuadraticBezier(const Vec2d& controlPos, const Vec2d& endPos) {
     if (points_.empty()) {
         return;
     }
@@ -710,11 +579,7 @@ void GraphicPath::addQuadraticBezier(
 }
 
 
-void GraphicPath::addSmoothBezier(
-    const Vec2d& control2Pos,
-    const Vec2d& endPos
-) noexcept
-{
+void GraphicPath::addSmoothBezier(const Vec2d& control2Pos, const Vec2d& endPos) {
     if (points_.empty()) {
         return;
     }
@@ -722,7 +587,7 @@ void GraphicPath::addSmoothBezier(
     const auto& point = points_.back();
 
     const Vec2d control1Pos =
-        point.leftFlag
+        point.left_flag
             ? point.left.reflectedPoint(point.anchor)
             : point.anchor;
 
@@ -734,10 +599,7 @@ void GraphicPath::addSmoothBezier(
 }
 
 
-void GraphicPath::addSmoothQuadraticBezier(
-    const Vec2d& endPos
-) noexcept
-{
+void GraphicPath::addSmoothQuadraticBezier(const Vec2d& endPos) {
     if (points_.empty()) {
         return;
     }
@@ -748,7 +610,7 @@ void GraphicPath::addSmoothQuadraticBezier(
 
     Vec2d controlPos;
 
-    if (point.leftFlag && pointIndex > 0) {
+    if (point.left_flag && pointIndex > 0) {
         Bezier previousBezier;
 
         if (bezierAtIndex(pointIndex - 1, previousBezier)) {
@@ -785,33 +647,27 @@ void GraphicPath::addSmoothQuadraticBezier(
 // Control points
 //------------------------------------------------------------------------------
 
-void GraphicPath::setLastLeft(
-    const Vec2d& left
-) noexcept
-{
+void GraphicPath::setLastLeft(const Vec2d& left) {
     if (points_.empty()) {
         return;
     }
 
     points_.back().left = left;
-    points_.back().leftFlag = true;
+    points_.back().left_flag = true;
 
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
-void GraphicPath::setLastRight(
-    const Vec2d& right
-) noexcept
-{
+void GraphicPath::setLastRight(const Vec2d& right) {
     if (points_.empty()) {
         return;
     }
 
     points_.back().right = right;
-    points_.back().rightFlag = true;
+    points_.back().right_flag = true;
 
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
@@ -819,36 +675,27 @@ void GraphicPath::setLastRight(
 // Transform
 //------------------------------------------------------------------------------
 
-void GraphicPath::translatePoint(
-    int32_t index,
-    double tx,
-    double ty
-) noexcept
-{
+void GraphicPath::translatePoint(int32_t index, double tx, double ty) {
     auto* point = pointPtrAtIndex(index);
 
-    if (!point) {
+    if (point == nullptr) {
         return;
     }
 
     point->translate(tx, ty);
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
-void GraphicPath::rotatePointDegrees(
-    int32_t index,
-    double degrees
-) noexcept
-{
+void GraphicPath::rotatePointDegrees(int32_t index, double degrees) {
     auto* point = pointPtrAtIndex(index);
 
-    if (!point) {
+    if (point == nullptr) {
         return;
     }
 
     point->rotateDegrees(degrees);
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
@@ -859,8 +706,7 @@ void GraphicPath::rotatePointDegrees(
 void GraphicPath::projectToQuadrilateral(
     const Quadrilateral& quadrilateral,
     const Mat3d* matrix
-) noexcept
-{
+) {
     for (auto& point : points_) {
         point.projectToQuadrilateral(
             quadrilateral,
@@ -868,7 +714,7 @@ void GraphicPath::projectToQuadrilateral(
         );
     }
 
-    mustUpdate_ = true;
+    must_update_ = true;
 }
 
 
@@ -879,10 +725,9 @@ void GraphicPath::projectToQuadrilateral(
 void GraphicPath::split(
     double start,
     double end,
-    GraphicPathSplitParam& outSplitParam
-)
-{
-    outSplitParam = {};
+    GraphicPathSplitParam& out_split_param
+) {
+    out_split_param = {};
 
     update();
 
@@ -899,10 +744,10 @@ void GraphicPath::split(
         return;
     }
 
-    outSplitParam.start = start;
-    outSplitParam.end = end;
+    out_split_param.start = start;
+    out_split_param.end = end;
 
-    const double startDistance = start * length_;
+    const double start_distance = start * length_;
     const double endDistance = end * length_;
 
     double accumulated = 0.0;
@@ -917,64 +762,50 @@ void GraphicPath::split(
             continue;
         }
 
-        const int32_t destinationIndex =
-            (segmentIndex + 1) % pointCount();
+        const int32_t destination_index = (segmentIndex + 1) % pointCount();
+        const double segment_length = points_[destination_index].bezier_segment_length;
+        const double segment_start = accumulated;
+        const double segment_end = accumulated + segment_length;
 
-        const double segmentLength =
-            points_[destinationIndex].bezierSegmentLength;
+        if (out_split_param.start_index < 0 && start_distance <= segment_end) {
+            out_split_param.start_index = segmentIndex;
 
-        const double segmentStart = accumulated;
-        const double segmentEnd =
-            accumulated + segmentLength;
-
-        if (outSplitParam.startIndex < 0 &&
-            startDistance <= segmentEnd)
-        {
-            outSplitParam.startIndex = segmentIndex;
-
-            outSplitParam.t0 =
-                segmentLength > 0.0
-                    ? (startDistance - segmentStart) /
-                      segmentLength
+            out_split_param.t0 =
+                segment_length > 0.0
+                    ? (start_distance - segment_start) /
+                      segment_length
                     : 0.0;
         }
 
-        if (outSplitParam.endIndex < 0 &&
-            endDistance <= segmentEnd)
-        {
-            outSplitParam.endIndex = segmentIndex;
+        if (out_split_param.end_index < 0 && endDistance <= segment_end) {
+            out_split_param.end_index = segmentIndex;
 
-            outSplitParam.t1 =
-                segmentLength > 0.0
-                    ? (endDistance - segmentStart) /
-                      segmentLength
+            out_split_param.t1 =
+                segment_length > 0.0
+                    ? (endDistance - segment_start) /
+                      segment_length
                     : 0.0;
 
             break;
         }
 
-        accumulated = segmentEnd;
+        accumulated = segment_end;
     }
 
-    if (outSplitParam.startIndex < 0) {
-        outSplitParam.startIndex = 0;
-        outSplitParam.t0 = 0.0;
+    if (out_split_param.start_index < 0) {
+        out_split_param.start_index = 0;
+        out_split_param.t0 = 0.0;
     }
 
-    if (outSplitParam.endIndex < 0) {
-        outSplitParam.endIndex =
-            segmentCount() - 1;
-
-        outSplitParam.t1 = 1.0;
+    if (out_split_param.end_index < 0) {
+        out_split_param.end_index = segmentCount() - 1;
+        out_split_param.t1 = 1.0;
     }
 
-    outSplitParam.t0 =
-        std::clamp(outSplitParam.t0, 0.0, 1.0);
+    out_split_param.t0 = std::clamp(out_split_param.t0, 0.0, 1.0);
+    out_split_param.t1 = std::clamp(out_split_param.t1, 0.0, 1.0);
 
-    outSplitParam.t1 =
-        std::clamp(outSplitParam.t1, 0.0, 1.0);
-
-    outSplitParam.valid = true;
+    out_split_param.valid = true;
 }
 
 

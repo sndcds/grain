@@ -7,7 +7,7 @@
 
 namespace Grain {
 
-enum class EventType {
+enum class EventType : uint32_t {
     None,
     Quit,
 
@@ -110,7 +110,7 @@ enum class KeyCode : uint32_t {
     F12
 };
 
-enum class MouseButton {
+enum class MouseButton : uint8_t {
     None,
     Left,
     Right,
@@ -127,20 +127,20 @@ enum class KeyModifiers : std::uint8_t {
     Command = 1 << 4
 };
 
-constexpr KeyModifiers operator|(
+constexpr auto operator | (
     KeyModifiers lhs,
     KeyModifiers rhs
-    ) noexcept {
+    ) -> KeyModifiers {
     return static_cast<KeyModifiers>(
         static_cast<std::uint8_t>(lhs) |
         static_cast<std::uint8_t>(rhs)
     );
 }
 
-constexpr KeyModifiers operator&(
+constexpr auto operator & (
     KeyModifiers lhs,
     KeyModifiers rhs
-    ) noexcept {
+    ) -> KeyModifiers {
     return static_cast<KeyModifiers>(
         static_cast<std::uint8_t>(lhs) &
         static_cast<std::uint8_t>(rhs)
@@ -162,9 +162,9 @@ struct Event {
     bool is_repeat_ = false;
 
     // Mouse
-    Vec2d mouse_pos_{};
-    Vec2d mouse_delta_{};
-    Vec2d mouse_wheel_{};
+    Vec2d mouse_pos_;
+    Vec2d mouse_delta_;
+    Vec2d mouse_wheel_;
     MouseButton mouse_button_ = MouseButton::Left;
     int32_t mouse_click_count_ = 0;
 
@@ -172,13 +172,11 @@ struct Event {
     int32_t width_ = 0;
     int32_t height_ = 0;
 
-    [[nodiscard]]
-    constexpr bool hasKeyModifier(KeyModifiers modifier) const {
+    [[nodiscard]] constexpr auto hasKeyModifier(KeyModifiers modifier) const -> bool {
         return (modifiers_ & modifier) == modifier;
     }
 
-    [[nodiscard]]
-    constexpr bool hasKeyModifierOnly(KeyModifiers modifier) const {
+    [[nodiscard]] constexpr auto hasKeyModifierOnly(KeyModifiers modifier) const -> bool {
         return modifiers_ == modifier;
     }
 };
