@@ -86,6 +86,9 @@ if(GRAIN_BUILD_TESTS)
 
 endif()
 
+find_package(PNG REQUIRED)
+
+
 # ------------------------------------------------------------------------------
 # Compiler warnings
 # ------------------------------------------------------------------------------
@@ -227,6 +230,8 @@ target_sources(
         src/Image/Image.cpp
         src/Image/ImageAccess.cpp
         src/Image/ImageTransfer.cpp
+        src/Image/ImageIO.cpp
+        src/Image/ImageIO_PNG.cpp
 
         src/Input/Input.cpp
 
@@ -309,6 +314,7 @@ target_sources(
         include/grain/Image/Image.hpp
         include/grain/Image/ImageAccess.hpp
         include/grain/Image/ImageTransfer.hpp
+        include/grain/Image/ImageIO.hpp
 
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp
@@ -449,6 +455,7 @@ target_link_libraries(
         Grain
         PRIVATE
         GrainWarnings
+        PNG::PNG
 )
 
 if(GRAIN_ENABLE_SANITIZERS)

@@ -4,6 +4,7 @@
 #include <grain/Graphics/Color.hpp>
 #include <grain/Image/Image.hpp>
 #include <grain/Image/ImageAccess.hpp>
+#include <grain/Image/ImageIO.hpp>
 
 auto main() -> int {
     constexpr uint32_t width = 800;
@@ -11,7 +12,11 @@ auto main() -> int {
 
     Grain::Image image;
 
-    // Create an 8-bit grayscale image.
+
+    //--------------------------------------------------------------------------
+    //  Create an 8-bit grayscale image.
+    //--------------------------------------------------------------------------
+
     if (!image.create(
         width,
         height,
@@ -22,7 +27,11 @@ auto main() -> int {
         return 1;
     }
 
-    // Fill with a horizontal gradient: 0 to 255.
+
+    //--------------------------------------------------------------------------
+    //  Fill with a horizontal gradient: 0 to 255.
+    //--------------------------------------------------------------------------
+
     for (uint32_t y = 0; y < height; ++y) {
         auto* row = image.rowData(y);
 
@@ -33,7 +42,11 @@ auto main() -> int {
         }
     }
 
-    // Set up pixel access.
+
+    //--------------------------------------------------------------------------
+    //  Set up pixel access.
+    //--------------------------------------------------------------------------
+
     Grain::ImageAccess access;
 
     if (!access.setup(image)) {
@@ -41,7 +54,63 @@ auto main() -> int {
         return 1;
     }
 
-    std::printf("Image: %u x %u\n", width, height);
+
+    //--------------------------------------------------------------------------
+    //  Invert every pixel.
+    //--------------------------------------------------------------------------
+
+    for (int32_t y = 0; y < static_cast<int32_t>(height); ++y) {
+        if (!access.beginRow(y)) {
+            std::fprintf(stderr, "Failed to begin row.\n");
+            return 1;
+        }
+
+        do {
+            if (!access.read()) {
+                std::fprintf(stderr, "Failed to read pixel.\n");
+                return 1;
+            }
+
+            float* values = access.transferPtr();
+            values[0] = 1.0f - values[0];
+
+            if (!access.write()) {
+                std::fprintf(stderr, "Failed to write pixel.\n");
+                return 1;
+            }
+        } while (access.nextX());
+    }
+
+
+    //--------------------------------------------------------------------------
+    //  Save as PNG.
+    //--------------------------------------------------------------------------
+
+    const auto error = Grain::ImageIO::save(
+        image,
+        "gradient-inverted.png",
+        Grain::ImageIO::Format::PNG
+    );
+
+    if (error != Grain::ImageIO::Error::None) {
+        std::fprintf(
+            stderr,
+            "Failed to save PNG (error code: %d).\n",
+            static_cast<int>(error)
+        );
+        return 1;
+    }
+
+    std::printf(
+        "Saved gradient-inverted.png (%u x %u).\n",
+        width,
+        height
+    );
+
+    //--------------------------------------------------------------------------
+    //  Print sampled colors.
+    //--------------------------------------------------------------------------
+
     std::printf("Sampled colors (x, y, r, g, b, a):\n");
 
     for (uint32_t y = 0; y < height; y += 100) {

@@ -48,6 +48,7 @@
 #include "grain/Image/Image.hpp"
 #include "grain/Image/ImageAccess.hpp"
 #include "grain/Image/ImageTransfer.hpp"
+#include "grain/Image/ImageIO.hpp"
 #include "grain/UI/Component.hpp"
 #include "grain/UI/Label.hpp"
 #include "grain/UI/Button.hpp"

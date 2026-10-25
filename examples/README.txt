@@ -48,13 +48,14 @@ clang++ -std=c++2b \
 
 
 clang++ -std=c++2b \
-  -O3 \
-  -DNDEBUG \
-  -I./include \
-  ./examples/Image/Image.cpp \
-  build-release/libGrain.a \
-  -framework AppKit \
-  -framework CoreGraphics \
-  -framework CoreVideo \
-  -o weighted_samples_demo
-
+    -O3 \
+    -DNDEBUG \
+    -I./include \
+    ./examples/Image/Image.cpp \
+    build-release/libGrain.a \
+    -L"$(brew --prefix libpng)/lib" \
+    -lpng \
+    -framework AppKit \
+    -framework CoreGraphics \
+    -framework CoreVideo \
+    -o image
