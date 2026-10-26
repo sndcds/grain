@@ -14,6 +14,7 @@
 
 namespace Grain {
 
+class Image;
 class Gradient;
 class TextLayout;
 
@@ -28,6 +29,13 @@ public:
     GraphicContext(GraphicContext&&) = delete;
 
     auto operator = (GraphicContext&&) -> GraphicContext& = delete;
+
+
+    //--------------------------------------------------------------------------
+    //  Factory.
+    //--------------------------------------------------------------------------
+
+    static auto createGraphicContext(Image& image) -> std::unique_ptr<GraphicContext>;
 
 
     //--------------------------------------------------------------------------
@@ -355,7 +363,7 @@ protected:
     GraphicContext() = default;
 
     GraphicState state_;
-    std::vector<GraphicState> stateStack_;
+    std::vector<GraphicState> state_stack_;
 };
 
 } // namespace Grain

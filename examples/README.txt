@@ -9,15 +9,6 @@ cmake -S . -B build \
 
 cmake --build build --target Grain -j
 
-clang++ -std=c++2b \
-  -I./include/ \
-  ./examples/WeightedSamples/WeightedSamples.cpp \
-  build/libGrain.a \
-  -framework AppKit \
-  -framework CoreGraphics \
-  -framework CoreVideo \
-  -o weighted_samples_demo
-
 
 //------------------------------------------------------------------------------
 //  Build libGrain.a - Release
@@ -51,11 +42,20 @@ clang++ -std=c++2b \
     -O3 \
     -DNDEBUG \
     -I./include \
+    -I"$(brew --prefix jpeg-turbo)/include" \
+    -I"$(brew --prefix libpng)/include" \
+    -I"$(brew --prefix webp)/include" \
     ./examples/Image/Image.cpp \
     build-release/libGrain.a \
     -L"$(brew --prefix libpng)/lib" \
     -lpng \
+    -L"$(brew --prefix jpeg-turbo)/lib" \
+    -ljpeg \
+    -L"$(brew --prefix webp)/lib" \
+    -lwebp \
     -framework AppKit \
     -framework CoreGraphics \
+    -framework CoreText \
+    -framework CoreFoundation \
     -framework CoreVideo \
     -o image

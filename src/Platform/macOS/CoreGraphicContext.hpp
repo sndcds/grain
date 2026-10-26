@@ -11,19 +11,22 @@
 
 namespace Grain {
 
+class Image;
 class Gradient;
+class GraphicContext;
+
 
 class CoreGraphicContext final : public GraphicContext {
 public:
     explicit CoreGraphicContext(CGContextRef context);
 
-    ~CoreGraphicContext() override = default;
+    ~CoreGraphicContext() override;
 
-    void save() override;
+    void save() override {}
     void restore() override;
 
 
-    //--------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     // Fill
     //--------------------------------------------------------------------------
 
@@ -115,9 +118,19 @@ public:
     //  Helper
     //--------------------------------------------------------------------------
 
+    void setContext(CGContextRef context) noexcept {
+        context_ = context;
+    }
+
+    [[nodiscard]] auto context() const noexcept -> CGContextRef {
+        return context_;
+    }
+
     void setTextMatrix(double a, double b, double c, double d, double tx, double ty);
 
     CGColorRef createCGColor(const Color& color) const;
+
+    void createGraphicContext(Image& image);
 
 
     //--------------------------------------------------------------------------

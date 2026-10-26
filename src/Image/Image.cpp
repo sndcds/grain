@@ -328,21 +328,6 @@ auto Image::ownsPixelData() const noexcept -> bool {
 //  Properties.
 //------------------------------------------------------------------------------
 
-auto Image::width() const noexcept -> uint32_t {
-    return width_;
-}
-
-auto Image::height() const noexcept -> uint32_t {
-    return height_;
-}
-
-auto Image::pixelType() const noexcept -> PixelType {
-    return pixel_type_;
-}
-
-auto Image::componentsPerPixel() const noexcept -> uint8_t {
-    return components_per_pixel_;
-}
 
 auto Image::bytesPerPixel() const noexcept -> size_t {
     size_t result = 0;
@@ -357,30 +342,17 @@ auto Image::bytesPerPixel() const noexcept -> size_t {
     return result;
 }
 
-auto Image::bytesPerRow() const noexcept -> size_t {
-    return row_stride_;
-}
 
-auto Image::pixelDataSize() const noexcept -> size_t {
-    return data_size_;
-}
-
-// MARK: - Pixel Data
-
-auto Image::pixelData() const noexcept -> const uint8_t* {
-    return data_;
-}
-
-auto Image::mutPixelData() noexcept -> uint8_t* {
-    return data_;
-}
+//------------------------------------------------------------------------------
+//  Pixel Data.
+//------------------------------------------------------------------------------
 
 auto Image::rowData(uint32_t y) noexcept -> uint8_t* {
     if (!isUsable() || y >= height_) {
         return nullptr;
     }
 
-    return data_ + static_cast<size_t>(y) * row_stride_;
+    return data_ + (static_cast<size_t>(y) * row_stride_);
 }
 
 auto Image::rowData(uint32_t y) const noexcept -> const uint8_t* {
@@ -388,7 +360,13 @@ auto Image::rowData(uint32_t y) const noexcept -> const uint8_t* {
         return nullptr;
     }
 
-    return data_ + static_cast<size_t>(y) * row_stride_;
+    return data_ + (static_cast<size_t>(y) * row_stride_);
+}
+
+
+
+auto Image::createGraphicContext() noexcept -> std::unique_ptr<GraphicContext> {
+
 }
 
 } // namespace Grain

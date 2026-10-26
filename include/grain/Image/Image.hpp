@@ -8,6 +8,8 @@
 
 namespace Grain {
 
+class GraphicContext;
+
 class Image {
 public:
     enum class PixelType : uint8_t {
@@ -56,26 +58,19 @@ public:
     [[nodiscard]] auto isUsable() const noexcept -> bool;
     [[nodiscard]] auto ownsPixelData() const noexcept -> bool;
 
-    [[nodiscard]] auto width() const noexcept -> uint32_t;
-    [[nodiscard]] auto height() const noexcept -> uint32_t;
-    [[nodiscard]] auto pixelType() const noexcept -> PixelType;
-    [[nodiscard]] auto componentsPerPixel() const noexcept -> uint8_t;
+    [[nodiscard]] auto width() const noexcept -> uint32_t { return width_; }
+    [[nodiscard]] auto height() const noexcept -> uint32_t { return height_; }
+    [[nodiscard]] auto pixelType() const noexcept -> PixelType { return pixel_type_; }
+    [[nodiscard]] auto componentsPerPixel() const noexcept -> uint8_t { return components_per_pixel_; }
 
     [[nodiscard]] auto bytesPerPixel() const noexcept -> size_t;
-    [[nodiscard]] auto bytesPerRow() const noexcept -> size_t;
-    [[nodiscard]] auto pixelDataSize() const noexcept -> size_t;
+    [[nodiscard]] auto bytesPerRow() const noexcept -> size_t { return row_stride_; }
+    [[nodiscard]] auto pixelDataSize() const noexcept -> size_t { return data_size_; }
 
-    [[nodiscard]]
-    auto pixelData() const noexcept -> const uint8_t*;
-
-    [[nodiscard]]
-    auto mutPixelData() noexcept -> uint8_t*;
-
-    [[nodiscard]]
-    auto rowData(uint32_t y) noexcept -> uint8_t*;
-
-    [[nodiscard]]
-    auto rowData(uint32_t y) const noexcept -> const uint8_t*;
+    [[nodiscard]] auto pixelData() const noexcept -> const uint8_t* { return data_; }
+    [[nodiscard]] auto mutPixelData() noexcept -> uint8_t* { return data_; }
+    [[nodiscard]] auto rowData(uint32_t y) noexcept -> uint8_t*;
+    [[nodiscard]] auto rowData(uint32_t y) const noexcept -> const uint8_t*;
 
 
     template<typename T>
@@ -122,6 +117,8 @@ public:
         return true;
     }
 
+
+    [[nodiscard]] auto createGraphicContext() noexcept -> std::unique_ptr<GraphicContext>;
 
 private:
     std::unique_ptr<uint8_t[]> owned_data_;

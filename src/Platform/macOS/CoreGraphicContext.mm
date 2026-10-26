@@ -3,6 +3,7 @@
 #include "CoreTextLayout.hpp"
 #include "grain/Geometry/Bezier.hpp"
 #include "grain/Graphics/Gradient.hpp"
+#include "grain/Image/Image.hpp"
 
 #include <CoreText/CoreText.h>
 
@@ -10,22 +11,21 @@
 
 namespace Grain {
 
-CoreGraphicContext::CoreGraphicContext(
-    CGContextRef context
-)
-    : context_(context)
+CoreGraphicContext::CoreGraphicContext(CGContextRef context)
+    : context_(context ? CGContextRetain(context) : nullptr)
 {
     color_space_ = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
 }
 
 
-void CoreGraphicContext::save() {
-    if (context_ == nullptr) {
-        return;
+CoreGraphicContext::~CoreGraphicContext() {
+    if (context_ != nullptr) {
+        CGContextRelease(context_);
     }
 
-    // GraphicContext::save();
-    CGContextSaveGState(context_);
+    if (color_space_ != nullptr) {
+        CGColorSpaceRelease(color_space_);
+    }
 }
 
 
@@ -377,7 +377,6 @@ void CoreGraphicContext::fillCircle(const Vec2d& center, double radius) {
     if (context_ == nullptr || radius <= 0.0) {
         return;
     }
-
     beginPath();
     addCirclePath(center, radius);
     fillPath();
@@ -1021,5 +1020,73 @@ CGColorRef CoreGraphicContext::createCGColor(
 
     return CGColorCreate(color_space_, components);
 }
+
+
+auto GraphicContext::createGraphicContext(
+    Image& image
+) -> std::unique_ptr<GraphicContext> {
+
+    if (image.width() <= 0 ||
+        image.height() <= 0 ||
+        image.componentsPerPixel() != 4 ||
+        image.pixelType() != Image::PixelType::UInt8 ||
+        image.pixelData() == nullptr) {
+        return nullptr;
+    }
+
+    const auto width = static_cast<std::size_t>(image.width());
+    const auto height = static_cast<std::size_t>(image.height());
+    const auto bytes_per_row = image.bytesPerRow();
+
+    if (width > std::numeric_limits<std::size_t>::max() / 4) {
+        return nullptr;
+    }
+
+    const auto minimum_bytes_per_row = width * 4;
+
+    if (bytes_per_row < minimum_bytes_per_row) {
+        return nullptr;
+    }
+
+    auto* color_space =
+        CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+
+    if (color_space == nullptr) {
+        return nullptr;
+    }
+
+    auto context = CGBitmapContextCreate(
+        image.mutPixelData(),
+        width,
+        height,
+        8,
+        bytes_per_row,
+        color_space,
+        kCGImageAlphaPremultipliedLast |
+            kCGBitmapByteOrder32Big
+    );
+
+    CGColorSpaceRelease(color_space);
+
+    if (context == nullptr) {
+        return nullptr;
+    }
+
+    // Convert to Grain's top-left coordinate system.
+    CGContextTranslateCTM(
+        context,
+        0.0,
+        static_cast<CGFloat>(height)
+    );
+    CGContextScaleCTM(context, 1.0, -1.0);
+
+    auto* result = new (std::nothrow) CoreGraphicContext(context);
+
+    // The constructor retains the context.
+    CGContextRelease(context);
+
+    return std::unique_ptr<GraphicContext>(result);
+}
+
 
 } // namespace Grain

@@ -2,9 +2,12 @@
 #include <grain/Image/ImageIO.hpp>
 
 #include "ImageIO_PNG.hpp"
+#include "ImageIO_JPG.hpp"
+#include "ImageIO_WebP.hpp"
 
 #include <cstdio>
 #include <cstdint>
+#include <print>
 
 namespace Grain {
 
@@ -87,6 +90,8 @@ auto ImageIO::load(
             return Detail::loadPNG(image, filename);
 
         case Format::JPEG:
+            return Detail::loadJPEG(image, filename);
+
         case Format::WebP:
             return Error::UnsupportedFormat;
 
@@ -120,12 +125,14 @@ auto ImageIO::save(
     }
 
     switch (format) {
-        case Format::PNG:
+    case Format::PNG:
             return Detail::savePNG(image, filename);
 
         case Format::JPEG:
+            return Detail::saveJPEG(image, filename, quality);
+
         case Format::WebP:
-            return Error::UnsupportedFormat;
+            return Detail::saveWebP(image, filename, quality);
 
         case Format::Unknown:
             return Error::UnsupportedFormat;

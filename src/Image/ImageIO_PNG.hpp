@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <grain/Image/ImageIO.hpp>

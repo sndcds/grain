@@ -87,7 +87,10 @@ if(GRAIN_BUILD_TESTS)
 endif()
 
 find_package(PNG REQUIRED)
+find_package(JPEG REQUIRED)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(WEBP REQUIRED IMPORTED_TARGET libwebp)
 
 # ------------------------------------------------------------------------------
 # Compiler warnings
@@ -232,7 +235,8 @@ target_sources(
         src/Image/ImageTransfer.cpp
         src/Image/ImageIO.cpp
         src/Image/ImageIO_PNG.cpp
-
+        src/Image/ImageIO_JPG.cpp
+        src/Image/ImageIO_WebP.cpp
         src/Input/Input.cpp
 
         src/Platform/View.cpp
@@ -327,7 +331,7 @@ target_sources(
 )
 
 # ------------------------------------------------------------------------------
-# Platform implementation
+#   Platform implementation
 # ------------------------------------------------------------------------------
 
 if(APPLE)
@@ -355,6 +359,8 @@ if(APPLE)
             PUBLIC
             "-framework AppKit"
             "-framework CoreGraphics"
+            "-framework CoreText"
+            "-framework CoreFoundation"
             "-framework CoreVideo"
     )
 
@@ -456,6 +462,8 @@ target_link_libraries(
         PRIVATE
         GrainWarnings
         PNG::PNG
+        JPEG::JPEG
+        PkgConfig::WEBP
 )
 
 if(GRAIN_ENABLE_SANITIZERS)
