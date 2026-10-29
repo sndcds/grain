@@ -97,6 +97,7 @@ void Slider::draw(GraphicContext& gc) {
     gc.setFillColor(handle_color_);
     gc.addCirclePath(handle.center(), handle.height * 0.5);
     gc.fillPath();
+
 }
 
 bool Slider::handleEvent(const Event& event) {

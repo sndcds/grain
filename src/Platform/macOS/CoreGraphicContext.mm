@@ -29,12 +29,20 @@ CoreGraphicContext::~CoreGraphicContext() {
 }
 
 
+void CoreGraphicContext::save() {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextSaveGState(context_);
+}
+
+
 void CoreGraphicContext::restore() {
     if (context_ == nullptr) {
         return;
     }
 
-    // GraphicContext::restore();
     CGContextRestoreGState(context_);
 }
 

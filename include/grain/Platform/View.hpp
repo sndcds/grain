@@ -50,6 +50,8 @@ public:
         return result;
     }
 
+    auto componentCount() -> size_t { return components_.size(); }
+
     void drawComponents(GraphicContext& gc, const Rectd& dirty_rect);
     virtual void drawContent(GraphicContext& gc, const Rectd& dirty_rect);
     virtual void draw(GraphicContext& gc, const Rectd& dirty_rect);

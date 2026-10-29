@@ -175,6 +175,8 @@ int main() {
 
         Random random;
 
+        std::cout << "Component count: " << view->componentCount() << '\n';
+
         for (double y = 20; y < 1280; y += 40) {
             auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
 
@@ -182,15 +184,17 @@ int main() {
             slider.setStep(1.0f);
 
             slider.setOrientation(Slider::Orientation::Horizontal);
-            slider.setTrackSize(random.real(2, 12));
+            slider.setTrackSize(20);
 
-            // slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
-            // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
-            // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
             slider.setAction([](double value) -> void {
             });
         }
+
+        std::cout << "Component count: " << view->componentCount() << '\n';
 
         for (double x = 300; x < 1280; x += 140) {
             auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
@@ -210,6 +214,7 @@ int main() {
             slider.setAction([](double value) -> void {
             });
         }
+        std::cout << "Component count: " << view->componentCount() << '\n';
 
         {
             auto& text_field = view->addComponent<TextField>();
@@ -222,6 +227,7 @@ int main() {
         window->setRootView(std::move(view));
     }
 
+    /*
     auto families = Grain::Platform::availableFontNames();
     for (const auto& family : families) {
         std::cout << family << '\n';
@@ -231,6 +237,7 @@ int main() {
     std::cout << "font fontName: " << font.fontNameUtf8() << '\n';
     std::cout << "font displayName: " << font.displayNameUtf8() << '\n';
     std::cout << "font size: " << font.size() << '\n';
+    */
 
     app.run();
 

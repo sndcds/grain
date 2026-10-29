@@ -22,7 +22,7 @@ public:
 
     ~CoreGraphicContext() override;
 
-    void save() override {}
+    void save() override;
     void restore() override;
 
 
