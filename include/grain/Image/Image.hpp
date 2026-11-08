@@ -16,7 +16,7 @@ public:
         UInt8,
         UInt16,
         UInt32,
-        Float
+        Float32
     };
 
     enum class StorageMode : uint8_t {
@@ -160,10 +160,10 @@ private:
     [[nodiscard]]
     auto bytesPerComponentForPixelType() const noexcept -> size_t {
         switch (pixel_type_) {
-        case PixelType::UInt8:  return sizeof(uint8_t);
+        case PixelType::UInt8: return sizeof(uint8_t);
         case PixelType::UInt16: return sizeof(uint16_t);
         case PixelType::UInt32: return sizeof(uint32_t);
-        case PixelType::Float:  return sizeof(float);
+        case PixelType::Float32: return sizeof(float);
         }
 
         return 0;

@@ -177,18 +177,25 @@ int main() {
 
         std::cout << "Component count: " << view->componentCount() << '\n';
 
-        for (double y = 20; y < 1280; y += 40) {
+        for (double y = 20; y < 1000; y += 40) {
             auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
+
+            auto handle_size = Math::remap(20, 1000, 3, 30, y);
+            auto track_size = Math::remap(20, 1000, 30, 3, y);
+
 
             slider.setBounds(Rectd{20.0, y, 240.0, 30.0});
             slider.setStep(1.0f);
 
             slider.setOrientation(Slider::Orientation::Horizontal);
-            slider.setTrackSize(20);
 
-            slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
-            slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
-            slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            slider.setPadding(8.0);
+            slider.setTrackSize(track_size);
+            slider.setHandleSize({handle_size, handle_size * 2});
+
+            // slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
             slider.setAction([](double value) -> void {
             });
@@ -199,17 +206,19 @@ int main() {
         for (double x = 300; x < 1280; x += 140) {
             auto& slider = view->addComponent<Slider>(0.0f, 100.0f, 50.0f);
 
+            auto handle_size = Math::remap(300, 1200, 3, 30, x);
+            auto track_size = Math::remap(300, 1200, 30, 3, x);
+
             slider.setBounds(Rectd{x, 200, 120, 800.0});
             slider.setStep(0.01f);
 
             slider.setOrientation(Slider::Orientation::Vertical);
-            slider.setTrackSize(random.real(20, 120));
-            auto s = random.real(slider.trackSize(), slider.trackSize() * 2);
-            slider.setHandleSize({s, s});
+            slider.setTrackSize(track_size);
+            slider.setHandleSize({handle_size, handle_size});
 
-            slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
-            slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
-            slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
+            // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
 
             slider.setAction([](double value) -> void {
             });

@@ -21,7 +21,8 @@ public:
         DecodeError,
         EncodeError,
         OutOfMemory,
-        UnsupportedPixelType
+        UnsupportedPixelType,
+        MemoryError
     };
 
     [[nodiscard]] static auto load(

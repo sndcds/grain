@@ -1,3 +1,4 @@
+
 #include "grain/UI/Slider.hpp"
 
 #include "grain/Graphics/GraphicContext.hpp"
@@ -5,7 +6,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <iomanip>
 #include <utility>
 
 namespace Grain {
@@ -18,89 +18,67 @@ Slider::Slider(View* view, double min, double max, double value)
 }
 
 void Slider::draw(GraphicContext& gc) {
-    const Rectd bounds = bounds_;
+    const Rectd track = trackRect();
     const bool horizontal = orientation_ == Orientation::Horizontal;
-    const double length = horizontal ? bounds.width : bounds.height;
-    const double track_length = length - handle_size_.height;
-    const double max_handle_width = horizontal ? bounds.height : bounds.width;
-    const double handle_width = std::min(handle_size_.width, max_handle_width);
-    const double handle_height = handle_size_.height;
-    const double half_handle_height = handle_size_.height / 2;
-    const double value = normalizedValue();
+    const auto handle_pos = handlePosition();
 
-    Rectd track_rect;
-
-    if (horizontal) {
-        track_rect = {
-            bounds.x + half_handle_height,
-            bounds.y + ((bounds.height - track_size_) / 2),
-            track_length,
-            track_size_
-        };
-    }
-    else {
-        track_rect = {
-            bounds.x + ((bounds.width - track_size_) / 2),
-            bounds.y + half_handle_height,
-            track_size_,
-            track_length
-        };
-    }
-
-    gc.addRoundBarPath(track_rect);
+    // Draw the visual track.
+    gc.addRoundBarPath(track);
     gc.save();
     gc.clipPath();
 
     if (horizontal) {
-        const double indicator_width = value * track_rect.width;
-
+        Rectd rect = bounds_;
+        rect.width = handle_pos.x - bounds_.x + 0.5;
         gc.setFillColor(indicator_color_);
-        gc.fillRect({
-            track_rect.x,
-            track_rect.y,
-            indicator_width,
-            track_rect.height
-        });
+        gc.fillRect(rect);
 
+        rect.x = handle_pos.x - 0.5;
+        rect.width = bounds_.right() - handle_pos.x + 0.5;
         gc.setFillColor(track_color_);
-        gc.fillRect({
-            track_rect.x + indicator_width,
-            track_rect.y,
-            track_rect.width - indicator_width,
-            track_rect.height
-        });
+        gc.fillRect(rect);
     }
     else {
-        const double indicator_height = value * track_rect.height;
-
-        gc.setFillColor(indicator_color_);
-        gc.fillRect({
-            track_rect.x,
-            track_rect.y + track_rect.height - indicator_height,
-            track_rect.width,
-            indicator_height
-        });
+        Rectd rect = bounds_;
+        rect.y = handle_pos.y - 0.5;
+        rect.height = handle_pos.y - bounds_.y + 0.5;
 
         gc.setFillColor(track_color_);
         gc.fillRect({
-            track_rect.x,
-            track_rect.y,
-            track_rect.width,
-            track_rect.height - indicator_height
+            bounds_.x,
+            bounds_.y,
+            bounds_.width,
+            rect.y - bounds_.y
+        });
+
+        gc.setFillColor(indicator_color_);
+        gc.fillRect({
+            bounds_.x,
+            rect.y,
+            bounds_.width,
+            bounds_.bottom() - rect.y
         });
     }
 
     gc.restore();
 
-    const Rect handle = handleRect();
+    // Draw the handle independently of the track representation.
+    const Rectd handle = handleRect();
 
     gc.setFillColor(handle_color_);
     gc.addCirclePath(handle.center(), handle.height * 0.5);
     gc.fillPath();
 
+    /*
+    gc.setFillColor({1, 0, 0});
+    gc.fillCircle(trackStart(), 3);
+    gc.setFillColor({1, 1, 0});
+    gc.fillCircle(trackEnd(), 3);
+    gc.fillCircle(zeroPosition(), 3);
+    */
 }
 
-bool Slider::handleEvent(const Event& event) {
+auto Slider::handleEvent(const Event& event) -> bool {
     if (!enabled_) {
         return false;
     }
@@ -116,7 +94,8 @@ bool Slider::handleEvent(const Event& event) {
         dragging_ = true;
         drag_offset_ = event.mouse_pos_ - handle_rect.center();
 
-        // Clicking outside the handle moves it to the clicked position.
+        // Clicking outside the handle moves it to the clicked
+        // position and begins dragging.
         if (!handle_rect.contains(event.mouse_pos_)) {
             drag_offset_ = {0.0, 0.0};
             updateValueFromPosition(event.mouse_pos_);
@@ -130,12 +109,12 @@ bool Slider::handleEvent(const Event& event) {
             return false;
         }
 
-        const Vec2d handle_center = {
+        const Vec2d desired_center = {
             event.mouse_pos_.x - drag_offset_.x,
             event.mouse_pos_.y - drag_offset_.y
         };
 
-        updateValueFromPosition(handle_center);
+        updateValueFromPosition(desired_center);
         return true;
     }
 
@@ -159,12 +138,15 @@ void Slider::setBounds(const Rectd& bounds) {
 }
 
 void Slider::setRange(double min, double max) {
-    if (!std::isfinite(min) || !std::isfinite(max) || min > max) {
+    if (!std::isfinite(min) ||
+        !std::isfinite(max) ||
+        min > max) {
         return;
     }
 
     min_ = min;
     max_ = max;
+
     value_ = clampValue(value_);
 
     invalidate();
@@ -182,7 +164,10 @@ void Slider::setValue(double value) {
 }
 
 void Slider::setStep(double step) {
-    step_ = std::isfinite(step) ? std::max(0.0, step) : 0.0;
+    step_ = std::isfinite(step)
+        ? std::max(0.0, step)
+        : 0.0;
+
     setValue(value_);
 }
 
@@ -192,8 +177,20 @@ void Slider::setOrientation(Orientation orientation) {
     }
 
     orientation_ = orientation;
-    // TODO: Union rect
-    view()->requestRedraw();
+    invalidate();
+}
+
+void Slider::setPadding(double padding) {
+    if (!std::isfinite(padding) || padding < 0.0) {
+        return;
+    }
+
+    if (padding_ == padding) {
+        return;
+    }
+
+    padding_ = padding;
+    invalidate();
 }
 
 void Slider::setTrackColor(const Color& color) {
@@ -202,6 +199,14 @@ void Slider::setTrackColor(const Color& color) {
 }
 
 void Slider::setTrackSize(double track_size) {
+    if (!std::isfinite(track_size) || track_size < 0.0) {
+        return;
+    }
+
+    if (track_size_ == track_size) {
+        return;
+    }
+
     track_size_ = track_size;
     invalidate();
 }
@@ -212,6 +217,18 @@ void Slider::setHandleColor(const Color& color) {
 }
 
 void Slider::setHandleSize(const Sized& handle_size) {
+    if (!std::isfinite(handle_size.width) ||
+        !std::isfinite(handle_size.height) ||
+        handle_size.width < 0.0 ||
+        handle_size.height < 0.0) {
+        return;
+    }
+
+    if (handle_size_.width == handle_size.width &&
+        handle_size_.height == handle_size.height) {
+        return;
+    }
+
     handle_size_ = handle_size;
     invalidate();
 }
@@ -225,21 +242,25 @@ void Slider::setAction(ValueChanged action) {
     action_ = std::move(action);
 }
 
-double Slider::normalizedValue() const {
+auto Slider::normalizedValue() const -> double {
     const double range = max_ - min_;
 
     if (range <= 0.0) {
         return 0.0;
     }
 
-    return std::clamp((value_ - min_) / range, 0.0, 1.0);
+    return std::clamp(
+        (value_ - min_) / range,
+        0.0,
+        1.0
+    );
 }
 
-Slider::Orientation Slider::orientation() const {
+auto Slider::orientation() const -> Slider::Orientation {
     return orientation_;
 }
 
-double Slider::clampValue(double value) const {
+auto Slider::clampValue(double value) const -> double {
     if (!std::isfinite(value)) {
         return min_;
     }
@@ -254,38 +275,195 @@ double Slider::clampValue(double value) const {
     return value;
 }
 
-double Slider::valueFromPosition(const Vec2d& position) const {
+auto Slider::trackStart() const -> Vec2d {
+    const bool horizontal = orientation_ == Orientation::Horizontal;
+
+    const double handle_length = horizontal
+        ? handle_size_.width
+        : handle_size_.height;
+
+    const double length = horizontal
+        ? bounds_.width
+        : bounds_.height;
+
+    const double inset = padding_ + (handle_length * 0.5);
+    const double travel = std::max(0.0, length - 2.0 * inset);
+
+    if (horizontal) {
+        return {
+            bounds_.x + inset,
+            bounds_.y + (bounds_.height * 0.5)
+        };
+    }
+
+    return {
+        bounds_.x + (bounds_.width * 0.5),
+        bounds_.y + bounds_.height - inset
+    };
+}
+
+auto Slider::trackEnd() const -> Vec2d {
+    const bool horizontal = orientation_ == Orientation::Horizontal;
+
+    const double handle_length = horizontal
+        ? handle_size_.width
+        : handle_size_.height;
+
+    const double length = horizontal
+        ? bounds_.width
+        : bounds_.height;
+
+    const double inset = padding_ + (handle_length * 0.5);
+    const double travel = std::max(0.0, length - 2.0 * inset);
+
+    const Vec2d start = trackStart();
+
+    if (horizontal) {
+        return {
+            start.x + travel,
+            start.y
+        };
+    }
+
+    return {
+        start.x,
+        start.y - travel
+    };
+}
+
+auto Slider::zeroPosition() const -> Vec2d {
+    const double range = max_ - min_;
+
+    if (range <= 0.0 || min_ > 0.0 || max_ < 0.0) {
+        // Zero is outside the range; return the minimum endpoint
+        // as a deterministic fallback.
+        return trackStart();
+    }
+
+    const double normalized = (0.0 - min_) / range;
+    const Vec2d start = trackStart();
+    const Vec2d end = trackEnd();
+
+    return {
+        start.x + ((end.x - start.x) * normalized),
+        start.y + ((end.y - start.y) * normalized)
+    };
+}
+
+auto Slider::handlePosition() const -> Vec2d {
+    const double range = max_ - min_;
+
+    if (range <= 0.0) {
+        return trackStart();
+    }
+
+    const double normalized = (value_ - min_) / range;
+
+    const Vec2d start = trackStart();
+    const Vec2d end = trackEnd();
+
+    return {
+        start.x + ((end.x - start.x) * normalized),
+        start.y + ((end.y - start.y) * normalized)
+    };
+}
+
+auto Slider::trackRect() const -> Rectd {
+    const bool horizontal = orientation_ == Orientation::Horizontal;
+
+    // The visual track spans the full bounds in the travel direction.
+    // Padding constrains handle travel, not track drawing.
+    const double track_size = std::max(0.0, track_size_);
+
+    const auto track_start = trackStart();
+    const auto track_end = trackEnd();
+
+    if (horizontal) {
+        return {
+            track_start.x - (track_size * 0.5),
+            track_start.y - (track_size * 0.5),
+            (track_end.x - track_start.x) + track_size,
+            track_size
+        };
+    }
+
+    return {
+        track_start.x - (track_size * 0.5),
+        track_end.y - (track_size * 0.5),
+        track_size,
+        (track_start.y - track_end.y) + track_size
+    };
+}
+
+auto Slider::handleRect() const -> Rectd {
     const bool horizontal = orientation_ == Orientation::Horizontal;
 
     const double length = horizontal
         ? bounds_.width
         : bounds_.height;
 
-    // Handle dimension along the slider's travel direction.
     const double handle_length = horizontal
         ? handle_size_.width
         : handle_size_.height;
 
-    const double travel = std::max(0.0, length - handle_length);
+    // Padding is additional to half the handle's dimension.
+    // Therefore, the track can extend beyond the handle at both ends.
+    const double inset = padding_ + (handle_length * 0.5);
+    const double travel = std::max(0.0, length - 2.0 * inset);
+
+    const double position = normalizedValue() * travel;
+
+    if (horizontal) {
+        const double center_x = bounds_.x + inset + position;
+        const double center_y = bounds_.y + (bounds_.height * 0.5);
+
+        return {
+            center_x - (handle_size_.width * 0.5),
+            center_y - (handle_size_.height * 0.5),
+            handle_size_.width,
+            handle_size_.height
+        };
+    }
+
+    const double center_x = bounds_.x + (bounds_.width * 0.5);
+    const double center_y = bounds_.y + bounds_.height - inset - position;
+
+    return {
+        center_x - (handle_size_.width * 0.5),
+        center_y - (handle_size_.height * 0.5),
+        handle_size_.width,
+        handle_size_.height
+    };
+}
+
+auto Slider::handleCenter() const -> Vec2d {
+    return handleRect().center();
+}
+
+auto Slider::valueFromPosition(const Vec2d& position) const -> double {
+    const bool horizontal = orientation_ == Orientation::Horizontal;
+
+    const double length = horizontal
+        ? bounds_.width
+        : bounds_.height;
+
+    const double handle_length = horizontal
+        ? handle_size_.width
+        : handle_size_.height;
+
+    const double inset = padding_ + (handle_length * 0.5);
+    const double travel = std::max(0.0, length - 2.0 * inset);
 
     if (travel <= 0.0 || max_ <= min_) {
         return min_;
     }
 
-    double offset;
-
-    if (horizontal) {
-        offset = position.x
-            - bounds_.x
-            - (handle_length * 0.5);
-    }
-    else {
-        // Vertical sliders increase from bottom to top.
-        offset = bounds_.y
-            + bounds_.height
-            - position.y
-            - (handle_length * 0.5);
-    }
+    // The input position represents the desired handle center.
+    // Horizontal values increase left to right.
+    // Vertical values increase bottom to top.
+    const double offset = horizontal
+        ? position.x - (bounds_.x + inset)
+        : (bounds_.y + bounds_.height - inset) - position.y;
 
     const double normalized = std::clamp(
         offset / travel,
@@ -296,56 +474,14 @@ double Slider::valueFromPosition(const Vec2d& position) const {
     return min_ + (normalized * (max_ - min_));
 }
 
-Rectd Slider::handleRect() const {
-    const bool horizontal = orientation_ == Orientation::Horizontal;
-
-    const double handle_length = horizontal
-        ? handle_size_.width
-        : handle_size_.height;
-
-    const double length = horizontal
-        ? bounds_.width
-        : bounds_.height;
-
-    const double travel = std::max(0.0, length - handle_length);
-    const double position = normalizedValue() * travel;
-
-    if (horizontal) {
-        return {
-            bounds_.x + position,
-            bounds_.y + ((bounds_.height - handle_size_.height) * 0.5),
-            handle_size_.width,
-            handle_size_.height
-        };
-    }
-
-    return {
-        bounds_.x + ((bounds_.width - handle_size_.width) * 0.5),
-        bounds_.y + bounds_.height - handle_length - position,
-        handle_size_.width,
-        handle_size_.height
-    };
-}
-
-
-Vec2d Slider::handleCenter() const {
-    const Rectd handle = handleRect();
-
-    return {
-        handle.x + handle.width * 0.5,
-        handle.y + handle.height * 0.5
-    };
-}
-
-
 void Slider::updateValueFromPosition(const Vec2d& position) {
-    const double newValue = clampValue(valueFromPosition(position));
+    const double new_value = clampValue(valueFromPosition(position));
 
-    if (value_ == newValue) {
+    if (value_ == new_value) {
         return;
     }
 
-    value_ = newValue;
+    value_ = new_value;
     invalidate();
 
     if (action_) {

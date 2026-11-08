@@ -285,7 +285,7 @@ void ImageAccess::selectTransferFunctions() noexcept {
             write_fn_ = &writeInteger<uint32_t>;
             break;
 
-        case Image::PixelType::Float:
+        case Image::PixelType::Float32:
             read_fn_ = &readFloat;
             write_fn_ = &writeFloat;
             break;

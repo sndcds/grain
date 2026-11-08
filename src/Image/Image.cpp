@@ -21,7 +21,7 @@ auto bytesPerComponent(Image::PixelType pixel_type) noexcept -> size_t {
         case Image::PixelType::UInt32:
             return sizeof(uint32_t);
 
-        case Image::PixelType::Float:
+        case Image::PixelType::Float32:
             return sizeof(float);
     }
 
@@ -184,11 +184,14 @@ auto Image::create(
     }
 
     auto new_data = std::unique_ptr<uint8_t[]>(
-        new (std::nothrow) uint8_t[data_size]);
+        new (std::nothrow) uint8_t[data_size]()
+    );
 
     if (!new_data) {
         return false;
     }
+
+
 
     // Commit only after validation and allocation succeed.
     owned_data_ = std::move(new_data);

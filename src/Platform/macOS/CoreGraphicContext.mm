@@ -1029,34 +1029,65 @@ CGColorRef CoreGraphicContext::createCGColor(
     return CGColorCreate(color_space_, components);
 }
 
-
 auto GraphicContext::createGraphicContext(
     Image& image
 ) -> std::unique_ptr<GraphicContext> {
 
-    if (image.width() <= 0 ||
-        image.height() <= 0 ||
+    if (!image.isUsable() ||
         image.componentsPerPixel() != 4 ||
-        image.pixelType() != Image::PixelType::UInt8 ||
-        image.pixelData() == nullptr) {
+        image.width() <= 0 ||
+        image.height() <= 0) {
         return nullptr;
     }
 
-    const auto width = static_cast<std::size_t>(image.width());
-    const auto height = static_cast<std::size_t>(image.height());
+    const auto width =
+        static_cast<std::size_t>(image.width());
+
+    const auto height =
+        static_cast<std::size_t>(image.height());
+
+    std::size_t bits_per_component = 0;
+    std::size_t bytes_per_pixel = 0;
+    CGBitmapInfo bitmap_info = 0;
+
+    switch (image.pixelType()) {
+
+        case Image::PixelType::UInt8:
+            bits_per_component = 8;
+            bytes_per_pixel = 4;
+            bitmap_info =
+                kCGImageAlphaPremultipliedLast |
+                kCGBitmapByteOrder32Big;
+            break;
+
+        case Image::PixelType::Float32:
+            bits_per_component = 32;
+            bytes_per_pixel = 4 * sizeof(float);
+            bitmap_info =
+                kCGImageAlphaPremultipliedLast |
+                kCGBitmapFloatComponents |
+                kCGBitmapByteOrder32Little;
+            break;
+
+        default:
+            return nullptr;
+    }
+
+    if (width >
+        std::numeric_limits<std::size_t>::max() / bytes_per_pixel) {
+        return nullptr;
+    }
+
+    const auto minimum_bytes_per_row =
+        width * bytes_per_pixel;
+
     const auto bytes_per_row = image.bytesPerRow();
-
-    if (width > std::numeric_limits<std::size_t>::max() / 4) {
-        return nullptr;
-    }
-
-    const auto minimum_bytes_per_row = width * 4;
 
     if (bytes_per_row < minimum_bytes_per_row) {
         return nullptr;
     }
 
-    auto* color_space =
+    auto color_space =
         CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
 
     if (color_space == nullptr) {
@@ -1067,11 +1098,10 @@ auto GraphicContext::createGraphicContext(
         image.mutPixelData(),
         width,
         height,
-        8,
+        bits_per_component,
         bytes_per_row,
         color_space,
-        kCGImageAlphaPremultipliedLast |
-            kCGBitmapByteOrder32Big
+        bitmap_info
     );
 
     CGColorSpaceRelease(color_space);
@@ -1080,21 +1110,23 @@ auto GraphicContext::createGraphicContext(
         return nullptr;
     }
 
-    // Convert to Grain's top-left coordinate system.
     CGContextTranslateCTM(
         context,
         0.0,
         static_cast<CGFloat>(height)
     );
+
     CGContextScaleCTM(context, 1.0, -1.0);
 
     auto* result = new (std::nothrow) CoreGraphicContext(context);
 
-    // The constructor retains the context.
     CGContextRelease(context);
+
+    if (result == nullptr) {
+        return nullptr;
+    }
 
     return std::unique_ptr<GraphicContext>(result);
 }
-
 
 } // namespace Grain
