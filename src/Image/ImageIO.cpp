@@ -116,7 +116,8 @@ auto ImageIO::save(
     const Image& image,
     const char* filename,
     Format format,
-    int quality
+    int quality,
+    bool unpremultiply_alpha
 ) noexcept -> Error {
     (void)quality; // Used by JPEG and WebP implementations later.
 
@@ -126,13 +127,13 @@ auto ImageIO::save(
 
     switch (format) {
     case Format::PNG:
-            return Detail::savePNG(image, filename);
+            return Detail::savePNG(image, filename, unpremultiply_alpha);
 
         case Format::JPEG:
             return Detail::saveJPEG(image, filename, quality);
 
         case Format::WebP:
-            return Detail::saveWebP(image, filename, quality);
+            return Detail::saveWebP(image, filename, quality, unpremultiply_alpha);
 
         case Format::Unknown:
             return Error::UnsupportedFormat;

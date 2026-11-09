@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdint>
 #include <cstdlib>
@@ -130,100 +131,265 @@ auto loadWebP(
 auto saveWebP(
     const Image& image,
     const char* filename,
-    int quality
+    int quality,
+    bool unpremultiply_alpha
 ) noexcept -> ImageIO::Error {
 
-    if (filename == nullptr || !image.isUsable()) {
+    if (filename == nullptr ||
+        filename[0] == '\0' ||
+        !image.isUsable()) {
         return ImageIO::Error::InvalidArgument;
     }
 
-    if (image.pixelType() != Image::PixelType::UInt8) {
+    const auto pixel_type = image.pixelType();
+    const auto components = image.componentsPerPixel();
+
+    const bool is_float =
+        pixel_type == Image::PixelType::Float32;
+
+    if (!is_float &&
+        pixel_type != Image::PixelType::UInt8) {
         return ImageIO::Error::UnsupportedPixelType;
-    }
-
-    const uint32_t width = image.width();
-    const uint32_t height = image.height();
-    const uint32_t components = image.componentsPerPixel();
-
-    if (width == 0 || height == 0 ||
-        width > 16383 || height > 16383) {
-        return ImageIO::Error::UnsupportedFormat;
     }
 
     if (components != 3 && components != 4) {
         return ImageIO::Error::UnsupportedFormat;
     }
 
-    const size_t rowBytes =
-        static_cast<size_t>(width) * components;
+    const auto width = image.width();
+    const auto height = image.height();
 
-    // Determine the actual row stride. Image rows are expected to
-    // belong to the same contiguous pixel buffer.
-    size_t rowStride = rowBytes;
-
-    if (height > 1) {
-        const auto* first = image.rowData(0);
-        const auto* second = image.rowData(1);
-
-        if (second <= first) {
-            return ImageIO::Error::InvalidArgument;
-        }
-
-        rowStride = static_cast<size_t>(second - first);
-    }
-
-    if (rowStride < rowBytes ||
-        rowStride >
-            static_cast<size_t>(std::numeric_limits<int>::max())) {
+    if (width <= 0 || height <= 0 ||
+        width > 16383 || height > 16383) {
         return ImageIO::Error::UnsupportedFormat;
     }
 
-    uint8_t* encoded = nullptr;
+    const auto width_size =
+        static_cast<std::size_t>(width);
 
-    const auto qualityValue = static_cast<float>(
-        quality < 0 ? 0 : (quality > 100 ? 100 : quality)
-    );
+    const auto height_size =
+        static_cast<std::size_t>(height);
 
-    const size_t encodedSize = components == 4
-        ? WebPEncodeRGBA(
-            image.rowData(0),
-            static_cast<int>(width),
-            static_cast<int>(height),
-            static_cast<int>(rowStride),
-            qualityValue,
-            &encoded
-        )
-        : WebPEncodeRGB(
-            image.rowData(0),
-            static_cast<int>(width),
-            static_cast<int>(height),
-            static_cast<int>(rowStride),
-            qualityValue,
-            &encoded
+    const std::size_t source_bytes_per_component =
+        is_float ? sizeof(float) : sizeof(std::uint8_t);
+
+    if (width_size >
+        std::numeric_limits<std::size_t>::max() /
+            components / source_bytes_per_component) {
+        return ImageIO::Error::InvalidArgument;
+    }
+
+    const auto source_row_bytes =
+        width_size * components * source_bytes_per_component;
+
+    const auto source_stride = image.bytesPerRow();
+
+    if (source_stride < source_row_bytes) {
+        return ImageIO::Error::InvalidArgument;
+    }
+
+    if (source_stride >
+        static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+        return ImageIO::Error::UnsupportedFormat;
+    }
+
+    const auto output_row_bytes =
+        width_size * components;
+
+    const bool needs_conversion =
+        is_float ||
+        (unpremultiply_alpha && components == 4);
+
+    std::uint8_t* converted_pixels = nullptr;
+
+    const std::uint8_t* pixels = nullptr;
+    int output_stride = 0;
+
+    if (needs_conversion) {
+
+        if (height_size >
+            std::numeric_limits<std::size_t>::max() /
+                output_row_bytes) {
+            return ImageIO::Error::InvalidArgument;
+        }
+
+        const auto output_size =
+            output_row_bytes * height_size;
+
+        converted_pixels = static_cast<std::uint8_t*>(
+            std::malloc(output_size)
         );
 
-    if (encodedSize == 0 || encoded == nullptr) {
+        if (converted_pixels == nullptr) {
+            return ImageIO::Error::MemoryError;
+        }
+
+        output_stride = static_cast<int>(output_row_bytes);
+
+        for (std::size_t y = 0; y < height_size; ++y) {
+            const auto* source = image.rowData(y);
+            auto* destination = converted_pixels + y * output_row_bytes;
+
+            if (!is_float) {
+                for (std::size_t x = 0; x < width_size; ++x) {
+                    const auto offset = x * components;
+
+                    if (unpremultiply_alpha && components == 4) {
+                        const auto alpha = source[offset + 3];
+
+                        if (alpha == 0) {
+                            destination[offset] = 0;
+                            destination[offset + 1] = 0;
+                            destination[offset + 2] = 0;
+                        }
+                        else {
+                            for (std::size_t c = 0; c < 3; ++c) {
+                                const auto value = std::lround(
+                                    static_cast<double>(source[offset + c]) *
+                                    255.0 / alpha
+                                );
+
+                                destination[offset + c] =
+                                    static_cast<std::uint8_t>(
+                                        std::clamp(value, 0L, 255L)
+                                    );
+                            }
+                        }
+
+                        destination[offset + 3] = alpha;
+                    }
+                    else {
+                        std::memcpy(
+                            destination + offset,
+                            source + offset,
+                            components
+                        );
+                    }
+                }
+            }
+            else {
+                for (std::size_t x = 0; x < width_size; ++x) {
+                    const auto offset = x * components;
+                    float values[4] = {};
+
+                    for (std::size_t c = 0; c < components; ++c) {
+                        std::memcpy(
+                            &values[c],
+                            source + (offset + c) * sizeof(float),
+                            sizeof(float)
+                        );
+
+                        if (!std::isfinite(values[c])) {
+                            values[c] = 0.0f;
+                        }
+                    }
+
+                    if (unpremultiply_alpha && components == 4) {
+                        const float alpha = std::clamp(values[3], 0.0f, 1.0f);
+                        values[3] = alpha;
+
+                        if (alpha > 0.0f) {
+                            for (std::size_t c = 0; c < 3; ++c) {
+                                values[c] /= alpha;
+                            }
+                        }
+                        else {
+                            values[0] = 0.0f;
+                            values[1] = 0.0f;
+                            values[2] = 0.0f;
+                        }
+                    }
+
+                    for (std::size_t c = 0; c < components; ++c) {
+                        const float value = std::clamp(values[c], 0.0f, 1.0f);
+
+                        destination[offset + c] =
+                            static_cast<std::uint8_t>(
+                                std::lround(value * 255.0f)
+                            );
+                    }
+                }
+            }
+        }
+
+        pixels = converted_pixels;
+    }
+    else {
+
+        pixels = image.rowData(0);
+        output_stride = static_cast<int>(source_stride);
+    }
+
+    std::uint8_t* encoded = nullptr;
+
+    const auto quality_value = static_cast<float>(
+        std::clamp(quality, 0, 100)
+    );
+
+    const auto encoded_size = quality >= 100
+        ? (components == 4
+            ? WebPEncodeLosslessRGBA(
+                pixels,
+                width,
+                height,
+                output_stride,
+                &encoded
+            )
+            : WebPEncodeLosslessRGB(
+                pixels,
+                width,
+                height,
+                output_stride,
+                &encoded
+            ))
+        : (components == 4
+            ? WebPEncodeRGBA(
+                pixels,
+                width,
+                height,
+                output_stride,
+                quality_value,
+                &encoded
+            )
+            : WebPEncodeRGB(
+                pixels,
+                width,
+                height,
+                output_stride,
+                quality_value,
+                &encoded
+            ));
+
+    std::free(converted_pixels);
+
+    if (encoded_size == 0 || encoded == nullptr) {
         WebPFree(encoded);
         return ImageIO::Error::EncodeError;
     }
 
-    std::FILE* file = std::fopen(filename, "wb");
+    FILE* file = std::fopen(filename, "wb");
 
     if (file == nullptr) {
         WebPFree(encoded);
         return ImageIO::Error::FileError;
     }
 
-    const size_t bytesWritten = std::fwrite(
-        encoded, 1, encodedSize, file
+    const auto bytes_written = std::fwrite(
+        encoded,
+        1,
+        encoded_size,
+        file
     );
 
-    const bool writeError = bytesWritten != encodedSize;
-    const bool closeError = std::fclose(file) != 0;
+    const bool write_error =
+        bytes_written != encoded_size;
+
+    const bool close_error =
+        std::fclose(file) != 0;
 
     WebPFree(encoded);
 
-    if (writeError || closeError) {
+    if (write_error || close_error) {
         return ImageIO::Error::FileError;
     }
 

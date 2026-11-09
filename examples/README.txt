@@ -59,3 +59,32 @@ clang++ -std=c++2b \
     -framework CoreFoundation \
     -framework CoreVideo \
     -o image
+
+
+clang++ -std=c++2b \
+    -O3 \
+    -DNDEBUG \
+    -I./include \
+    -I"$(brew --prefix jpeg-turbo)/include" \
+    -I"$(brew --prefix libpng)/include" \
+    -I"$(brew --prefix webp)/include" \
+    -I"$(brew --prefix ffmpeg)/include" \
+    ./examples/Movie/MovieExample.cpp \
+    build-release/libGrain.a \
+    -L"$(brew --prefix libpng)/lib" \
+    -lpng \
+    -L"$(brew --prefix jpeg-turbo)/lib" \
+    -ljpeg \
+    -L"$(brew --prefix webp)/lib" \
+    -lwebp \
+    -L"$(brew --prefix ffmpeg)/lib" \
+    -lavformat \
+    -lavcodec \
+    -lavutil \
+    -lswscale \
+    -framework AppKit \
+    -framework CoreGraphics \
+    -framework CoreText \
+    -framework CoreFoundation \
+    -framework CoreVideo \
+    -o movie

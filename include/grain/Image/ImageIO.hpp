@@ -34,7 +34,8 @@ public:
         const Image& image,
         const char* filename,
         Format format,
-        int quality = 90
+        int quality = 90,
+        bool unpremultiply_alpha = false
     ) noexcept -> Error;
 
     [[nodiscard]] static auto detectFormat(

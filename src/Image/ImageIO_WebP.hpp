@@ -12,7 +12,8 @@ auto loadWebP(
 auto saveWebP(
     const Image& image,
     const char* filename,
-    int quality
+    int quality,
+    bool unpremultiply_alpha = false
 ) noexcept -> ImageIO::Error;
 
 } // namespace Grain::Detail

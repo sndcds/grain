@@ -7,9 +7,30 @@ project(
         LANGUAGES CXX
 )
 
-# ------------------------------------------------------------------------------
-# Project options
-# ------------------------------------------------------------------------------
+if(APPLE)
+    enable_language(OBJCXX)
+endif()
+
+
+#-------------------------------------------------------------------------------
+#   C++ standard.
+#-------------------------------------------------------------------------------
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_OBJCXX_STANDARD 23)
+set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
+set(CMAKE_OBJCXX_EXTENSIONS OFF)
+
+# Generate compile_commands.json for clang tooling.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
+#-------------------------------------------------------------------------------
+#   Project options.
+#-------------------------------------------------------------------------------
 
 option(
         GRAIN_BUILD_TESTS
@@ -53,30 +74,17 @@ set_property(
         PROPERTY STRINGS X11 GTK4
 )
 
-# ------------------------------------------------------------------------------
-# C++ standard
-# ------------------------------------------------------------------------------
 
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-set(CMAKE_OBJCXX_STANDARD 23)
-set(CMAKE_OBJCXX_STANDARD_REQUIRED ON)
-set(CMAKE_OBJCXX_EXTENSIONS OFF)
-
-# Generate compile_commands.json for clang tooling.
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# ------------------------------------------------------------------------------
-# CPM
-# ------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+#   CPM.
+#-------------------------------------------------------------------------------
 
 include(cmake/CPM.cmake)
 
-# ------------------------------------------------------------------------------
-# Dependencies
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   Dependencies.
+#-------------------------------------------------------------------------------
 
 if(GRAIN_BUILD_TESTS)
 
@@ -92,9 +100,20 @@ find_package(JPEG REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(WEBP REQUIRED IMPORTED_TARGET libwebp)
 
-# ------------------------------------------------------------------------------
-# Compiler warnings
-# ------------------------------------------------------------------------------
+pkg_check_modules(
+        FFMPEG
+        REQUIRED
+        IMPORTED_TARGET
+        libavformat
+        libavcodec
+        libavutil
+        libswscale
+)
+
+
+#-------------------------------------------------------------------------------
+#   Compiler warnings.
+#-------------------------------------------------------------------------------
 
 add_library(GrainWarnings INTERFACE)
 
@@ -154,9 +173,10 @@ if(GRAIN_WARNINGS_AS_ERRORS)
 
 endif()
 
-# ------------------------------------------------------------------------------
-# Sanitizers
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   Sanitizers.
+#-------------------------------------------------------------------------------
 
 if(GRAIN_ENABLE_SANITIZERS)
 
@@ -188,9 +208,10 @@ if(GRAIN_ENABLE_SANITIZERS)
 
 endif()
 
-# ------------------------------------------------------------------------------
-# Library
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   Library.
+#-------------------------------------------------------------------------------
 
 add_library(Grain)
 
@@ -237,6 +258,12 @@ target_sources(
         src/Image/ImageIO_PNG.cpp
         src/Image/ImageIO_JPG.cpp
         src/Image/ImageIO_WebP.cpp
+
+        src/Signal/SignalData.cpp
+        src/Signal/Signal.cpp
+
+        src/Movie/MovieWriter.cpp
+
         src/Input/Input.cpp
 
         src/Platform/View.cpp
@@ -320,6 +347,12 @@ target_sources(
         include/grain/Image/ImageTransfer.hpp
         include/grain/Image/ImageIO.hpp
 
+        include/grain/Signal/SignalData.hpp
+        include/grain/Signal/Signal.hpp
+
+        include/grain/Movie/Movie.hpp
+        include/grain/Movie/MovieWriter.hpp
+
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp
         include/grain/UI/Button.hpp
@@ -330,13 +363,12 @@ target_sources(
         include/grain/Animation/AnimationDriver.hpp
 )
 
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
 #   Platform implementation
-# ------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 if(APPLE)
-
-    enable_language(OBJCXX)
 
     target_sources(
             Grain
@@ -440,9 +472,10 @@ elseif(UNIX AND NOT APPLE)
 
 endif()
 
-# ------------------------------------------------------------------------------
-# Library configuration
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   Library configuration.
+#-------------------------------------------------------------------------------
 
 target_include_directories(
         Grain
@@ -464,6 +497,7 @@ target_link_libraries(
         PNG::PNG
         JPEG::JPEG
         PkgConfig::WEBP
+        PkgConfig::FFMPEG
 )
 
 if(GRAIN_ENABLE_SANITIZERS)
@@ -476,9 +510,10 @@ if(GRAIN_ENABLE_SANITIZERS)
 
 endif()
 
-# ------------------------------------------------------------------------------
-# clang-tidy
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   clang-tidy.
+#-------------------------------------------------------------------------------
 
 if(GRAIN_ENABLE_CLANG_TIDY)
 
@@ -496,9 +531,10 @@ if(GRAIN_ENABLE_CLANG_TIDY)
 
 endif()
 
-# ------------------------------------------------------------------------------
-# Tests
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   Tests.
+#-------------------------------------------------------------------------------
 
 if(GRAIN_BUILD_TESTS)
 
@@ -508,9 +544,10 @@ if(GRAIN_BUILD_TESTS)
 
 endif()
 
-# ------------------------------------------------------------------------------
-# Examples
-# ------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+#   Examples.
+#-------------------------------------------------------------------------------
 
 if(GRAIN_BUILD_EXAMPLES)
 

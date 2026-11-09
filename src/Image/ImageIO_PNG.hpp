@@ -11,7 +11,8 @@ namespace Grain::Detail {
 
 [[nodiscard]] auto savePNG(
     const Image& image,
-    const char* filename
+    const char* filename,
+    bool unpremultiply_alpha = false
 ) noexcept -> ImageIO::Error;
 
 } // namespace Grain::Detail

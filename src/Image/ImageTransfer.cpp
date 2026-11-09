@@ -4,7 +4,7 @@
 namespace Grain {
 
 ImageTransfer::ImageTransfer(Image& image) noexcept {
-    setup(image);
+    (void)setup(image);
 }
 
 auto ImageTransfer::setup(Image& image) noexcept -> bool {

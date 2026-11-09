@@ -24,43 +24,58 @@ auto main() -> int {
         width,
         height,
         4,
-        Grain::Image::PixelType::UInt8
+        Grain::Image::PixelType::Float32
     )) {
         std::fprintf(stderr, "Failed to create image.\n");
         return 1;
     }
 
-    //--------------------------------------------------------------------------
-    //  Fill the image with an RGB gradient.
-    //--------------------------------------------------------------------------
-
-    if (false) {
-        for (uint32_t y = 0; y < height; ++y) {
-            auto* row = image.rowData(y);
-
-            for (uint32_t x = 0; x < width; ++x) {
-                const size_t offset = static_cast<size_t>(x) * 4;
-
-                row[offset + 0] = static_cast<uint8_t>(
-                    x * 255 / (width - 1)
-                );
-
-                row[offset + 1] = static_cast<uint8_t>(
-                    y * 255 / (height - 1)
-                );
-
-                row[offset + 2] = static_cast<uint8_t>(
-                    (x + y) * 255 / (width + height - 2)
-                );
-
-                row[offset + 3] = 255;
-            }
-        }
-    }
-
 
     //--------------------------------------------------------------------------
     //  Set up pixel access.
+    //--------------------------------------------------------------------------
+
+    Grain::ImageAccess access;
+
+    if (!access.setup(image)) {
+        std::fprintf(stderr, "Failed to set up ImageAccess.\n");
+        return 1;
+    }
+
+    //--------------------------------------------------------------------------
+    //  Fill every RGB channel.
+    //--------------------------------------------------------------------------
+
+    if (true) {
+        for (int32_t y = 0; y < static_cast<int32_t>(height); ++y) {
+            if (!access.beginRow(y)) {
+                std::fprintf(stderr, "Failed to begin row.\n");
+                return 1;
+            }
+
+            do {
+                if (!access.read()) {
+                    std::fprintf(stderr, "Failed to read pixel.\n");
+                    return 1;
+                }
+
+                float* values = access.transferPtr();
+
+                values[0] = 0.001 * y;
+                values[1] = 0.001 * access.x();
+                values[2] = 0;
+                values[3] = 0.25;
+
+                if (!access.write()) {
+                    std::fprintf(stderr, "Failed to write pixel.\n");
+                    return 1;
+                }
+            } while (access.nextX());
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    //  Draw.
     //--------------------------------------------------------------------------
 
     auto gc = Grain::GraphicContext::createGraphicContext(image);
@@ -75,15 +90,6 @@ auto main() -> int {
             gc->rotateDegrees(10);
         }
     }
-
-
-    Grain::ImageAccess access;
-
-    if (!access.setup(image)) {
-        std::fprintf(stderr, "Failed to set up ImageAccess.\n");
-        return 1;
-    }
-
 
     //--------------------------------------------------------------------------
     //  Invert every RGB channel.
@@ -118,38 +124,6 @@ auto main() -> int {
 
 
     //--------------------------------------------------------------------------
-    //  Fill every RGB channel.
-    //--------------------------------------------------------------------------
-
-    if (false) {
-        for (int32_t y = 0; y < static_cast<int32_t>(height); ++y) {
-            if (!access.beginRow(y)) {
-                std::fprintf(stderr, "Failed to begin row.\n");
-                return 1;
-            }
-
-            do {
-                if (!access.read()) {
-                    std::fprintf(stderr, "Failed to read pixel.\n");
-                    return 1;
-                }
-
-                float* values = access.transferPtr();
-
-                values[0] = 0.001 * y;
-                values[1] = 0.001 * access.x();
-                values[2] = 0;
-                values[3] = 1;
-
-                if (!access.write()) {
-                    std::fprintf(stderr, "Failed to write pixel.\n");
-                    return 1;
-                }
-            } while (access.nextX());
-        }
-    }
-
-    //--------------------------------------------------------------------------
     //  Save the image in different formats.
     //--------------------------------------------------------------------------
 
@@ -166,14 +140,14 @@ auto main() -> int {
             "JPEG"
         },
         {
-            "gradient-inverted.webp",
-            Grain::ImageIO::Format::WebP,
-            "WebP"
-        },
-        {
             "gradient-inverted.png",
             Grain::ImageIO::Format::PNG,
             "PNG"
+        },
+        {
+            "gradient-inverted.webp",
+            Grain::ImageIO::Format::WebP,
+            "WebP"
         },
     };
 
@@ -181,7 +155,9 @@ auto main() -> int {
         const auto error = Grain::ImageIO::save(
             image,
             output.filename,
-            output.format
+            output.format,
+            100,
+            true
         );
 
         if (error != Grain::ImageIO::Error::None) {

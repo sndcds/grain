@@ -20,9 +20,6 @@ public:
         kDefaultBezierResolution = 64
     };
 
-    enum Error : int32_t {
-    };
-
 private:
     int32_t resolution_ = 0;
     int32_t last_index_ = 0;
@@ -38,7 +35,7 @@ public:
 
     void _init(int32_t resolution, int32_t max_resolution, float* mem);
 
-    auto setResolution(int32_t resolution) -> Error;
+    auto setResolution(int32_t resolution) -> int32_t;
 
     [[nodiscard]] auto resolution() const -> int32_t { return resolution_; }
     [[nodiscard]] auto samplePtr() const -> const float* { return samples_; }
