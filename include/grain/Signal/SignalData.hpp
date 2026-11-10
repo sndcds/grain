@@ -56,7 +56,9 @@ namespace Grain {
         auto operator = (SignalData&& other) noexcept -> SignalData&;
 
 
-        // Configuration
+        //----------------------------------------------------------------------
+        //  Configuration
+        //----------------------------------------------------------------------
 
         [[nodiscard]] auto configure(
             int32_t channel_count,
@@ -72,7 +74,9 @@ namespace Grain {
         void free() noexcept;
 
 
-        // Configuration information
+        //----------------------------------------------------------------------
+        //  Configuration information
+        //----------------------------------------------------------------------
 
         [[nodiscard]] auto sampleType() const -> SignalSampleType { return sample_type_; }
         [[nodiscard]] auto channelCount() const -> int32_t { return channel_count_; }
@@ -106,7 +110,9 @@ namespace Grain {
         }
 
 
-        // Information
+        //----------------------------------------------------------------------
+        //  Information
+        //----------------------------------------------------------------------
 
         [[nodiscard]]
         auto hasData() const noexcept -> bool {
@@ -189,7 +195,9 @@ namespace Grain {
         }
 
 
-        // Sample storage
+        //----------------------------------------------------------------------
+        //  Sample storage
+        //----------------------------------------------------------------------
 
         [[nodiscard]]
         auto dataPtr() const noexcept -> const void* {
@@ -278,13 +286,17 @@ namespace Grain {
         );
 
 
-        // Utilities
+        //----------------------------------------------------------------------
+        //  Utilities
+        //----------------------------------------------------------------------
 
         [[nodiscard]]
         auto hasSameFormatAs(const SignalData& other) const noexcept -> bool;
 
 
-        // Swap
+        //----------------------------------------------------------------------
+        //  Swap
+        //----------------------------------------------------------------------
 
         void swap(SignalData& other) noexcept;
 

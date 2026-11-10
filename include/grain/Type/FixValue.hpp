@@ -14,7 +14,7 @@ namespace Grain {
 
 class FixValue {
 public:
-    using RawType = std::int64_t;
+    using RawType = int64_t;
 
     static constexpr RawType kScale = 1'000'000'000;
     static constexpr RawType kMinRaw = -999'999'999'000'000'000LL;

@@ -108,6 +108,7 @@ pkg_check_modules(
         libavcodec
         libavutil
         libswscale
+        libswresample
 )
 
 
@@ -261,6 +262,9 @@ target_sources(
 
         src/Signal/SignalData.cpp
         src/Signal/Signal.cpp
+        src/Signal/AudioFile.cpp
+        src/Signal/FFmpeg/FFmpegReader.cpp
+        src/Signal/FFmpeg/FFmpegWriter.cpp
 
         src/Movie/MovieWriter.cpp
 
@@ -349,6 +353,10 @@ target_sources(
 
         include/grain/Signal/SignalData.hpp
         include/grain/Signal/Signal.hpp
+        include/grain/Signal/AudioFile.hpp
+        include/grain/Signal/FFmpeg/FFmpegFormat.hpp
+        include/grain/Signal/FFmpeg/FFmpegReader.hpp
+        include/grain/Signal/FFmpeg/FFmpegWriter.hpp
 
         include/grain/Movie/Movie.hpp
         include/grain/Movie/MovieWriter.hpp

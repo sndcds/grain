@@ -15,21 +15,23 @@ public:
     ~Signal() = default;
 
     Signal(const Signal&) = delete;
-    Signal& operator=(const Signal&) = delete;
+    auto operator = (const Signal&) -> Signal& = delete;
 
     Signal(Signal&&) noexcept = default;
-    Signal& operator=(Signal&&) noexcept = default;
+    auto operator = (Signal&&) noexcept -> Signal& = default;
 
 
-    // Configuration
+    //--------------------------------------------------------------------------
+    //  Configuration.
+    //--------------------------------------------------------------------------
 
     [[nodiscard]]
-    std::int32_t configure(
-        std::int32_t channel_count,
-        std::int32_t sample_rate,
-        std::int64_t sample_count,
+    auto configure(
+        int32_t channel_count,
+        int32_t sample_rate,
+        int64_t sample_count,
         SignalSampleType sample_type
-    ) {
+    ) -> int32_t {
         return data_.configure(
             channel_count,
             sample_rate,
@@ -39,7 +41,7 @@ public:
     }
 
     [[nodiscard]]
-    std::int32_t growIfNeeded(std::int64_t sample_count) {
+    auto growIfNeeded(int64_t sample_count) -> int32_t {
         return data_.growIfNeeded(sample_count);
     }
 
@@ -52,236 +54,244 @@ public:
     }
 
 
-    // Configuration information
+    //--------------------------------------------------------------------------
+    //  Configuration information.
+    //--------------------------------------------------------------------------
 
     [[nodiscard]]
-    SignalSampleType sampleType() const noexcept {
+    auto sampleType() const noexcept -> SignalSampleType {
         return data_.sampleType();
     }
 
     [[nodiscard]]
-    std::int32_t sampleRate() const noexcept {
+    auto sampleRate() const noexcept -> int32_t {
         return data_.sampleRate();
     }
 
     [[nodiscard]]
-    std::int32_t channelCount() const noexcept {
+    auto channelCount() const noexcept -> int32_t {
         return data_.channelCount();
     }
 
     [[nodiscard]]
-    std::int64_t sampleCount() const noexcept {
+    auto sampleCount() const noexcept -> int64_t {
         return data_.sampleCount();
     }
 
     [[nodiscard]]
-    std::int64_t lastSampleIndex() const noexcept {
+    auto lastSampleIndex() const noexcept -> int64_t {
         return data_.lastSampleIndex();
     }
 
     [[nodiscard]]
-    std::int64_t allChannelSampleCount() const noexcept {
+    auto allChannelSampleCount() const noexcept -> int64_t {
         return data_.allChannelSampleCount();
     }
 
     [[nodiscard]]
-    std::int32_t bitsPerSample() const noexcept {
+    auto bitsPerSample() const noexcept -> int32_t {
         return data_.bitsPerSample();
     }
 
     [[nodiscard]]
-    std::int32_t bytesPerSample() const noexcept {
+    auto bytesPerSample() const noexcept -> int32_t {
         return data_.bytesPerSample();
     }
 
     [[nodiscard]]
-    std::size_t dataSize() const noexcept {
+    auto dataSize() const noexcept -> std::size_t {
         return data_.dataSize();
     }
 
 
-    // Information
+    //--------------------------------------------------------------------------
+    //  Information.
+    //--------------------------------------------------------------------------
 
     [[nodiscard]]
-    bool hasData() const noexcept {
+    auto hasData() const noexcept -> bool {
         return data_.hasData();
     }
 
     [[nodiscard]]
-    bool isConfigured() const noexcept {
+    auto isConfigured() const noexcept -> bool {
         return data_.isConfigured();
     }
 
     [[nodiscard]]
-    bool isIntegerType() const noexcept {
+    auto isIntegerType() const noexcept -> bool {
         return data_.isIntegerType();
     }
 
     [[nodiscard]]
-    bool isFloatingPointType() const noexcept {
+    auto isFloatingPointType() const noexcept -> bool {
         return data_.isFloatingPointType();
     }
 
     [[nodiscard]]
-    bool isInt8Type() const noexcept {
+    auto isInt8Type() const noexcept -> bool {
         return data_.isInt8Type();
     }
 
     [[nodiscard]]
-    bool isInt16Type() const noexcept {
+    auto isInt16Type() const noexcept -> bool {
         return data_.isInt16Type();
     }
 
     [[nodiscard]]
-    bool isInt32Type() const noexcept {
+    auto isInt32Type() const noexcept -> bool {
         return data_.isInt32Type();
     }
 
     [[nodiscard]]
-    bool isFloatType() const noexcept {
+    auto isFloatType() const noexcept -> bool {
         return data_.isFloatType();
     }
 
     [[nodiscard]]
-    bool isMono() const noexcept {
+    auto isMono() const noexcept -> bool {
         return data_.isMono();
     }
 
     [[nodiscard]]
-    bool isStereo() const noexcept {
+    auto isStereo() const noexcept -> bool {
         return data_.isStereo();
     }
 
     [[nodiscard]]
-    bool isQuadra() const noexcept {
+    auto isQuadra() const noexcept -> bool {
         return data_.isQuadra();
     }
 
     [[nodiscard]]
-    bool hasChannel(std::int32_t channel) const noexcept {
+    auto hasChannel(int32_t channel) const noexcept -> bool {
         return data_.hasChannel(channel);
     }
 
     [[nodiscard]]
-    bool hasChannelAndData(std::int32_t channel) const noexcept {
+    auto hasChannelAndData(int32_t channel) const noexcept -> bool {
         return data_.hasChannelAndData(channel);
     }
 
     [[nodiscard]]
-    bool hasSampleAtChannel(
-        std::int32_t channel,
-        std::int64_t index
-    ) const noexcept {
+    auto hasSampleAtChannel(
+        int32_t channel,
+        int64_t index
+    ) const noexcept -> bool {
         return data_.hasSampleAtChannel(channel, index);
     }
 
 
-    // Sample storage access
+    //--------------------------------------------------------------------------
+    //  Sample storage access.
+    //--------------------------------------------------------------------------
 
     [[nodiscard]]
-    const void* dataPtr() const noexcept {
+    auto dataPtr() const noexcept -> const void* {
         return data_.dataPtr();
     }
 
     [[nodiscard]]
-    void* mutDataPtr() noexcept {
+    auto mutDataPtr() noexcept -> void* {
         return data_.mutDataPtr();
     }
 
     [[nodiscard]]
-    const void* dataPtr(
-        std::int32_t channel,
-        std::int64_t index = 0
-    ) const {
+    auto dataPtr(
+        int32_t channel,
+        int64_t index = 0
+    ) const -> const void* {
         return data_.dataPtr(channel, index);
     }
 
     [[nodiscard]]
-    void* mutDataPtr(
-        std::int32_t channel,
-        std::int64_t index = 0
-    ) {
+    auto mutDataPtr(
+        int32_t channel,
+        int64_t index = 0
+    ) -> void* {
         return data_.mutDataPtr(channel, index);
     }
 
 
-    // Typed sample access
+    //--------------------------------------------------------------------------
+    //  Typed sample access.
+    //--------------------------------------------------------------------------
 
     [[nodiscard]]
-    std::int8_t readInt8(
-        std::int32_t channel,
-        std::int64_t index
-    ) const {
+    auto readInt8(
+        int32_t channel,
+        int64_t index
+    ) const -> int8_t {
         return data_.readInt8(channel, index);
     }
 
     [[nodiscard]]
-    std::int16_t readInt16(
-        std::int32_t channel,
-        std::int64_t index
-    ) const {
+    auto readInt16(
+        int32_t channel,
+        int64_t index
+    ) const -> int16_t {
         return data_.readInt16(channel, index);
     }
 
     [[nodiscard]]
-    std::int32_t readInt32(
-        std::int32_t channel,
-        std::int64_t index
-    ) const {
+    auto readInt32(
+        int32_t channel,
+        int64_t index
+    ) const -> int32_t {
         return data_.readInt32(channel, index);
     }
 
     [[nodiscard]]
-    float readFloat(
-        std::int32_t channel,
-        std::int64_t index
-    ) const {
+    auto readFloat(
+        int32_t channel,
+        int64_t index
+    ) const -> float {
         return data_.readFloat(channel, index);
     }
 
     [[nodiscard]]
-    double readDouble(
-        std::int32_t channel,
-        std::int64_t index
-    ) const {
+    auto readDouble(
+        int32_t channel,
+        int64_t index
+    ) const -> double {
         return data_.readDouble(channel, index);
     }
 
     void writeInt8(
-        std::int32_t channel,
-        std::int64_t index,
-        std::int8_t value
+        int32_t channel,
+        int64_t index,
+        int8_t value
     ) {
         data_.writeInt8(channel, index, value);
     }
 
     void writeInt16(
-        std::int32_t channel,
-        std::int64_t index,
-        std::int16_t value
+        int32_t channel,
+        int64_t index,
+        int16_t value
     ) {
         data_.writeInt16(channel, index, value);
     }
 
     void writeInt32(
-        std::int32_t channel,
-        std::int64_t index,
-        std::int32_t value
+        int32_t channel,
+        int64_t index,
+        int32_t value
     ) {
         data_.writeInt32(channel, index, value);
     }
 
     void writeFloat(
-        std::int32_t channel,
-        std::int64_t index,
+        int32_t channel,
+        int64_t index,
         float value
     ) {
         data_.writeFloat(channel, index, value);
     }
 
     void writeDouble(
-        std::int32_t channel,
-        std::int64_t index,
+        int32_t channel,
+        int64_t index,
         double value
     ) {
         data_.writeDouble(channel, index, value);

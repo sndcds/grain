@@ -250,7 +250,7 @@ auto solveCubicBezier(
 
     std::ranges::sort(out_values.begin(), out_values.begin() + count);
 
-    return static_cast<std::int32_t>(count);
+    return static_cast<int32_t>(count);
 }
 
 } // namespace Grain::Polynomial

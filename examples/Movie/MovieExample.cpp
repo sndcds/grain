@@ -11,14 +11,14 @@
 
 
 struct MovieContext {
-    std::int32_t width = 1200;
-    std::int32_t height = 800;
+    int32_t width = 1200;
+    int32_t height = 800;
 };
 
 
 bool renderFrame(
     Grain::MovieWriter* writer,
-    std::int64_t frame_index,
+    int64_t frame_index,
     void* ref
 ) noexcept {
 
@@ -43,7 +43,7 @@ bool renderFrame(
     const float phase =
         static_cast<float>(frame_index) * 0.04f;
 
-    for (std::int32_t y = 0; y < context->height; ++y) {
+    for (int32_t y = 0; y < context->height; ++y) {
 
         if (!access.beginRow(y)) {
             return false;
@@ -83,19 +83,19 @@ bool renderFrame(
 
 int main() {
 
-    constexpr std::int32_t width = 1200;
-    constexpr std::int32_t height = 800;
+    constexpr int32_t width = 1200;
+    constexpr int32_t height = 800;
 
-    constexpr std::int32_t frame_rate = 25;
-    constexpr std::int64_t duration_seconds = 10;
+    constexpr int32_t frame_rate = 25;
+    constexpr int64_t duration_seconds = 10;
 
-    constexpr std::int64_t frame_count =
+    constexpr int64_t frame_count =
         frame_rate * duration_seconds;
 
 
-    //----------------------------------------------------------------------
-    // Configure the movie.
-    //----------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    //  Configure the movie.
+    //--------------------------------------------------------------------------
 
     Grain::MovieWriterConfig config;
 
@@ -111,9 +111,9 @@ int main() {
     config.has_audio = false;
 
 
-    //----------------------------------------------------------------------
-    // Set up the frame callback context.
-    //----------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    //  Set up the frame callback context.
+    //--------------------------------------------------------------------------
 
     MovieContext context;
 
@@ -121,9 +121,9 @@ int main() {
     context.height = height;
 
 
-    //----------------------------------------------------------------------
-    // Create the movie writer.
-    //----------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    //  Create the movie writer.
+    //--------------------------------------------------------------------------
 
     Grain::MovieWriter writer;
 

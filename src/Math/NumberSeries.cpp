@@ -13,8 +13,8 @@ auto NumberSeries::countBits(
 
 auto NumberSeries::perNoergaardInfiniteNumber(
     std::uint32_t index
-) -> std::int32_t {
-    std::int32_t result = 0;
+) -> int32_t {
+    int32_t result = 0;
 
     while (index != 0) {
         if ((index & 1U) != 0U) {
@@ -33,18 +33,18 @@ auto NumberSeries::perNoergaardInfiniteNumber(
 auto NumberSeries::collatzSequenceNumber(
     std::uint64_t value,
     std::uint32_t max_steps
-) -> std::int32_t {
+) -> int32_t {
     if (value == 0) {
         return -1;
     }
 
     for (std::uint32_t step = 0; step <= max_steps; ++step) {
         if (value == 1) {
-            if (step > static_cast<std::uint32_t>(std::numeric_limits<std::int32_t>::max())) {
+            if (step > static_cast<std::uint32_t>(std::numeric_limits<int32_t>::max())) {
                 return -1;
             }
 
-            return static_cast<std::int32_t>(step);
+            return static_cast<int32_t>(step);
         }
 
         if (step == max_steps) {

@@ -25,7 +25,7 @@ namespace Grain {
 
     using MovieWriterFrameCallbackFunc = bool (*)(
         MovieWriter* movie_writer,
-        std::int64_t frame_index,
+        int64_t frame_index,
         void* ref
     );
 
@@ -33,22 +33,22 @@ namespace Grain {
     struct MovieWriterConfig {
 
         // Video
-        std::int32_t width = 1920;
-        std::int32_t height = 1080;
+        int32_t width = 1920;
+        int32_t height = 1080;
 
-        std::int32_t frame_rate_num = 25;
-        std::int32_t frame_rate_den = 1;
+        int32_t frame_rate_num = 25;
+        int32_t frame_rate_den = 1;
 
         MovieVideoCodec video_codec = MovieVideoCodec::H264;
 
         // H.264: CRF value (lower means better quality).
         // ProRes: codec-specific quality setting.
-        std::int32_t video_quality = 23;
+        int32_t video_quality = 23;
 
         // Audio
         bool has_audio = true;
         MovieAudioCodec audio_codec = MovieAudioCodec::AAC;
-        std::int32_t audio_bitrate = 128000;
+        int32_t audio_bitrate = 128000;
     };
 
 
@@ -66,7 +66,7 @@ namespace Grain {
 
         MovieWriterError writeVideoWithAudio(
             const String& file_path,
-            std::int64_t video_frame_count,
+            int64_t video_frame_count,
             const MovieWriterConfig& config,
             MovieWriterFrameCallbackFunc frame_callback,
             Signal* audio_signal = nullptr,

@@ -596,7 +596,7 @@ TEST_CASE("Vec2 stream output", "[Vec2]")
     SECTION("int8 vector is printed numerically")
     {
         std::ostringstream stream;
-        stream << Vec2<std::int8_t>{10, 20};
+        stream << Vec2<int8_t>{10, 20};
 
         REQUIRE(stream.str() == "10, 20");
     }

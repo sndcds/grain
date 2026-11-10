@@ -209,7 +209,7 @@ MovieWriter& MovieWriter::operator = (MovieWriter&& other) noexcept {
 
 MovieWriterError MovieWriter::writeVideoWithAudio(
     const String& file_path,
-    std::int64_t video_frame_count,
+    int64_t video_frame_count,
     const MovieWriterConfig& config,
     MovieWriterFrameCallbackFunc frame_callback,
     Signal* audio_signal,
@@ -380,7 +380,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
     } else if (config.video_codec == MovieVideoCodec::ProRes) {
 
-        const std::int32_t profile = config.video_quality;
+        const int32_t profile = config.video_quality;
 
         if (profile < 0 || profile > 5) {
             return MovieWriterError::InvalidArgument;
@@ -682,7 +682,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
     //  Encode video frames.
     //--------------------------------------------------------------------------
 
-    for (std::int64_t frame_index = 0;
+    for (int64_t frame_index = 0;
          frame_index < video_frame_count;
          ++frame_index) {
 
@@ -709,7 +709,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
         float* pixel = image_access.transferPtr();
 
-        for (std::int32_t y = 0; y < config.height; ++y) {
+        for (int32_t y = 0; y < config.height; ++y) {
 
             image_access.beginRow(y);
 
@@ -718,7 +718,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
                 y * frame_rgb->linesize[0]
             );
 
-            std::int32_t x = 0;
+            int32_t x = 0;
 
             do {
                 image_access.read();
@@ -811,7 +811,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
         }
 
         const int channels = audio_ctx->ch_layout.nb_channels;
-        const std::int64_t total_samples = audio_signal->sampleCount();
+        const int64_t total_samples = audio_signal->sampleCount();
 
         const int frame_size = audio_ctx->frame_size;
 
@@ -825,12 +825,12 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
             return MovieWriterError::OutOfMemory;
         }
 
-        std::int64_t sample_position = 0;
+        int64_t sample_position = 0;
 
         while (sample_position < total_samples) {
 
             const int sample_count = static_cast<int>(
-                std::min<std::int64_t>(
+                std::min<int64_t>(
                     frame_size,
                     total_samples - sample_position
                 )

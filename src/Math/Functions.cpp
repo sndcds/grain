@@ -33,7 +33,7 @@ auto besselI0(const double x) -> double {
     double term = 1.0;
     double sum = 1.0;
 
-    for (std::int32_t i = 1; i < 1000; ++i) {
+    for (int32_t i = 1; i < 1000; ++i) {
         const auto n = static_cast<double>(i);
 
         term *= (half_x * half_x) / (n * n);

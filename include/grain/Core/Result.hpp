@@ -4,7 +4,7 @@
 
 namespace Grain {
 
-enum class Result : std::int32_t {
+enum class Result : int32_t {
     Success = 0,
     Error,
     InvalidArgument,

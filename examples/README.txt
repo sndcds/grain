@@ -23,7 +23,11 @@ cmake --build build-release --target Grain -j
 
 
 //------------------------------------------------------------------------------
-//  Compile program
+//  Compile program.
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//  Weighted Samples Demo.
 //------------------------------------------------------------------------------
 
 clang++ -std=c++2b \
@@ -37,6 +41,10 @@ clang++ -std=c++2b \
   -framework CoreVideo \
   -o weighted_samples_demo
 
+
+//------------------------------------------------------------------------------
+//  Image Demo.
+//------------------------------------------------------------------------------
 
 clang++ -std=c++2b \
     -O3 \
@@ -60,6 +68,10 @@ clang++ -std=c++2b \
     -framework CoreVideo \
     -o image
 
+
+//------------------------------------------------------------------------------
+//  Movie Demo.
+//------------------------------------------------------------------------------
 
 clang++ -std=c++2b \
     -O3 \
@@ -88,3 +100,38 @@ clang++ -std=c++2b \
     -framework CoreFoundation \
     -framework CoreVideo \
     -o movie
+
+
+//------------------------------------------------------------------------------
+//  Audio Demo.
+//------------------------------------------------------------------------------
+
+clang++ -std=c++2b \
+    -O3 \
+    -DNDEBUG \
+    -I./include \
+    -I"$(brew --prefix jpeg-turbo)/include" \
+    -I"$(brew --prefix libpng)/include" \
+    -I"$(brew --prefix webp)/include" \
+    -I"$(brew --prefix ffmpeg)/include" \
+    ./examples/Audio/AudioDemo.cpp \
+    build-release/libGrain.a \
+    -L"$(brew --prefix libpng)/lib" \
+    -lpng \
+    -L"$(brew --prefix jpeg-turbo)/lib" \
+    -ljpeg \
+    -L"$(brew --prefix webp)/lib" \
+    -lwebp \
+    -L"$(brew --prefix ffmpeg)/lib" \
+    -lavformat \
+    -lavcodec \
+    -lavutil \
+    -lswscale \
+    -lswresample \
+    -framework AppKit \
+    -framework CoreGraphics \
+    -framework CoreText \
+    -framework CoreFoundation \
+    -framework CoreVideo \
+    -o audio_demo
+

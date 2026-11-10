@@ -533,8 +533,8 @@ struct Rect {
     }
 };
 
-using Recti = Rect<std::int32_t>;
-using Rectl = Rect<std::int64_t>;
+using Recti = Rect<int32_t>;
+using Rectl = Rect<int64_t>;
 using Rectf = Rect<float>;
 using Rectd = Rect<double>;
 

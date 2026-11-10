@@ -11,7 +11,7 @@ using Grain::FixValue;
 
 namespace {
 
-constexpr std::int64_t kScale = 1'000'000'000LL;
+constexpr int64_t kScale = 1'000'000'000LL;
 
 bool approximatelyEqual(
     double actual,

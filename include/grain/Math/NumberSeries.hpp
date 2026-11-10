@@ -10,17 +10,17 @@ public:
     NumberSeries() = delete;
 
     [[nodiscard]] static auto countBits(
-        std::uint32_t value
-    ) -> std::uint32_t;
+        uint32_t value
+    ) -> uint32_t;
 
     [[nodiscard]] static auto perNoergaardInfiniteNumber(
-        std::uint32_t index
-    ) -> std::int32_t;
+        uint32_t index
+    ) -> int32_t;
 
     [[nodiscard]] static auto collatzSequenceNumber(
-        std::uint64_t value,
-        std::uint32_t max_steps
-    ) -> std::int32_t;
+        uint64_t value,
+        uint32_t max_steps
+    ) -> int32_t;
 };
 
 } // namespace Grain
