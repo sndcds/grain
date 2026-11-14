@@ -4,8 +4,7 @@
 #include <cstdio>
 #include <filesystem>
 
-#include <grain/Signal/Signal.hpp>
-#include <grain/Signal/AudioFile.hpp>
+#include "../../include/Grain.hpp"
 
 
 int main() {
@@ -22,7 +21,7 @@ int main() {
 
 
     //--------------------------------------------------------------------------
-    //  Create and configure the source signal.
+    //  Create and configure the source signal
     //--------------------------------------------------------------------------
 
     Grain::Signal signal;
@@ -47,7 +46,7 @@ int main() {
 
 
     //--------------------------------------------------------------------------
-    //  Generate a sine wave.
+    //  Generate a sine wave
     //--------------------------------------------------------------------------
 
     float* samples = static_cast<float*>(signal.mutDataPtr());
@@ -75,7 +74,7 @@ int main() {
 
 
     //--------------------------------------------------------------------------
-    //  Save the signal as WAV.
+    //  Save the signal as WAV
     //--------------------------------------------------------------------------
 
     Grain::AudioFileOptions wav_options;
@@ -105,7 +104,7 @@ int main() {
 
 
     //--------------------------------------------------------------------------
-    //  Load the WAV file into another signal.
+    //  Load the WAV file into another signal
     //--------------------------------------------------------------------------
 
     Grain::Signal decoded_signal;
@@ -136,7 +135,7 @@ int main() {
 
 
     //--------------------------------------------------------------------------
-    //  Save the decoded signal as MP3.
+    //  Save the decoded signal as MP3
     //--------------------------------------------------------------------------
 
     Grain::AudioFileOptions mp3_options;

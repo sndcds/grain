@@ -1,4 +1,4 @@
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 
 #include <cmath>
 #include <algorithm>

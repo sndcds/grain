@@ -1,4 +1,4 @@
-#include <grain/Graphics/ColorLUT.hpp>
+#include <grain/Color/ColorLUT.hpp>
 
 #include <algorithm>
 #include <cmath>

@@ -1,13 +1,7 @@
 #include <cstdint>
 #include <cstdio>
 
-#include <grain/Graphics/Color.hpp>
-#include <grain/Image/Image.hpp>
-
-#include "grain/Graphics/GraphicContext.hpp"
-
-#include <grain/Image/ImageAccess.hpp>
-#include <grain/Image/ImageIO.hpp>
+#include "../../include/Grain.hpp"
 
 auto main() -> int {
     constexpr uint32_t width = 1200;
@@ -17,7 +11,7 @@ auto main() -> int {
 
 
     //--------------------------------------------------------------------------
-    //  Create an 8-bit RGB image.
+    //  Create an 8-bit RGB image
     //--------------------------------------------------------------------------
 
     if (!image.create(
@@ -32,7 +26,7 @@ auto main() -> int {
 
 
     //--------------------------------------------------------------------------
-    //  Set up pixel access.
+    //  Set up pixel access
     //--------------------------------------------------------------------------
 
     Grain::ImageAccess access;
@@ -43,7 +37,7 @@ auto main() -> int {
     }
 
     //--------------------------------------------------------------------------
-    //  Fill every RGB channel.
+    //  Fill every RGB channel
     //--------------------------------------------------------------------------
 
     if (true) {
@@ -75,7 +69,7 @@ auto main() -> int {
     }
 
     //--------------------------------------------------------------------------
-    //  Draw.
+    //  Draw
     //--------------------------------------------------------------------------
 
     auto gc = Grain::GraphicContext::createGraphicContext(image);
@@ -92,7 +86,7 @@ auto main() -> int {
     }
 
     //--------------------------------------------------------------------------
-    //  Invert every RGB channel.
+    //  Invert every RGB channel
     //--------------------------------------------------------------------------
 
     if (false) {
@@ -124,7 +118,7 @@ auto main() -> int {
 
 
     //--------------------------------------------------------------------------
-    //  Save the image in different formats.
+    //  Save the image in different formats
     //--------------------------------------------------------------------------
 
     struct Output {
@@ -181,7 +175,7 @@ auto main() -> int {
 
 
     //--------------------------------------------------------------------------
-    //  Print sampled colors.
+    //  Print sampled colors
     //--------------------------------------------------------------------------
 
     std::printf("Sampled colors (x, y, r, g, b):\n");

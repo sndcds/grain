@@ -2,7 +2,7 @@
 
 #include <grain/UI/Component.hpp>
 #include <grain/Geometry/Rect.hpp>
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 
 #include <functional>
 #include <string>

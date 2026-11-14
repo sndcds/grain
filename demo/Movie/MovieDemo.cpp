@@ -1,13 +1,7 @@
 #include <cstdint>
 #include <cstdio>
 
-#include <grain/String/String.hpp>
-
-#include <grain/Movie/Movie.hpp>
-#include <grain/Movie/MovieWriter.hpp>
-
-#include <grain/Image/Image.hpp>
-#include <grain/Image/ImageAccess.hpp>
+#include "../../include/Grain.hpp"
 
 
 struct MovieContext {
@@ -89,12 +83,61 @@ int main() {
     constexpr int32_t frame_rate = 25;
     constexpr int64_t duration_seconds = 10;
 
-    constexpr int64_t frame_count =
-        frame_rate * duration_seconds;
+    constexpr int64_t frame_count =frame_rate * duration_seconds;
+
+    //--------------------------------------------------------------------------
+    //  Create the audio signal
+    //--------------------------------------------------------------------------
+
+    Grain::Signal audio_signal;
+    int32_t audio_channel_count = 2;
+    int32_t audio_sample_rate = 44100;
+    int32_t audio_sample_count = 10 * audio_sample_rate;
+    float audio_sine_frequency = 440.0f;
+    float audio_amplitude = 1.0f;
+
+    const int32_t configure_error = audio_signal.configure(
+        audio_channel_count,
+        audio_sample_rate,
+        audio_sample_count,
+        Grain::SignalSampleType::Float32
+    );
+
+    if (configure_error != 0) {
+        std::fprintf(
+            stderr,
+            "Failed to configure signal (error code: %d).\n",
+            configure_error
+        );
+
+        return 1;
+    }
 
 
     //--------------------------------------------------------------------------
-    //  Configure the movie.
+    //  Generate a sine wave
+    //--------------------------------------------------------------------------
+
+    float* samples = static_cast<float*>(audio_signal.mutDataPtr());
+
+    if (samples == nullptr) {
+        std::fprintf(stderr, "Signal has no data buffer.\n");
+        return 1;
+    }
+
+    for (int64_t i = 0; i < audio_sample_count; ++i) {
+        const float time = static_cast<float>(i) / static_cast<float>(audio_sample_rate);
+        const float phase = 2.0f * static_cast<float>(M_PI) * audio_sine_frequency * time;
+        const float value = audio_amplitude * std::sin(phase);
+
+        // Interleaved stereo: left, right, left, right, ...
+        samples[i * audio_channel_count + 0] = value;
+        samples[i * audio_channel_count + 1] = value;
+    }
+
+
+    //--------------------------------------------------------------------------
+    //  Configure the movie
     //--------------------------------------------------------------------------
 
     Grain::MovieWriterConfig config;
@@ -108,11 +151,13 @@ int main() {
     config.video_codec = Grain::MovieVideoCodec::H264;
     config.video_quality = 23;
 
-    config.has_audio = false;
+    config.has_audio = true;
+    config.audio_codec = Grain::MovieAudioCodec::AAC;
+    config.audio_bitrate = 192000;
 
 
     //--------------------------------------------------------------------------
-    //  Set up the frame callback context.
+    //  Set up the frame callback context
     //--------------------------------------------------------------------------
 
     MovieContext context;
@@ -122,7 +167,7 @@ int main() {
 
 
     //--------------------------------------------------------------------------
-    //  Create the movie writer.
+    //  Create the movie writer
     //--------------------------------------------------------------------------
 
     Grain::MovieWriter writer;
@@ -133,7 +178,7 @@ int main() {
             frame_count,
             config,
             renderFrame,
-            nullptr,
+            &audio_signal,
             &context
         );
 

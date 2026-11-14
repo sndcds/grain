@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 #include <grain/Image/ImageAccess.hpp>
 
 namespace Grain {

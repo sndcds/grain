@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <grain/Graphics/GraphicState.hpp>
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 #include <grain/Graphics/Font.hpp>
 #include <grain/Graphics/GraphicPath.hpp>
 #include <grain/Geometry/Rect.hpp>

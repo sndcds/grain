@@ -1,6 +1,6 @@
 #pragma once
 
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 
 namespace Grain {
 

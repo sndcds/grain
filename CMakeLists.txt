@@ -139,6 +139,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
             -Wcast-align
             -Wextra-semi
             -Wundef
+            -w
     )
 
 elseif(MSVC)
@@ -245,8 +246,9 @@ target_sources(
         src/Geometry/Bezier.cpp
         src/Geometry/BezierValueCurve.cpp
 
-        src/Graphics/Color.cpp
-        src/Graphics/ColorLUT.cpp
+        src/Color/Color.cpp
+        src/Color/HSVColor.cpp
+        src/Color/ColorLUT.cpp
         src/Graphics/GraphicPathPoint.cpp
         src/Graphics/GraphicPath.cpp
         src/Graphics/Gradient.cpp
@@ -336,8 +338,9 @@ target_sources(
         include/grain/Platform/Window.hpp
         include/grain/Platform/View.hpp
 
-        include/grain/Graphics/Color.hpp
-        include/grain/Graphics/ColorLUT.hpp
+        include/grain/Color/Color.hpp
+        include/grain/Color/ColorLUT.hpp
+        include/grain/Color/HSVColor.hpp
         include/grain/Graphics/Canvas.hpp
         include/grain/Graphics/GraphicState.hpp
         include/grain/Graphics/GraphicContext.hpp

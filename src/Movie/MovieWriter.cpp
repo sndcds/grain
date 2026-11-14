@@ -3,7 +3,7 @@
 #include <grain/String/String.hpp>
 #include <grain/Image/Image.hpp>
 #include <grain/Image/ImageAccess.hpp>
-// #include <grain/Signal/Signal.hpp>
+#include <grain/Signal/Signal.hpp>
 
 #include <algorithm>
 #include <string>
@@ -237,11 +237,8 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
     ref_ptr_ = ref;
 
 
-
-
-
     //--------------------------------------------------------------------------
-    //  Create the video frame buffer.
+    //  Create the video frame buffer
     //--------------------------------------------------------------------------
 
     delete video_frame_buffer_;
@@ -281,7 +278,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Format.
+    //  Format
     //--------------------------------------------------------------------------
 
     if (avformat_alloc_output_context2(
@@ -296,7 +293,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Video codec.
+    //  Video codec
     //--------------------------------------------------------------------------
 
     AVCodecID video_codec_id = AV_CODEC_ID_NONE;
@@ -351,7 +348,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Video pixel format and codec options.
+    //  Video pixel format and codec options
     //--------------------------------------------------------------------------
 
     AVPixelFormat intermediate_fmt = AV_PIX_FMT_NONE;
@@ -450,11 +447,11 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Audio codec.
+    //  Audio codec
     //--------------------------------------------------------------------------
 
     AVStream* audio_stream = nullptr;
-/*
+
     if (has_audio) {
 
         AVCodecID audio_codec_id = AV_CODEC_ID_NONE;
@@ -521,10 +518,10 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
         audio_stream->time_base = audio_ctx->time_base;
     }
-*/
+
 
     //--------------------------------------------------------------------------
-    //  Output file.
+    //  Output file
     //--------------------------------------------------------------------------
 
     if (!(fmt_ctx->oformat->flags & AVFMT_NOFILE)) {
@@ -547,7 +544,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Allocate video frames.
+    //  Allocate video frames
     //--------------------------------------------------------------------------
 
     frame_yuv = av_frame_alloc();
@@ -599,7 +596,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  RGB -> YUV conversion.
+    //  RGB -> YUV conversion
     //--------------------------------------------------------------------------
 
     const AVPixelFormat conversion_format =
@@ -668,7 +665,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Packet.
+    //  Packet
     //--------------------------------------------------------------------------
 
     packet = av_packet_alloc();
@@ -679,7 +676,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Encode video frames.
+    //  Encode video frames
     //--------------------------------------------------------------------------
 
     for (int64_t frame_index = 0;
@@ -788,9 +785,9 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Encode audio.
+    //  Encode audio
     //--------------------------------------------------------------------------
-/*
+
     if (has_audio) {
 
         audio_frame = av_frame_alloc();
@@ -874,10 +871,10 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
             sample_position += sample_count;
         }
     }
-*/
+
 
     //--------------------------------------------------------------------------
-    //  Flush encoders.
+    //  Flush encoders
     //--------------------------------------------------------------------------
 
     MovieWriterError result = flushEncoder(
@@ -907,7 +904,7 @@ MovieWriterError MovieWriter::writeVideoWithAudio(
 
 
     //--------------------------------------------------------------------------
-    //  Finalize output.
+    //  Finalize output
     //--------------------------------------------------------------------------
 
     if (av_write_trailer(fmt_ctx) < 0) {

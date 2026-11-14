@@ -4,7 +4,7 @@
 #include <grain/UI/Component.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/Size.hpp>
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 
 #include <cstdint>
 #include <functional>

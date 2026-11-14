@@ -2,7 +2,7 @@
 #pragma once
 
 #include <grain/UI/Component.hpp>
-#include <grain/Graphics/Color.hpp>
+#include <grain/Color/Color.hpp>
 
 #include <string>
 
