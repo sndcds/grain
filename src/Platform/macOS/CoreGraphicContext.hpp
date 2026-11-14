@@ -43,6 +43,21 @@ public:
 
 
     //--------------------------------------------------------------------------
+    //  Rendering configuration
+    //--------------------------------------------------------------------------
+
+    void setAllowsAntialiasing(bool flag) override;
+    void setShouldSmoothFonts(bool flag) override;
+    void setShouldSubpixelQuantizeFonts(bool flag) override;
+
+    void setTextMatrix(
+        double a, double b, double c, double d,
+        double tx, double ty,
+        bool flipped
+    ) override;
+
+
+    //--------------------------------------------------------------------------
     // Fill
     //--------------------------------------------------------------------------
 
@@ -58,6 +73,8 @@ public:
     void setStrokeJoinStyle(StrokeJoinStyle style) override;
     void setStrokeCapStyle(StrokeCapStyle style) override;
     void setStrokeDash(double phase, const double* lengths, size_t count) override;
+	void setStrokeMiterLimit(double limit) override;
+    void setStrokeSolid() override;
 
 
     //--------------------------------------------------------------------------
@@ -101,7 +118,19 @@ public:
         const Vec2d& start_pos,
         const Vec2d& end_pos,
         bool draw_before,
-        bool draw_after) override;
+        bool draw_after
+    ) override;
+
+    void fillRadialGradient(
+        Gradient* gradient,
+        const Vec2d& start_center,
+        double start_radius,
+        const Vec2d& end_center,
+        double end_radius,
+        bool draw_before,
+        bool draw_after
+    ) override;
+
 
 
     //--------------------------------------------------------------------------
@@ -139,8 +168,7 @@ public:
 
     [[nodiscard]] CFObject<CTLineRef> createTextLine(
         const String& text,
-        const Font* font,
-        const Color& color
+        const Font* font
     );
 
     void drawText(
@@ -154,8 +182,7 @@ public:
         const String& text,
         const Rectd& rect,
         Alignment alignment,
-        const Font* font,
-        const Color& color
+        const Font* font
     ) override;
 
     [[nodiscard]] std::unique_ptr<TextLayout> createTextLayout(

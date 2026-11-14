@@ -1,3 +1,4 @@
+#include <grain/Graphics/GraphicCompoundPath.hpp>
 #include <grain/Graphics/Font.hpp>
 #include <grain/Platform/Font.hpp>
 
@@ -141,6 +142,21 @@ auto Font::charIndexAtX(
         in_out_delta,
         out_cursor_x);
 }
+
+
+auto Font::buildPath(const char* text) const -> FontPath {
+    if (!platform_) {
+        return {};
+    }
+
+    return platform_->buildPath(text);
+}
+
+
+auto Font::buildPath(const String& text) const -> FontPath {
+    return buildPath(text.utf8());
+}
+
 
 [[nodiscard]] auto Font::nativeHandle() const -> void* {
     return platform_

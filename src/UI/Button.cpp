@@ -42,8 +42,7 @@ void Button::draw(GraphicContext& gc) {
         "kulturbytes",
         bounds_,
         Grain::Alignment::Center,
-        font,
-        Color(0, 0, 0, alpha));
+        font);
 }
 
 void Button::setTitle(std::string title) {
@@ -68,12 +67,10 @@ void Button::click() {
 bool Button::handleEvent(const Event& event) {
     if (event.type_ == Grain::EventType::MouseButtonDown) {
         if (bounds_.contains(event.mouse_pos_)) {
-            std::cout << "Button::handleEvent" << std::endl;
             click();
         }
     }
     else if (event.type_ == Grain::EventType::MouseMove) {
-        std::cout << "MouseMove: " << event.mouse_delta_ << std::endl;
     }
     return false;
 }

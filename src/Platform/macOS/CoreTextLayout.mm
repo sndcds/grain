@@ -52,15 +52,21 @@ CFObject<CFAttributedStringRef> createAttributedString(
         return {};
     }
 
-    const void* keys[] = { kCTFontAttributeName };
-    const void* values[] = { native_font };
+    const void* keys[] = {
+        kCTFontAttributeName,
+        kCTForegroundColorFromContextAttributeName
+    };
+    const void* values[] = {
+        native_font,
+        kCFBooleanTrue
+    };
 
     CFObject<CFDictionaryRef> attributes(
         CFDictionaryCreate(
             kCFAllocatorDefault,
             keys,
             values,
-            1,
+            2,
             &kCFTypeDictionaryKeyCallBacks,
             &kCFTypeDictionaryValueCallBacks
         )

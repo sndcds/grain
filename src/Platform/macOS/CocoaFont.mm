@@ -2,8 +2,11 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreText/CoreText.h>
+#include <grain/Graphics/GraphicCompoundPath.hpp>
 
 #include <vector>
+#include <algorithm>
+#include <limits>
 
 namespace Grain::Platform {
 
@@ -72,6 +75,77 @@ CTLineRef createLine(CFStringRef string, CTFontRef font) {
     return CTLineCreateWithAttributedString(
         attributes.get()
     );
+}
+
+
+struct CGPathContext {
+    FontPath* path = nullptr;
+    Vec2d offset{};
+    bool failed = false;
+};
+
+
+void applyCGPathElement(
+    void* info,
+    const CGPathElement* element
+) {
+    auto* context = static_cast<CGPathContext*>(info);
+
+    if (context == nullptr ||
+        context->path == nullptr ||
+        element == nullptr ||
+        context->failed) {
+        return;
+    }
+
+    FontPathElement item;
+
+    const auto makePoint = [&](std::size_t index) -> Vec2d {
+        return {
+            element->points[index].x + context->offset.x,
+            element->points[index].y + context->offset.y
+        };
+    };
+
+    switch (element->type) {
+        case kCGPathElementMoveToPoint:
+            item.type = FontPathElement::Type::MoveTo;
+            item.points[0] = makePoint(0);
+            break;
+
+        case kCGPathElementAddLineToPoint:
+            item.type = FontPathElement::Type::LineTo;
+            item.points[0] = makePoint(0);
+            break;
+
+        case kCGPathElementAddQuadCurveToPoint:
+            item.type = FontPathElement::Type::QuadraticTo;
+            item.points[0] = makePoint(0); // Control point
+            item.points[1] = makePoint(1); // End point
+            break;
+
+        case kCGPathElementAddCurveToPoint:
+            item.type = FontPathElement::Type::CubicTo;
+            item.points[0] = makePoint(0);
+            item.points[1] = makePoint(1);
+            item.points[2] = makePoint(2);
+            break;
+
+        case kCGPathElementCloseSubpath:
+            item.type = FontPathElement::Type::Close;
+            break;
+
+        default:
+            return;
+    }
+
+    // Do not allow a C++ exception to escape through CGPathApply.
+    try {
+        context->path->elements.push_back(item);
+    }
+    catch (...) {
+        context->failed = true;
+    }
 }
 
 } // namespace
@@ -578,5 +652,140 @@ std::unique_ptr<Font> createFont(const String& name, float size) {
     return std::make_unique<CocoaFont>(name, size);
 }
 
+
+auto CocoaFont::buildPath(
+    const char* text
+) const -> FontPath {
+
+    FontPath result;
+
+    if (!ct_font_ || text == nullptr || text[0] == '\0') {
+        return result;
+    }
+
+    CFObject<CFStringRef> cf_string(
+        makeCFString(text, -1)
+    );
+
+    if (!cf_string) {
+        return result;
+    }
+
+    const CFIndex char_count = CFStringGetLength(cf_string.get());
+
+    if (char_count == 0) {
+        return result;
+    }
+
+    const auto count = static_cast<std::size_t>(char_count);
+
+    std::vector<UniChar> characters(count);
+    std::vector<CGGlyph> glyphs(count);
+    std::vector<CGSize> advances(count);
+    std::vector<CGRect> glyph_bounds(count);
+
+    CFStringGetCharacters(
+        cf_string.get(),
+        CFRangeMake(0, char_count),
+        characters.data()
+    );
+
+    const CTFontRef ct_font = ct_font_.get();
+
+    if (!CTFontGetGlyphsForCharacters(
+            ct_font,
+            characters.data(),
+            glyphs.data(),
+            char_count
+        )) {
+        return {};
+    }
+
+    CTFontGetAdvancesForGlyphs(
+        ct_font,
+        kCTFontOrientationHorizontal,
+        glyphs.data(),
+        advances.data(),
+        char_count
+    );
+
+    CTFontGetBoundingRectsForGlyphs(
+        ct_font,
+        kCTFontOrientationHorizontal,
+        glyphs.data(),
+        glyph_bounds.data(),
+        char_count
+    );
+
+    double cursor_x = 0.0;
+    double cursor_y = 0.0;
+
+    double min_x = std::numeric_limits<double>::max();
+    double min_y = std::numeric_limits<double>::max();
+    double max_x = std::numeric_limits<double>::lowest();
+    double max_y = std::numeric_limits<double>::lowest();
+
+    for (CFIndex i = 0; i < char_count; ++i) {
+        const auto index = static_cast<std::size_t>(i);
+
+        const CGRect& glyph_rect = glyph_bounds[index];
+
+        min_x = std::min(
+            min_x,
+            cursor_x + glyph_rect.origin.x
+        );
+
+        min_y = std::min(
+            min_y,
+            cursor_y + glyph_rect.origin.y
+        );
+
+        max_x = std::max(
+            max_x,
+            cursor_x + glyph_rect.origin.x + glyph_rect.size.width
+        );
+
+        max_y = std::max(
+            max_y,
+            cursor_y + glyph_rect.origin.y + glyph_rect.size.height
+        );
+
+        CFObject<CGPathRef> glyph_path(
+            CTFontCreatePathForGlyph(
+                ct_font,
+                glyphs[index],
+                nullptr
+            )
+        );
+
+        if (glyph_path) {
+            CGPathContext context;
+            context.path = &result;
+            context.offset = { cursor_x, cursor_y };
+
+            CGPathApply(
+                glyph_path.get(),
+                &context,
+                applyCGPathElement
+            );
+
+            if (context.failed) {
+                return {};
+            }
+        }
+
+        cursor_x += advances[index].width;
+        cursor_y += advances[index].height;
+    }
+
+    if (min_x != std::numeric_limits<double>::max()) {
+        result.bounds.x = min_x;
+        result.bounds.y = -max_y;
+        result.bounds.width = max_x - min_x;
+        result.bounds.height = max_y - min_y;
+    }
+
+    return result;
+}
 
 } // namespace Grain::Platform

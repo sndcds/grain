@@ -43,6 +43,7 @@
 #include "grain/Graphics/GraphicContext.hpp"
 #include "grain/Graphics/GraphicPathPoint.hpp"
 #include "grain/Graphics/GraphicPath.hpp"
+#include "grain/Graphics/GraphicCompoundPath.hpp"
 #include "grain/Graphics/Gradient.hpp"
 #include "grain/Graphics/Font.hpp"
 #include "grain/Image/Image.hpp"

@@ -36,12 +36,13 @@ void Label::draw(GraphicContext& gc) {
         return;
     }
 
+    // TODO: Set text color!
+
     gc.drawTextInRect(
         text_,
         bounds_,
         Alignment::Left,
-        font,
-        enabled_ ? Color(1, 0, 0, 1) : Color(.1, .1, .1, 1));
+        font);
 }
 
 }

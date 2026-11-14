@@ -3,15 +3,20 @@
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/Size.hpp>
 #include <grain/String/String.hpp>
+#include <grain/Graphics/FontPath.hpp>
 
 #include <cstdint>
 #include <memory>
+#include <vector>
+
 
 namespace Grain::Platform {
 class Font;
 }
 
 namespace Grain {
+
+class GraphicCompoundPath;
 
 class Font {
 public:
@@ -61,6 +66,16 @@ public:
         double& in_out_delta,
         double& out_cursor_x
     ) const -> int32_t;
+
+
+    [[nodiscard]] auto buildPath(
+        const char* text
+    ) const -> FontPath;
+
+    [[nodiscard]] auto buildPath(
+        const String& text
+    ) const -> FontPath;
+
 
     [[nodiscard]] auto nativeHandle() const -> void*;
 

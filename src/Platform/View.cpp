@@ -16,7 +16,6 @@ public:
 View::View()
     : impl_(std::make_unique<Impl>())
 {
-    std::cout << "View::View()" << '\n';
 }
 
 
@@ -166,7 +165,6 @@ void View::handleKeyEvent(const Event& event) {
     switch (event.type_) {
         case EventType::KeyDown: {
             if (focused_component_ != nullptr) {
-                std::cout << event.text_ << '\n';
             }
             break;
         }

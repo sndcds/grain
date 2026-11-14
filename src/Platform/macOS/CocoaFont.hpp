@@ -5,9 +5,6 @@
 
 #include <CoreText/CoreText.h>
 
-namespace Grain {
-class Font;
-}
 
 namespace Grain::Platform {
 
@@ -74,6 +71,12 @@ public:
         double& in_out_delta,
         double& out_cursor_x
     ) const override;
+
+
+    [[nodiscard]] auto buildPath(
+        const char* text
+    ) const -> FontPath override;
+
 
     void* nativeHandle() const override {
         return const_cast<void*>(

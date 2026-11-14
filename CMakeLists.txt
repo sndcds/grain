@@ -249,8 +249,10 @@ target_sources(
         src/Color/Color.cpp
         src/Color/HSVColor.cpp
         src/Color/ColorLUT.cpp
+        src/Graphics/GraphicContext.cpp
         src/Graphics/GraphicPathPoint.cpp
         src/Graphics/GraphicPath.cpp
+        src/Graphics/GraphicCompoundPath.cpp
         src/Graphics/Gradient.cpp
         src/Graphics/Font.cpp
 
@@ -346,6 +348,7 @@ target_sources(
         include/grain/Graphics/GraphicContext.hpp
         include/grain/Graphics/GraphicPathPoint.hpp
         include/grain/Graphics/GraphicPath.hpp
+        include/grain/Graphics/GraphicCompoundPath.hpp
         include/grain/Graphics/Gradient.hpp
         include/grain/Graphics/Font.hpp
 

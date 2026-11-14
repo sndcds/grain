@@ -201,12 +201,13 @@ namespace Grain {
 
             Color info_color = {0, 1, 0, 1};
 
+            // TODO: Set text color!
+
             gc.drawTextInRect(
                 info_text_,
                 bounds_,
                 alignment,
-                font,
-                info_color
+                font
             );
         }
 
@@ -580,8 +581,6 @@ namespace Grain {
 
     bool TextField::_handleKeyDown(const Event& event) {
         cursor_must_be_visible_ = true;
-
-        std::cout << event.text_ << '\n';
 
         int32_t new_cursor_index = -1;
 

@@ -90,37 +90,92 @@ void CoreGraphicContext::clipPathEvenOdd() {
 //  Blend
 //------------------------------------------------------------------------------
 
-void CoreGraphicContext::setBlendMode(
-    ColorBlendMode mode
+void CoreGraphicContext::setBlendMode(ColorBlendMode mode)
+{
+    static constexpr std::array<CGBlendMode, 28> cg_modes = {
+        kCGBlendModeNormal,
+        kCGBlendModeMultiply,
+        kCGBlendModeScreen,
+        kCGBlendModeOverlay,
+        kCGBlendModeDarken,
+        kCGBlendModeLighten,
+        kCGBlendModeColorDodge,
+        kCGBlendModeColorBurn,
+        kCGBlendModeSoftLight,
+        kCGBlendModeHardLight,
+        kCGBlendModeDifference,
+        kCGBlendModeExclusion,
+        kCGBlendModeHue,
+        kCGBlendModeSaturation,
+        kCGBlendModeColor,
+        kCGBlendModeLuminosity,
+        kCGBlendModeClear,
+        kCGBlendModeCopy,
+        kCGBlendModeSourceIn,
+        kCGBlendModeSourceOut,
+        kCGBlendModeSourceAtop,
+        kCGBlendModeDestinationOver,
+        kCGBlendModeDestinationIn,
+        kCGBlendModeDestinationOut,
+        kCGBlendModeDestinationAtop,
+        kCGBlendModeXOR,
+        kCGBlendModePlusDarker,
+        kCGBlendModePlusLighter
+    };
+
+    if (context_ == nullptr) {
+        return;
+    }
+
+    const auto index = static_cast<int32_t>(mode);
+
+    if (index < 0 || index >= static_cast<int32_t>(cg_modes.size())) {
+        return;
+    }
+
+    CGContextSetBlendMode(context_, cg_modes[index]);
+}
+
+
+//--------------------------------------------------------------------------
+//  Rendering configuration
+//--------------------------------------------------------------------------
+
+void CoreGraphicContext::setAllowsAntialiasing(bool flag) {
+    if (context_ == nullptr) {
+        return;
+    }
+    CGContextSetAllowsAntialiasing(context_, flag);
+}
+
+
+void CoreGraphicContext::setShouldSmoothFonts(bool flag) {
+    if (context_ == nullptr) {
+        return;
+    }
+    CGContextSetShouldSmoothFonts(context_, flag);
+}
+
+
+void CoreGraphicContext::setShouldSubpixelQuantizeFonts(bool flag) {
+    if (context_ == nullptr) {
+        return;
+    }
+    CGContextSetShouldSubpixelQuantizeFonts(context_, flag);
+}
+
+
+void CoreGraphicContext::setTextMatrix(
+    double a, double b, double c, double d, double tx, double ty, bool flipped
 ) {
     if (context_ == nullptr) {
         return;
     }
 
-    CGBlendMode cg_blend_mode_;
-
-    switch (mode) {
-        case ColorBlendMode::Normal:
-            cg_blend_mode_ = kCGBlendModeNormal;
-            break;
-
-        case ColorBlendMode::Multiply:
-            cg_blend_mode_ = kCGBlendModeMultiply;
-            break;
-
-        case ColorBlendMode::Screen:
-            cg_blend_mode_ = kCGBlendModeScreen;
-            break;
-
-        case ColorBlendMode::Overlay:
-            cg_blend_mode_ = kCGBlendModeOverlay;
-            break;
-
-        default:
-            return;
+    if (!flipped) {
+        d = -d;
     }
-
-    CGContextSetBlendMode(context_, cg_blend_mode_);
+    CGContextSetTextMatrix(context_, CGAffineTransformMake(a, b, c, d, tx, ty));
 }
 
 
@@ -246,6 +301,27 @@ void CoreGraphicContext::setStrokeDash(
         lengths,
         count
     );
+}
+
+
+void CoreGraphicContext::setStrokeMiterLimit(double limit) {
+    if (context_ == nullptr || !std::isfinite(limit) || limit < 1.0) {
+        return;
+    }
+
+    CGContextSetMiterLimit(
+        context_,
+        static_cast<CGFloat>(limit)
+    );
+}
+
+
+void CoreGraphicContext::setStrokeSolid() {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGContextSetLineDash(context_, 0, nullptr, 0);
 }
 
 
@@ -478,9 +554,7 @@ void CoreGraphicContext::fillGradient(
         static_cast<size_t>(gradient->stopCount()) * 8);
 
     for (int32_t i = 0; i < gradient->stopCount(); ++i) {
-        const GradientStop* stop =
-            gradient->stopPtrAtIndex(i);
-
+        const GradientStop* stop = gradient->stopPtrAtIndex(i);
         if (stop == nullptr) {
             return;
         }
@@ -515,9 +589,7 @@ void CoreGraphicContext::fillGradient(
         return;
     }
 
-    CGColorSpaceRef color_space =
-        CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
-
+    CGColorSpaceRef color_space = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
     if (color_space == nullptr) {
         return;
     }
@@ -556,24 +628,82 @@ void CoreGraphicContext::fillGradient(
 }
 
 
-/* TODO: implement!
-void AppleCGContext::drawRadialGradient(
+void CoreGraphicContext::fillRadialGradient(
     Gradient* gradient,
-    const Vec2d& pos,
-    double radius,
+    const Vec2d& start_center,
+    double start_radius,
+    const Vec2d& end_center,
+    double end_radius,
     bool draw_before,
-    bool draw_after
-) noexcept {
-    if (gradient == nullptr ||
+    bool draw_after)
+{
+    if (context_ == nullptr ||
+        gradient == nullptr ||
         gradient->stopCount() < 2 ||
-        radius <= 0.0) {
+        !std::isfinite(start_radius) ||
+        !std::isfinite(end_radius) ||
+        start_radius < 0.0 ||
+        end_radius < 0.0) {
         return;
     }
 
-    gradient->updateLUT();
-    gradient->update(this);
+    std::vector<CGFloat> locations;
+    std::vector<CGFloat> components;
 
-    auto cg_gradient = gradient->macos_cgGradient(this);
+    locations.reserve(static_cast<size_t>(gradient->stopCount()) * 2);
+    components.reserve(static_cast<size_t>(gradient->stopCount()) * 8);
+
+    for (int32_t i = 0; i < gradient->stopCount(); ++i) {
+        const GradientStop* stop = gradient->stopPtrAtIndex(i);
+
+        if (stop == nullptr) {
+            return;
+        }
+
+        const CGFloat pos = std::clamp(
+            static_cast<CGFloat>(stop->pos()),
+            0.0,
+            1.0);
+
+        const Color left = stop->leftColor();
+        const Color right = stop->rightColor();
+
+        auto appendColor = [&](const Color& color, CGFloat location) {
+            locations.push_back(location);
+
+            components.push_back(color.red);
+            components.push_back(color.green);
+            components.push_back(color.blue);
+            components.push_back(color.alpha);
+        };
+
+        if (stop->isTwoColored()) {
+            appendColor(left, pos);
+            appendColor(right, pos);
+        }
+        else {
+            appendColor(left, pos);
+        }
+    }
+
+    if (locations.size() < 2) {
+        return;
+    }
+
+    CGColorSpaceRef color_space = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+    if (color_space == nullptr) {
+        return;
+    }
+
+    CGGradientRef cg_gradient =
+        CGGradientCreateWithColorComponents(
+            color_space,
+            components.data(),
+            locations.data(),
+            locations.size());
+
+    CGColorSpaceRelease(color_space);
+
     if (cg_gradient == nullptr) {
         return;
     }
@@ -589,34 +719,27 @@ void AppleCGContext::drawRadialGradient(
     }
 
     CGContextDrawRadialGradient(
-        cgContext(),
+        context_,
         cg_gradient,
-        pos.cgPoint(),
-        0.0,
-        pos.cgPoint(),
-        radius,
-        options
-    );
+        CGPointMake(start_center.x, start_center.y),
+        static_cast<CGFloat>(start_radius),
+        CGPointMake(end_center.x, end_center.y),
+        static_cast<CGFloat>(end_radius),
+        options);
+
+    CGGradientRelease(cg_gradient);
 }
-*/
 
 
 //------------------------------------------------------------------------------
 //  Text
 //------------------------------------------------------------------------------
 
-
 CFObject<CTLineRef> CoreGraphicContext::createTextLine(
     const String& text,
-    const Font* font,
-    const Color& color
+    const Font* font
 ) {
     if (font == nullptr) {
-        return {};
-    }
-
-    CFObject<CGColorRef> cg_color(createCGColor(color));
-    if (!cg_color) {
         return {};
     }
 
@@ -627,7 +750,7 @@ CFObject<CTLineRef> CoreGraphicContext::createTextLine(
 
     CFTypeRef values[] = {
         font->nativeHandle(),
-        cg_color.get()
+        kCFBooleanTrue
     };
 
     CFObject<CFDictionaryRef> attributes(
@@ -777,8 +900,7 @@ double CoreGraphicContext::drawTextInRect(
     const String& text,
     const Rectd& rect,
     Alignment alignment,
-    const Font* font,
-    const Color& color
+    const Font* font
 ) {
     if (context_ == nullptr || font == nullptr) {
         return 0.0;
@@ -786,8 +908,7 @@ double CoreGraphicContext::drawTextInRect(
 
     setTextMatrix(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
 
-    CFObject<CTLineRef> line = createTextLine(text, font, color);
-
+    CFObject<CTLineRef> line = createTextLine(text, font);
     if (!line) {
         return 0.0;
     }
@@ -875,15 +996,12 @@ void CoreGraphicContext::drawTextLayoutRange(
         return;
     }
 
-    const auto* text_layout =
-        dynamic_cast<const CoreTextLayout*>(&layout);
-
+    const auto* text_layout = dynamic_cast<const CoreTextLayout*>(&layout);
     if (text_layout == nullptr) {
         return;
     }
 
     const CTLineRef line = text_layout->nativeLine();
-
     if (line == nullptr) {
         return;
     }
@@ -892,12 +1010,8 @@ void CoreGraphicContext::drawTextLayoutRange(
     start = std::max<int32_t>(0, start);
     end = std::max(start, end);
 
-    const double start_x =
-        text_layout->offsetForIndex(start);
-
-    const double end_x =
-        text_layout->offsetForIndex(end);
-
+    const double start_x = text_layout->offsetForIndex(start);
+    const double end_x = text_layout->offsetForIndex(end);
     if (start_x == end_x) {
         return;
     }

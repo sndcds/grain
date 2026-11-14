@@ -6,6 +6,40 @@
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
+
+#--------------------------------------------------------------------------
+# WebP
+#--------------------------------------------------------------------------
+
+execute_process(
+        COMMAND brew --prefix webp
+        OUTPUT_VARIABLE WEBP_PREFIX
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        COMMAND_ERROR_IS_FATAL ANY
+)
+
+find_path(WEBP_INCLUDE_DIR
+        NAMES webp/encode.h
+        PATHS "${WEBP_PREFIX}/include"
+        NO_DEFAULT_PATH
+        REQUIRED
+)
+
+find_library(WEBP_LIBRARY
+        NAMES webp
+        PATHS "${WEBP_PREFIX}/lib"
+        NO_DEFAULT_PATH
+        REQUIRED
+)
+
+add_library(WebP::WebP UNKNOWN IMPORTED GLOBAL)
+
+set_target_properties(WebP::WebP PROPERTIES
+        IMPORTED_LOCATION "${WEBP_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${WEBP_INCLUDE_DIR}"
+)
+
+
 #--------------------------------------------------------------------------#
 # FFmpeg
 #--------------------------------------------------------------------------#
@@ -92,7 +126,7 @@ target_compile_features(Grain INTERFACE cxx_std_23)
 target_link_libraries(Grain INTERFACE
         PNG::PNG
         JPEG::JPEG
-        WebP
+        WebP::WebP
         FFmpeg
 
         "-framework AppKit"

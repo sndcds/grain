@@ -1,10 +1,14 @@
 #pragma once
 
+#include <grain/Graphics/FontPath.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/Size.hpp>
 #include <grain/String/String.hpp>
 
+#include <cstdint>
 #include <memory>
+#include <vector>
+
 
 namespace Grain::Platform {
 
@@ -52,11 +56,20 @@ public:
         double& out_cursor_x
     ) const -> int32_t = 0;
 
+
+    [[nodiscard]] virtual auto buildPath(
+        const char* text
+    ) const -> FontPath = 0;
+
     [[nodiscard]] virtual auto nativeHandle() const -> void* = 0;
 };
 
 [[nodiscard]] auto availableFontNames() -> std::vector<String>;
 [[nodiscard]] auto availableFontFamilies() -> std::vector<String>;
-[[nodiscard]] auto createFont(const String& name, float size) -> std::unique_ptr<Font>;
+
+[[nodiscard]] auto createFont(
+    const String& name,
+    float size
+) -> std::unique_ptr<Font>;
 
 } // namespace Grain::Platform
