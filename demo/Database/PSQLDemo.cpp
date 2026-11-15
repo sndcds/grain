@@ -24,17 +24,17 @@ int main() {
             auto tx = database.read();
 
             auto result = tx.exec(
-                "SELECT uuid, name "
-                "FROM uranus.organization"
+                "SELECT uuid, title "
+                "FROM uranus.event"
             );
 
             for (std::size_t i = 0; i < result.size(); ++i) {
                 const auto row = result[i];
                 const auto uuid = row["uuid"].as<std::string>();
-                const auto name = row["name"].as<std::string>();
+                const auto name = row["title"].as<std::string>();
 
                 std::printf(
-                    "UUID: %s | Name: %s\n",
+                    "uuid: %s | title: %s\n",
                     uuid.c_str(),
                     name.c_str()
                 );

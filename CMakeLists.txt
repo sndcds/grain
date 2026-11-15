@@ -95,6 +95,7 @@ if(GRAIN_BUILD_TESTS)
 endif()
 
 find_package(libpqxx CONFIG REQUIRED)
+find_package(CURL REQUIRED)
 
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
@@ -225,6 +226,8 @@ target_sources(
 
         src/Type/FixValue.cpp
 
+        src/Network/HTTPClient.cpp
+
         src/Math/Math.cpp
         src/Math/Functions.cpp
         src/Math/Interpolation.cpp
@@ -301,6 +304,10 @@ target_sources(
         include/Grain.hpp
 
         include/grain/Type/FixValue.hpp
+
+        include/grain/Network/HTTPRequest.hpp
+        include/grain/Network/HTTPResponse.hpp
+        include/grain/Network/HTTPClient.hpp
 
         include/grain/Math/Math.hpp
         include/grain/Math/Functions.hpp
@@ -521,6 +528,7 @@ target_link_libraries(
         Grain
         PRIVATE
         GrainWarnings
+        CURL::libcurl
         PNG::PNG
         JPEG::JPEG
         PkgConfig::WEBP

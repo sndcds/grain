@@ -4,6 +4,7 @@
 #--------------------------------------------------------------------------#
 
 find_package(libpqxx CONFIG REQUIRED)
+find_package(CURL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
@@ -125,6 +126,7 @@ target_compile_features(Grain INTERFACE cxx_std_23)
 
 target_link_libraries(Grain INTERFACE
         pqxx
+        CURL::libcurl
         PNG::PNG
         JPEG::JPEG
         WebP::WebP

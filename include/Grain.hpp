@@ -1,6 +1,9 @@
 #pragma once
 
 #include "grain/Type/FixValue.hpp"
+#include "grain/Network/HTTPClient.hpp"
+#include "grain/Network/HTTPRequest.hpp"
+#include "grain/Network/HTTPResponse.hpp"
 #include "grain/Containers/List.hpp"
 #include "grain/Geometry/Layout.hpp"
 #include "grain/Math/Math.hpp"

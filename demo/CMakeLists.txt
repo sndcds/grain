@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(../cmake/GrainDependencies.cmake)
 
 add_subdirectory(Database)
+add_subdirectory(Network)
 add_subdirectory(Audio)
 add_subdirectory(Image)
 add_subdirectory(Movie)
