@@ -4,8 +4,8 @@
 #include <grain/DSP/WeightedSamples.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/Bezier.hpp>
-#include <grain/Geometry/Layout.hpp>
-#include <grain/Containers/List.hpp>
+#include <grain/Geometry/Geometry.hpp>
+#include <grain/Container/List.hpp>
 
 
 namespace Grain {

@@ -6,7 +6,7 @@
 #include <grain/Graphics/GraphicPath.hpp>
 #include <grain/Graphics/GraphicCompoundPath.hpp>
 #include <grain/Geometry/Rect.hpp>
-#include <grain/Geometry/Layout.hpp>
+#include <grain/Geometry/Geometry.hpp>
 
 #include <memory>
 

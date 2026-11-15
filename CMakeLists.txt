@@ -259,6 +259,7 @@ target_sources(
         src/Geometry/Bezier.cpp
         src/Geometry/BezierValueCurve.cpp
         src/Geometry/CatmullRomCurve.cpp
+        src/Geometry/Delaunay.cpp
 
         src/Color/Color.cpp
         src/Color/HSVColor.cpp
@@ -351,13 +352,15 @@ target_sources(
         include/grain/Geometry/Circle.hpp
         include/grain/Geometry/Superellipse.hpp
         include/grain/Geometry/CatmullRomCurve.hpp
-        include/grain/Geometry/Size.hpp
         include/grain/Geometry/Rect.hpp
+        include/grain/Geometry/Size.hpp
+        include/grain/Geometry/Bounds.hpp
         include/grain/Geometry/RemapRect.hpp
         include/grain/Geometry/RectLayout.hpp
         include/grain/Geometry/Bezier.hpp
         include/grain/Geometry/BezierValueCurve.hpp
-        include/grain/Geometry/Layout.hpp
+        include/grain/Geometry/Geometry.hpp
+        include/grain/Geometry/Delaunay.hpp
 
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
@@ -365,7 +368,7 @@ target_sources(
 
         include/grain/Database/PSQL.hpp
 
-        include/grain/Containers/List.hpp
+        include/grain/Container/List.hpp
 
         include/grain/Input/Input.hpp
         include/grain/Input/Event.hpp

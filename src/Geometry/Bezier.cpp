@@ -45,7 +45,7 @@ Bezier::Bezier(const BezierValueCurvePoint& p0, const BezierValueCurvePoint& p1)
 }
 
 
-auto operator<<(std::ostream& os, const Bezier& bezier) -> std::ostream& {
+auto operator << (std::ostream& os, const Bezier& bezier) -> std::ostream& {
     os  << bezier.pos_[0] << " .. "
         << bezier.pos_[1] << " .. "
         << bezier.pos_[2] << " .. "

@@ -4,7 +4,7 @@
 #include <CoreText/CoreText.h>
 
 #include <grain/Graphics/GraphicContext.hpp>
-#include <grain/Geometry/Layout.hpp>
+#include <grain/Geometry/Geometry.hpp>
 
 #include "CFObject.hpp"
 

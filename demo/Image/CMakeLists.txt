@@ -22,3 +22,16 @@ target_link_libraries(
         PRIVATE
         Grain
 )
+
+
+# Delaunay demo
+add_executable(
+        image_delaunay_demo
+        ImageDelaunayDemo.cpp
+)
+
+target_link_libraries(
+        image_delaunay_demo
+        PRIVATE
+        Grain
+)

@@ -13,7 +13,7 @@
 #include "grain/JSON/JSONValue.hpp"
 #include "grain/JSON/JSONWalker.hpp"
 
-#include "grain/Containers/List.hpp"
+#include "grain/Container/List.hpp"
 
 #include "grain/Math/Math.hpp"
 #include "grain/Math/Functions.hpp"
@@ -43,10 +43,13 @@
 #include "grain/Geometry/Line.hpp"
 #include "grain/Geometry/Rect.hpp"
 #include "grain/Geometry/Size.hpp"
+#include "grain/Geometry/Bounds.hpp"
 #include "grain/Geometry/CatmullRomCurve.hpp"
 #include "grain/Geometry/RemapRect.hpp"
 #include "grain/Geometry/Bezier.hpp"
-#include "grain/Geometry/Layout.hpp"
+#include "grain/Geometry/Geometry.hpp"
+#include "grain/Geometry/Delaunay.hpp"
+
 
 #include "grain/Database/PSQL.hpp"
 

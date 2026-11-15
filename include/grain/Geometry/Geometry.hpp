@@ -15,6 +15,13 @@ enum class Alignment : int8_t {
     BottomRight
 };
 
+enum class Edge : int8_t {
+    Top = 0,
+    Right,
+    Bottom,
+    Left
+};
+
 enum class FitMode : int8_t {
     Cover,
     Fit,
