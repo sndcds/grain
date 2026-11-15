@@ -7,6 +7,7 @@ find_package(libpqxx CONFIG REQUIRED)
 find_package(CURL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
+pkg_check_modules(LUA REQUIRED IMPORTED_TARGET lua)
 
 #--------------------------------------------------------------------------
 # WebP
@@ -131,6 +132,7 @@ target_link_libraries(Grain INTERFACE
         JPEG::JPEG
         WebP::WebP
         FFmpeg
+        PkgConfig::LUA
 
         "-framework AppKit"
         "-framework CoreGraphics"

@@ -70,3 +70,4 @@
 #include "grain/Animation/Animation.hpp"
 #include "grain/Animation/AnimationDriver.hpp"
 #include "grain/Animation/EaseMode.hpp"
+#include "grain/Script/Lua.hpp"

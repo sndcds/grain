@@ -9,6 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(../cmake/GrainDependencies.cmake)
 
 add_subdirectory(JSON)
+add_subdirectory(Lua)
 add_subdirectory(Database)
 add_subdirectory(Network)
 add_subdirectory(Audio)

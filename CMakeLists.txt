@@ -102,6 +102,7 @@ find_package(JPEG REQUIRED)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(WEBP REQUIRED IMPORTED_TARGET libwebp)
+pkg_check_modules(LUA REQUIRED IMPORTED_TARGET lua)
 
 pkg_check_modules(
         FFMPEG
@@ -296,6 +297,8 @@ target_sources(
         src/Animation/Animation.cpp
         src/Animation/AnimationDriver.cpp
 
+        src/Script/Lua.cpp
+
         external/mixbox/mixbox.cpp
 
 
@@ -397,6 +400,8 @@ target_sources(
 
         include/grain/Animation/Animation.hpp
         include/grain/Animation/AnimationDriver.hpp
+
+        include/grain/Script/Lua.hpp
 )
 
 
@@ -542,6 +547,7 @@ target_link_libraries(
         JPEG::JPEG
         PkgConfig::WEBP
         PkgConfig::FFMPEG
+        PkgConfig::LUA
 )
 
 
