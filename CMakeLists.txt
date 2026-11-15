@@ -228,6 +228,10 @@ target_sources(
 
         src/Network/HTTPClient.cpp
 
+        src/JSON/JSONAcessor.cpp
+        src/JSON/JSONValue.cpp
+        src/JSON/JSONWalker.cpp
+
         src/Math/Math.cpp
         src/Math/Functions.cpp
         src/Math/Interpolation.cpp
@@ -308,6 +312,11 @@ target_sources(
         include/grain/Network/HTTPRequest.hpp
         include/grain/Network/HTTPResponse.hpp
         include/grain/Network/HTTPClient.hpp
+
+        include/grain/JSON/JSON.hpp
+        include/grain/JSON/JSONAccessor.hpp
+        include/grain/JSON/JSONValue.hpp
+        include/grain/JSON/JSONWalker.hpp
 
         include/grain/Math/Math.hpp
         include/grain/Math/Functions.hpp

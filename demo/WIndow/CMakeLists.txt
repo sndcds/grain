@@ -1,10 +1,10 @@
 add_executable(
-        grain_basic
-        main.cpp
+        window_demo
+        WindowDemo.cpp
 )
 
 target_link_libraries(
-        grain_basic
+        window_demo
         PRIVATE
         Grain
 )

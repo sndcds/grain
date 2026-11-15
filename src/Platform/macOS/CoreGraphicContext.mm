@@ -744,13 +744,11 @@ CFObject<CTLineRef> CoreGraphicContext::createTextLine(
     }
 
     CFStringRef keys[] = {
-        kCTFontAttributeName,
-        kCTForegroundColorAttributeName
+        kCTFontAttributeName
     };
 
     CFTypeRef values[] = {
-        font->nativeHandle(),
-        kCFBooleanTrue
+        font->nativeHandle()
     };
 
     CFObject<CFDictionaryRef> attributes(
