@@ -15,7 +15,7 @@ public:
     ~CocoaAnimationDriver();
 
     CocoaAnimationDriver(const CocoaAnimationDriver&) = delete;
-    CocoaAnimationDriver& operator=(const CocoaAnimationDriver&) = delete;
+    CocoaAnimationDriver& operator = (const CocoaAnimationDriver&) = delete;
 
     void start();
     void stop();

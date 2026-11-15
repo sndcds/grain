@@ -77,10 +77,10 @@ public:
     ~Lua() noexcept;
 
     Lua(const Lua&) = delete;
-    auto operator=(const Lua&) -> Lua& = delete;
+    auto operator = (const Lua&) -> Lua& = delete;
 
     Lua(Lua&&) = delete;
-    auto operator=(Lua&&) -> Lua& = delete;
+    auto operator = (Lua&&) -> Lua& = delete;
 
 
     //--------------------------------------------------------------------------

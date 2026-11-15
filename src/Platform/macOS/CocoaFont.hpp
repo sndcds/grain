@@ -15,7 +15,7 @@ public:
     ~CocoaFont() = default;
 
     CocoaFont(const CocoaFont&) = delete;
-    CocoaFont& operator=(const CocoaFont&) = delete;
+    CocoaFont& operator = (const CocoaFont&) = delete;
 
     [[nodiscard]] const char* fontNameUtf8() const override;
 

@@ -1,15 +1,20 @@
 #pragma once
 
 #include "grain/Type/FixValue.hpp"
+
+#include "grain/Core/ThreadPool.hpp"
+
 #include "grain/Network/HTTPClient.hpp"
 #include "grain/Network/HTTPRequest.hpp"
 #include "grain/Network/HTTPResponse.hpp"
+
 #include "grain/JSON/JSON.hpp"
 #include "grain/JSON/JSONAccessor.hpp"
 #include "grain/JSON/JSONValue.hpp"
 #include "grain/JSON/JSONWalker.hpp"
+
 #include "grain/Containers/List.hpp"
-#include "grain/Geometry/Layout.hpp"
+
 #include "grain/Math/Math.hpp"
 #include "grain/Math/Functions.hpp"
 #include "grain/Math/Statistics.hpp"
@@ -17,7 +22,6 @@
 #include "grain/Math/Interpolation.hpp"
 #include "grain/Math/Easing.hpp"
 #include "grain/Math/Polynomial.hpp"
-#include "grain/Math/Circle.hpp"
 #include "grain/Math/Sphere.hpp"
 #include "grain/Math/Geo.hpp"
 #include "grain/Math/Optics.hpp"
@@ -28,24 +32,37 @@
 #include "grain/Math/Mat3.hpp"
 #include "grain/Math/Quadrilateral.hpp"
 #include "grain/Math/NumberSeries.hpp"
+
 #include "grain/DSP/DSPWindow.hpp"
 #include "grain/DSP/ValueLUT.hpp"
 #include "grain/DSP/WeightedSamples.hpp"
-#include "grain/Geometry/Size.hpp"
+
+#include "grain/Geometry/Arc.hpp"
+#include "grain/Geometry/Circle.hpp"
+#include "grain/Geometry/Superellipse.hpp"
 #include "grain/Geometry/Line.hpp"
 #include "grain/Geometry/Rect.hpp"
+#include "grain/Geometry/Size.hpp"
+#include "grain/Geometry/CatmullRomCurve.hpp"
 #include "grain/Geometry/RemapRect.hpp"
 #include "grain/Geometry/Bezier.hpp"
+#include "grain/Geometry/Layout.hpp"
+
 #include "grain/Database/PSQL.hpp"
+
 #include "grain/String/String.hpp"
+
 #include "grain/Input/Event.hpp"
 #include "grain/Input/Input.hpp"
+
 #include "grain/Platform/App.hpp"
 #include "grain/Platform/Window.hpp"
 #include "grain/Platform/View.hpp"
 #include "grain/Platform/Font.hpp"
+
 #include "grain/Color/Color.hpp"
 #include "grain/Color/ColorLUT.hpp"
+
 #include "grain/Graphics/Canvas.hpp"
 #include "grain/Graphics/GraphicState.hpp"
 #include "grain/Graphics/GraphicContext.hpp"
@@ -54,20 +71,28 @@
 #include "grain/Graphics/GraphicCompoundPath.hpp"
 #include "grain/Graphics/Gradient.hpp"
 #include "grain/Graphics/Font.hpp"
+
+#include "grain/Text/TextWordLayout.hpp"
+
 #include "grain/Image/Image.hpp"
 #include "grain/Image/ImageAccess.hpp"
 #include "grain/Image/ImageTransfer.hpp"
 #include "grain/Image/ImageIO.hpp"
+
 #include "grain/Signal/Signal.hpp"
 #include "grain/Signal/SignalData.hpp"
 #include "grain/Signal/AudioFile.hpp"
+
 #include "grain/Movie/Movie.hpp"
 #include "grain/Movie/MovieWriter.hpp"
+
 #include "grain/UI/Component.hpp"
 #include "grain/UI/Label.hpp"
 #include "grain/UI/Button.hpp"
 #include "grain/UI/Slider.hpp"
+
 #include "grain/Animation/Animation.hpp"
 #include "grain/Animation/AnimationDriver.hpp"
 #include "grain/Animation/EaseMode.hpp"
+
 #include "grain/Script/Lua.hpp"

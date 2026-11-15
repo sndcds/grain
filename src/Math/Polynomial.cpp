@@ -188,7 +188,7 @@ auto solveCubic(
 
     out_values[0] = (radius * std::cos(theta / 3.0)) - offset;
     out_values[1] = (radius * std::cos((theta + kTwoPi) / 3.0)) - offset;
-    out_values[2] =(radius * std::cos((theta + 2.0 * kTwoPi) / 3.0)) - offset;
+    out_values[2] = (radius * std::cos((theta + 2.0 * kTwoPi) / 3.0)) - offset;
 
     std::ranges::sort(out_values);
 

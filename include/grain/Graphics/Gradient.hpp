@@ -147,7 +147,7 @@ public:
     ~Gradient();
 
     Gradient(const Gradient&) = delete;
-    auto operator=(const Gradient&) -> Gradient& = delete;
+    auto operator = (const Gradient&) -> Gradient& = delete;
 
     static auto createByPreset(Preset preset, bool flip = false) -> Gradient*;
 

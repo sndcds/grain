@@ -18,14 +18,14 @@ public:
     }
 
     CFObject(const CFObject&) = delete;
-    CFObject& operator=(const CFObject&) = delete;
+    CFObject& operator = (const CFObject&) = delete;
 
     CFObject(CFObject&& other)
         : object_(other.object_) {
         other.object_ = nullptr;
     }
 
-    CFObject& operator=(CFObject&& other) {
+    CFObject& operator = (CFObject&& other) {
         if (this != &other) {
             reset();
 

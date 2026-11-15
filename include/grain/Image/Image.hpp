@@ -5,6 +5,11 @@
 #include <cstring>
 #include <type_traits>
 
+#if defined(__APPLE__) && defined(__MACH__)
+#include <CoreImage/CoreImage.h>
+#include <CoreGraphics/CoreGraphics.h>
+#endif
+
 
 namespace Grain {
 
@@ -26,7 +31,7 @@ public:
     };
 
     Image() noexcept = default;
-    ~Image() = default;
+    ~Image() noexcept;
 
     Image(const Image&) = delete;
     auto operator = (const Image&) -> Image& = delete;
@@ -119,6 +124,19 @@ public:
 
 
     [[nodiscard]] auto createGraphicContext() noexcept -> std::unique_ptr<GraphicContext>;
+
+
+#if defined(__APPLE__) && defined(__MACH__)
+public:
+    [[nodiscard]]
+    auto macos_cgImageRef() const noexcept -> CGImageRef;
+
+private:
+    auto macos_buildCGImageRef() const noexcept -> bool;
+    auto macos_releaseCGImageRef() const noexcept -> void;
+    mutable CGImageRef cg_image_ref_ = nullptr;
+#endif
+
 
 private:
     std::unique_ptr<uint8_t[]> owned_data_;

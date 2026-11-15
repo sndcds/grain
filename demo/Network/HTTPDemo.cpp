@@ -18,7 +18,7 @@ int main() {
         HTTPRequest request;
 
         request.method = HTTPMethod::Get;
-        request.url = "https://api.kulturbytes.de/api/events";
+        request.url = "https://api.kulturbytes.de/api/events?limit=10";
 
         request.headers = {
             "Accept: application/json",

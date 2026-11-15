@@ -204,6 +204,12 @@ public:
         const Color& color
     ) override;
 
+    void drawImage(
+        const Image& image,
+        const Rectd& rect,
+        float alpha = 1.0f
+    ) override;
+
 private:
     CGContextRef context_ = nullptr;
 

@@ -32,7 +32,7 @@ public:
     }
 
     CurlGlobal(const CurlGlobal&) = delete;
-    auto operator=(const CurlGlobal&) -> CurlGlobal& = delete;
+    auto operator = (const CurlGlobal&) -> CurlGlobal& = delete;
 
     [[nodiscard]]
     auto isInitialized() const noexcept -> bool {

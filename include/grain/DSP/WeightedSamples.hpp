@@ -39,9 +39,9 @@ public:
     ~WeightedSamples();
 
     WeightedSamples(const WeightedSamples&) = delete;
-    auto operator=(const WeightedSamples&) -> WeightedSamples& = delete;
+    auto operator = (const WeightedSamples&) -> WeightedSamples& = delete;
     WeightedSamples(WeightedSamples&&) = delete;
-    auto operator=(WeightedSamples&&) -> WeightedSamples& = delete;
+    auto operator = (WeightedSamples&&) -> WeightedSamples& = delete;
 
     [[nodiscard]] auto resolution() const -> int32_t { return resolution_; }
     [[nodiscard]] auto maxResolution() const -> int32_t { return max_resolution_; }

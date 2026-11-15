@@ -137,10 +137,10 @@ public:
     explicit PSQLTxResult(pqxx::result&& result);
 
     PSQLTxResult(const PSQLTxResult&) = delete;
-    auto operator=(const PSQLTxResult&) -> PSQLTxResult& = delete;
+    auto operator = (const PSQLTxResult&) -> PSQLTxResult& = delete;
 
     PSQLTxResult(PSQLTxResult&&) noexcept = default;
-    auto operator=(PSQLTxResult&&) noexcept -> PSQLTxResult& = default;
+    auto operator = (PSQLTxResult&&) noexcept -> PSQLTxResult& = default;
 
     [[nodiscard]]
     auto size() const noexcept -> std::size_t;
@@ -180,11 +180,11 @@ public:
 
     // No copying
     PSQLReadTx(const PSQLReadTx&) = delete;
-    auto operator=(const PSQLReadTx&) -> PSQLReadTx& = delete;
+    auto operator = (const PSQLReadTx&) -> PSQLReadTx& = delete;
 
     // Allow moving
     PSQLReadTx(PSQLReadTx&&) noexcept = default;
-    auto operator=(PSQLReadTx&&) noexcept -> PSQLReadTx& = default;
+    auto operator = (PSQLReadTx&&) noexcept -> PSQLReadTx& = default;
 
 
     [[nodiscard]]
@@ -224,11 +224,11 @@ public:
 
     // No copying
     PSQLWriteTx(const PSQLWriteTx&) = delete;
-    auto operator=(const PSQLWriteTx&) -> PSQLWriteTx& = delete;
+    auto operator = (const PSQLWriteTx&) -> PSQLWriteTx& = delete;
 
     // Allow moving
     PSQLWriteTx(PSQLWriteTx&&) noexcept = default;
-    auto operator=(PSQLWriteTx&&) noexcept -> PSQLWriteTx& = default;
+    auto operator = (PSQLWriteTx&&) noexcept -> PSQLWriteTx& = default;
 
     [[nodiscard]]
     auto exec(const std::string& query) -> PSQLTxResult;
@@ -269,10 +269,10 @@ public:
     ~PSQL() = default;
 
     PSQL(const PSQL&) = delete;
-    auto operator=(const PSQL&) -> PSQL& = delete;
+    auto operator = (const PSQL&) -> PSQL& = delete;
 
     PSQL(PSQL&&) noexcept = default;
-    auto operator=(PSQL&&) noexcept -> PSQL& = default;
+    auto operator = (PSQL&&) noexcept -> PSQL& = default;
 
     [[nodiscard]]
     auto connect(const std::string& connectionString) -> PSQLError;

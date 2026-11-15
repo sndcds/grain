@@ -33,9 +33,9 @@ class View;
 class Window {
 public:
     Window(const Window&) = delete;
-    auto operator=(const Window&) -> Window& = delete;
+    auto operator = (const Window&) -> Window& = delete;
     Window(Window&&) = delete;
-    auto operator=(Window&&) -> Window& = delete;
+    auto operator = (Window&&) -> Window& = delete;
 
     virtual ~Window() = default;
 
@@ -55,9 +55,10 @@ auto createView(Grain::View* view) -> std::unique_ptr<View>;
 class App {
 public:
     App(const App&) = delete;
-    auto operator=(const App&) -> App& = delete;
+    auto operator = (const App&) -> App& = delete;
+
     App(App&&) = delete;
-    auto operator=(App&&) -> App& = delete;
+    auto operator = (App&&) -> App& = delete;
 
     virtual ~App() = default;
 

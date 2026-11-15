@@ -309,7 +309,7 @@ auto Bezier::hit(const Vec2d& position, double radius) const -> double {
     double result = std::numeric_limits<double>::max();
 
     for (int32_t iteration = 0; iteration <= kIterations; ++iteration) {
-        const double step =(end - start) / kResolution;
+        const double step = (end - start) / kResolution;
 
         double minimum_distance = std::numeric_limits<double>::max();
         int32_t minimum_index = -1;
@@ -522,7 +522,7 @@ auto Bezier::arcToBezierPosArray(
 
     const double sign = large_arc_flag != sweep_flag ? 1.0 : -1.0;
 
-    double factor =((rx2 * ry2) - (rx2 * y1p2) - (ry2 * x1p2)) / denominator;
+    double factor = ((rx2 * ry2) - (rx2 * y1p2) - (ry2 * x1p2)) / denominator;
     factor = std::max(0.0, factor);
 
     const double cxp =

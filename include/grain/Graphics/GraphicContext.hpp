@@ -169,16 +169,6 @@ public:
 
 
     //--------------------------------------------------------------------------
-    //  Transform
-    //--------------------------------------------------------------------------
-
-    virtual void translate(double x, double y);
-    virtual void scale(double x, double y);
-    virtual void rotate(double radians);
-    virtual void rotateDegrees(double degrees);
-
-
-    //--------------------------------------------------------------------------
     //  Text
     //--------------------------------------------------------------------------
 
@@ -214,6 +204,28 @@ public:
         int32_t end,
         const Color& color
     ) = 0;
+
+
+    //--------------------------------------------------------------------------
+    //  Image
+    //--------------------------------------------------------------------------
+
+    virtual void drawImage(
+        const Image& image,
+        const Rectd& rect,
+        float alpha = 1.0f
+    ) = 0;
+
+
+    //--------------------------------------------------------------------------
+    //  Transform
+    //--------------------------------------------------------------------------
+
+    virtual void translate(double x, double y);
+    virtual void scale(double x, double y);
+    virtual void rotate(double radians);
+    virtual void rotateDegrees(double degrees);
+
 
 protected:
     GraphicContext() = default;

@@ -16,10 +16,10 @@ public:
     explicit ImageAccess(Image& image) noexcept;
 
     ImageAccess(const ImageAccess&) = delete;
-    auto operator=(const ImageAccess&) -> ImageAccess& = delete;
+    auto operator = (const ImageAccess&) -> ImageAccess& = delete;
 
     ImageAccess(ImageAccess&&) noexcept = default;
-    auto operator=(ImageAccess&&) noexcept -> ImageAccess& = default;
+    auto operator = (ImageAccess&&) noexcept -> ImageAccess& = default;
 
     [[nodiscard]] auto setup(Image& image) noexcept -> bool;
     void undefine() noexcept;

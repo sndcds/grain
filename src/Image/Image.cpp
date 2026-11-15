@@ -5,6 +5,7 @@
 #include <new>
 #include <utility>
 
+
 namespace Grain {
 
 namespace {
@@ -124,6 +125,15 @@ Image::Image(Image&& other) noexcept
     other.row_stride_ = 0;
     other.data_size_ = 0;
 }
+
+
+Image::~Image() noexcept {
+
+#if defined(__APPLE__) && defined(__MACH__)
+    macos_releaseCGImageRef();
+#endif
+}
+
 
 auto Image::operator = (Image&& other) noexcept -> Image& {
     if (this == &other) {
@@ -371,5 +381,163 @@ auto Image::rowData(uint32_t y) const noexcept -> const uint8_t* {
 auto Image::createGraphicContext() noexcept -> std::unique_ptr<GraphicContext> {
 
 }
+
+
+auto Image::macos_cgImageRef() const noexcept -> CGImageRef {
+
+    if (cg_image_ref_ == nullptr) {
+        macos_buildCGImageRef();
+    }
+
+    return cg_image_ref_;
+}
+
+
+auto Image::macos_releaseCGImageRef() const noexcept -> void {
+
+    if (cg_image_ref_ != nullptr) {
+        CGImageRelease(cg_image_ref_);
+        cg_image_ref_ = nullptr;
+    }
+}
+
+
+auto Image::macos_buildCGImageRef() const noexcept -> bool {
+
+    macos_releaseCGImageRef();
+
+    if (!isUsable() ||
+        pixelData() == nullptr ||
+        pixelDataSize() == 0) {
+        return false;
+    }
+
+    const size_t component_count = componentsPerPixel();
+    const size_t component_size = bytesPerPixel() / component_count;
+
+    if (component_count < 1 || component_count > 4 ||
+        component_size == 0) {
+        return false;
+    }
+
+    // Determine the bits per component.
+    size_t bits_per_component = 0;
+    CGBitmapInfo bitmap_info = kCGBitmapByteOrderDefault;
+
+    switch (pixelType()) {
+
+        case PixelType::UInt8:
+            bits_per_component = 8;
+            break;
+
+        case PixelType::UInt16:
+            bits_per_component = 16;
+            bitmap_info |= kCGBitmapByteOrder16Little;
+            break;
+
+        case PixelType::UInt32:
+            bits_per_component = 32;
+            bitmap_info |= kCGBitmapByteOrder32Little;
+            break;
+
+        case PixelType::Float32:
+            bits_per_component = 32;
+            bitmap_info |=
+                kCGBitmapFloatComponents |
+                kCGBitmapByteOrder32Little;
+            break;
+
+        default:
+            return false;
+    }
+
+    // Determine the color space.
+    CGColorSpaceRef color_space = nullptr;
+
+    if (component_count <= 2) {
+        color_space = CGColorSpaceCreateDeviceGray();
+    }
+    else {
+        color_space = CGColorSpaceCreateDeviceRGB();
+    }
+
+    if (color_space == nullptr) {
+        return false;
+    }
+
+    // Components 2 and 4 have an alpha channel in the last position.
+    if (component_count == 2 || component_count == 4) {
+        bitmap_info |= kCGImageAlphaLast;
+    }
+    else {
+        bitmap_info |= kCGImageAlphaNone;
+    }
+
+    const size_t width = this->width();
+    const size_t height = this->height();
+
+    const size_t bytes_per_pixel = bytesPerPixel();
+    const size_t bytes_per_row = bytesPerRow();
+
+    if (width == 0 || height == 0 ||
+        width > std::numeric_limits<size_t>::max() / bytes_per_pixel) {
+        CGColorSpaceRelease(color_space);
+        return false;
+    }
+
+    const size_t minimum_row_size = width * bytes_per_pixel;
+
+    if (bytes_per_row < minimum_row_size ||
+        height > std::numeric_limits<size_t>::max() / bytes_per_row ||
+        pixelDataSize() < bytes_per_row * height ||
+        pixelDataSize() > static_cast<size_t>(
+            std::numeric_limits<CFIndex>::max())) {
+
+        CGColorSpaceRelease(color_space);
+        return false;
+    }
+
+    CFDataRef data = CFDataCreateWithBytesNoCopy(
+        kCFAllocatorDefault,
+        pixelData(),
+        static_cast<CFIndex>(pixelDataSize()),
+        kCFAllocatorNull
+    );
+
+    if (data == nullptr) {
+        CGColorSpaceRelease(color_space);
+        return false;
+    }
+
+    CGDataProviderRef provider =
+        CGDataProviderCreateWithCFData(data);
+
+    CFRelease(data);
+
+    if (provider == nullptr) {
+        CGColorSpaceRelease(color_space);
+        return false;
+    }
+
+    cg_image_ref_ = CGImageCreate(
+        width,
+        height,
+        bits_per_component,
+        bytes_per_pixel * 8,
+        bytes_per_row,
+        color_space,
+        bitmap_info,
+        provider,
+        nullptr,
+        false,
+        kCGRenderingIntentDefault
+    );
+
+    CGDataProviderRelease(provider);
+    CGColorSpaceRelease(color_space);
+
+    return cg_image_ref_ != nullptr;
+}
+
 
 } // namespace Grain

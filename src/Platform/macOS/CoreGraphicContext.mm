@@ -1053,6 +1053,62 @@ void CoreGraphicContext::drawTextLayoutRange(
     CGContextRestoreGState(context_);
 }
 
+//------------------------------------------------------------------------------
+//  Image
+//------------------------------------------------------------------------------
+
+void CoreGraphicContext::drawImage(
+    const Image& image,
+    const Rectd& rect,
+    float alpha
+) {
+    if (context_ == nullptr ||
+        !image.isUsable() ||
+        rect.width <= 0.0 ||
+        rect.height <= 0.0 ||
+        !std::isfinite(alpha)) {
+        return;
+    }
+
+    CGImageRef cg_image = image.macos_cgImageRef();
+
+    if (cg_image == nullptr) {
+        return;
+    }
+
+    CGContextSaveGState(context_);
+
+    CGContextSetAlpha(
+        context_,
+        std::clamp(static_cast<CGFloat>(alpha), 0.0, 1.0)
+    );
+
+    CGContextSetInterpolationQuality(
+        context_,
+        kCGInterpolationMedium
+    );
+
+    CGContextTranslateCTM(
+        context_,
+        0.0,
+        rect.y * 2.0 + rect.height
+    );
+
+    CGContextScaleCTM(
+        context_,
+        1.0,
+        -1.0
+    );
+
+    CGContextDrawImage(
+        context_,
+        CGRectMake(rect.x, rect.y, rect.width, rect.height),
+        cg_image
+    );
+
+    CGContextRestoreGState(context_);
+}
+
 
 //------------------------------------------------------------------------------
 //  Transformation

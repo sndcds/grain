@@ -16,10 +16,10 @@ public:
     ~HTTPClient() = default;
 
     HTTPClient(const HTTPClient&) = delete;
-    auto operator=(const HTTPClient&) -> HTTPClient& = delete;
+    auto operator = (const HTTPClient&) -> HTTPClient& = delete;
 
     HTTPClient(HTTPClient&&) noexcept = default;
-    auto operator=(HTTPClient&&) noexcept -> HTTPClient& = default;
+    auto operator = (HTTPClient&&) noexcept -> HTTPClient& = default;
 
 
     [[nodiscard]]

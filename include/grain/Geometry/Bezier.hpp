@@ -32,11 +32,11 @@ public:
 
     Bezier(const Bezier&) = default;
 
-    auto operator=(const Bezier&) -> Bezier& = default;
+    auto operator = (const Bezier&) -> Bezier& = default;
 
     Bezier(Bezier&&) = default;
 
-    auto operator=(Bezier&&) -> Bezier& = default;
+    auto operator = (Bezier&&) -> Bezier& = default;
 
     [[nodiscard]] auto startPos() const -> Vec2d;
     [[nodiscard]] auto controlPos1() const -> Vec2d;

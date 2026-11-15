@@ -227,6 +227,8 @@ target_sources(
 
         src/Type/FixValue.cpp
 
+        src/Core/ThreadPool.cpp
+
         src/Network/HTTPClient.cpp
 
         src/JSON/JSONAcessor.cpp
@@ -238,7 +240,6 @@ target_sources(
         src/Math/Interpolation.cpp
         src/Math/Easing.cpp
         src/Math/Polynomial.cpp
-        src/Math/Circle.cpp
         src/Math/Sphere.cpp
         src/Math/Geo.cpp
         src/Math/Optics.cpp
@@ -257,6 +258,7 @@ target_sources(
 
         src/Geometry/Bezier.cpp
         src/Geometry/BezierValueCurve.cpp
+        src/Geometry/CatmullRomCurve.cpp
 
         src/Color/Color.cpp
         src/Color/HSVColor.cpp
@@ -267,6 +269,8 @@ target_sources(
         src/Graphics/GraphicCompoundPath.cpp
         src/Graphics/Gradient.cpp
         src/Graphics/Font.cpp
+
+        src/Text/TextWordLayout.cpp
 
         src/Image/Image.cpp
         src/Image/ImageAccess.cpp
@@ -312,6 +316,8 @@ target_sources(
 
         include/grain/Type/FixValue.hpp
 
+        include/grain/Core/ThreadPool.hpp
+
         include/grain/Network/HTTPRequest.hpp
         include/grain/Network/HTTPResponse.hpp
         include/grain/Network/HTTPClient.hpp
@@ -328,7 +334,6 @@ target_sources(
         include/grain/Math/Interpolation.hpp
         include/grain/Math/Easing.hpp
         include/grain/Math/Polynomial.hpp
-        include/grain/Math/Circle.hpp
         include/grain/Math/Sphere.hpp
         include/grain/Math/Geo.hpp
         include/grain/Math/Optics.hpp
@@ -342,6 +347,10 @@ target_sources(
 
         include/grain/DSP/WeightedSamples.hpp
 
+        include/grain/Geometry/Arc.hpp
+        include/grain/Geometry/Circle.hpp
+        include/grain/Geometry/Superellipse.hpp
+        include/grain/Geometry/CatmullRomCurve.hpp
         include/grain/Geometry/Size.hpp
         include/grain/Geometry/Rect.hpp
         include/grain/Geometry/RemapRect.hpp
@@ -376,6 +385,8 @@ target_sources(
         include/grain/Graphics/GraphicCompoundPath.hpp
         include/grain/Graphics/Gradient.hpp
         include/grain/Graphics/Font.hpp
+
+        include/grain/Text/TextWordLayout.hpp
 
         include/grain/Image/Image.hpp
         include/grain/Image/ImageAccess.hpp

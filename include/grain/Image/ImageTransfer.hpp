@@ -14,7 +14,7 @@ public:
     explicit ImageTransfer(Image& image) noexcept;
 
     ImageTransfer(const ImageTransfer&) = delete;
-    auto operator=(const ImageTransfer&) -> ImageTransfer& = delete;
+    auto operator = (const ImageTransfer&) -> ImageTransfer& = delete;
 
     [[nodiscard]] auto setup(Image& image) noexcept -> bool;
 

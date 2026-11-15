@@ -12,7 +12,7 @@ class CocoaAnimationDriver;
 class AnimationDriver {
 public:
     AnimationDriver(const AnimationDriver&) = delete;
-    auto operator=(const AnimationDriver&) -> AnimationDriver& = delete;
+    auto operator = (const AnimationDriver&) -> AnimationDriver& = delete;
 
     static auto instance() -> AnimationDriver&;
 

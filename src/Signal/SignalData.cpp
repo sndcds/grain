@@ -157,7 +157,7 @@ SignalData::SignalData(SignalData&& other) noexcept {
     swap(other);
 }
 
-SignalData& SignalData::operator=(SignalData&& other) noexcept {
+SignalData& SignalData::operator = (SignalData&& other) noexcept {
     if (this != &other) {
         free();
         swap(other);
