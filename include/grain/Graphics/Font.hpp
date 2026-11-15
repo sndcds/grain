@@ -56,7 +56,15 @@ public:
     [[nodiscard]] auto glyphCount() const -> int32_t;
     [[nodiscard]] auto boundingBox() const -> const Rectd&;
 
-    [[nodiscard]] auto glyphAdvanceWidth(const char* symbol, int32_t length = -1 ) const -> double;
+    [[nodiscard]] auto glyphAdvanceWidth(
+        const char* symbol,
+        int32_t length = -1
+    ) const -> double;
+
+    [[nodiscard]] auto glyphPairAdvanceWidth(
+        const char* left,
+        const char* right
+    ) const -> double;
 
     [[nodiscard]] auto textDimension(const char* str, int32_t byte_length = -1) const -> Sized;
 

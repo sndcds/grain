@@ -60,6 +60,11 @@ public:
         int32_t length = -1
     ) const override;
 
+    [[nodiscard]] auto glyphPairAdvanceWidth(
+        const char* left,
+        const char* right
+    ) const -> double override;
+
     [[nodiscard]] Sized textDimension(
         const char* str,
         int32_t byte_length = -1

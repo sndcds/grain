@@ -20,6 +20,7 @@ struct MovieContext {
 
 #include <cmath>
 #include <numbers>
+#include <iostream>
 
 
 //--------------------------------------------------------------------------
@@ -33,6 +34,7 @@ void renderCompoundPathFromText(
     double y,
     double time
 ) {
+
     //--------------------------------------------------------------------------
     //  Create compound path from text
     //--------------------------------------------------------------------------

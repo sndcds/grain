@@ -3,9 +3,9 @@
 # Dependencies
 #--------------------------------------------------------------------------#
 
+find_package(libpqxx CONFIG REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
-
 
 #--------------------------------------------------------------------------
 # WebP
@@ -124,6 +124,7 @@ set_target_properties(Grain PROPERTIES
 target_compile_features(Grain INTERFACE cxx_std_23)
 
 target_link_libraries(Grain INTERFACE
+        pqxx
         PNG::PNG
         JPEG::JPEG
         WebP::WebP

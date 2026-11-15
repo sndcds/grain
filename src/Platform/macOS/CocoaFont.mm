@@ -442,6 +442,116 @@ double CocoaFont::glyphAdvanceWidth(
 }
 
 
+auto CocoaFont::glyphPairAdvanceWidth(
+    const char* left,
+    const char* right
+) const -> double {
+
+    if (!ct_font_ || left == nullptr || right == nullptr || *left == '\0' || *right == '\0') {
+        return 0.0;
+    }
+
+    const auto left_length = static_cast<int32_t>(std::strlen(left));
+    const auto right_length = static_cast<int32_t>(std::strlen(right));
+
+    CFObject<CFStringRef> left_string(
+        makeCFString(left, left_length)
+    );
+
+    CFObject<CFStringRef> right_string(
+        makeCFString(right, right_length)
+    );
+
+    if (!left_string || !right_string) {
+        return 0.0;
+    }
+
+    // Create the combined string.
+    CFObject<CFMutableStringRef> combined_string(
+        CFStringCreateMutableCopy(
+            kCFAllocatorDefault,
+            0,
+            left_string.get()
+        )
+    );
+
+    if (!combined_string) {
+        return 0.0;
+    }
+
+    CFStringAppend(combined_string.get(), right_string.get());
+
+    // Create the CoreText font attributes.
+    const void* keys[] = {
+        kCTFontAttributeName
+    };
+
+    const void* values[] = {
+        ct_font_.get()
+    };
+
+    CFObject<CFDictionaryRef> attributes(
+        CFDictionaryCreate(
+            kCFAllocatorDefault,
+            keys,
+            values,
+            1,
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks
+        )
+    );
+
+    if (!attributes) {
+        return 0.0;
+    }
+
+    // Measure a string using CoreText.
+    const auto measure = [&attributes](
+        CFStringRef string
+    ) -> double {
+
+        CFObject<CFAttributedStringRef> attributed_string(
+            CFAttributedStringCreate(
+                kCFAllocatorDefault,
+                string,
+                attributes.get()
+            )
+        );
+
+        if (!attributed_string) {
+            return 0.0;
+        }
+
+        CFObject<CTLineRef> line(
+            CTLineCreateWithAttributedString(
+                attributed_string.get()
+            )
+        );
+
+        if (!line) {
+            return 0.0;
+        }
+
+        return CTLineGetTypographicBounds(
+            line.get(),
+            nullptr,
+            nullptr,
+            nullptr
+        );
+    };
+
+    const double combined_width = measure(
+        combined_string.get()
+    );
+
+    const double right_width = measure(
+        right_string.get()
+    );
+
+    return combined_width - right_width;
+}
+
+
 Sized CocoaFont::textDimension(const char* str, int32_t byte_length) const  {
     if (!ct_font_ || str == nullptr) {
         return Sized{};

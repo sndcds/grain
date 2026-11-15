@@ -44,6 +44,11 @@ public:
         int32_t length
     ) const -> double = 0;
 
+    [[nodiscard]] virtual auto glyphPairAdvanceWidth(
+        const char* left,
+        const char* right
+    ) const -> double = 0;
+
     [[nodiscard]] virtual auto textDimension(
         const char* str,
         int32_t byte_length

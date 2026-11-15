@@ -94,6 +94,8 @@ if(GRAIN_BUILD_TESTS)
 
 endif()
 
+find_package(libpqxx CONFIG REQUIRED)
+
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
@@ -243,6 +245,8 @@ target_sources(
         src/String/StringUtf8.cpp
         src/String/Character.cpp
 
+        src/Database/PSQL.cpp
+
         src/Geometry/Bezier.cpp
         src/Geometry/BezierValueCurve.cpp
 
@@ -330,6 +334,8 @@ target_sources(
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
         include/grain/String/Character.hpp
+
+        include/grain/Database/PSQL.hpp
 
         include/grain/Containers/List.hpp
 
@@ -504,6 +510,13 @@ target_compile_features(
         cxx_std_23
 )
 
+
+target_link_libraries(
+        Grain
+        PUBLIC
+        pqxx
+)
+
 target_link_libraries(
         Grain
         PRIVATE
@@ -513,6 +526,7 @@ target_link_libraries(
         PkgConfig::WEBP
         PkgConfig::FFMPEG
 )
+
 
 if(GRAIN_ENABLE_SANITIZERS)
 
@@ -555,16 +569,5 @@ if(GRAIN_BUILD_TESTS)
     enable_testing()
 
     add_subdirectory(tests)
-
-endif()
-
-
-#-------------------------------------------------------------------------------
-#   Examples.
-#-------------------------------------------------------------------------------
-
-if(GRAIN_BUILD_EXAMPLES)
-
-    add_subdirectory(examples/basic)
 
 endif()

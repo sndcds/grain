@@ -111,19 +111,35 @@ auto Font::underlineThickness() const -> double {
 }
 
 auto Font::unitsPerEm() const -> int32_t {
+
     return platform_->unitsPerEm();
 }
 
+
 auto Font::glyphCount() const -> int32_t {
+
     return platform_->glyphCount();
 }
 
+
 auto Font::boundingBox() const -> const Rectd& {
+
     return platform_->boundingBox();
 }
 
+
 auto Font::glyphAdvanceWidth(const char* symbol, int32_t length) const -> double {
+
     return platform_->glyphAdvanceWidth(symbol, length);
+}
+
+
+auto Font::glyphPairAdvanceWidth(
+    const char* left,
+    const char* right
+) const -> double {
+
+    return platform_->glyphPairAdvanceWidth(left, right);
 }
 
 auto Font::textDimension(const char* str, int32_t byte_length) const -> Sized {
