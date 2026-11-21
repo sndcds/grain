@@ -1,6 +1,6 @@
 #include <grain/Platform/App.hpp>
 
-#include "Platform.hpp"
+#include "../../include/grain/Platform/Platform.hpp"
 
 #include <memory>
 #include <utility>
@@ -50,10 +50,9 @@ auto App::setIcon(const std::string& path) -> bool {
 }
 
 
-auto App::createWindow(
+auto App::addWindow(
     std::string_view title,
-    int width,
-    int height
+    const Recti& rect
 ) -> Window*
 {
     if (impl_ == nullptr || impl_->platform_app_ == nullptr) {
@@ -63,11 +62,10 @@ auto App::createWindow(
     const uint64_t window_id = impl_->next_window_id++;
 
     auto platform_window =
-        impl_->platform_app_->createWindow(
+        impl_->platform_app_->addWindow(
             window_id,
             title,
-            width,
-            height
+            rect
         );
 
     if (platform_window == nullptr) {

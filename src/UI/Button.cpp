@@ -1,7 +1,7 @@
 #include "grain/UI/Button.hpp"
 
 #include "grain/Graphics/GraphicContext.hpp"
-#include "grain/Platform/View.hpp"
+#include "../../include/grain/UI/View.hpp"
 
 namespace Grain {
 

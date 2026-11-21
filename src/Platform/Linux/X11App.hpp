@@ -18,12 +18,11 @@ public:
 
     ~X11App() override;
 
-    std::unique_ptr<Window> createWindow(
+    std::unique_ptr<Window> addWindow(
         WindowId id,
         std::string_view title,
-        int width,
-        int height
-        ) override;
+        const Recti& rect
+    ) override;
 
     void run() override;
 
@@ -34,9 +33,7 @@ public:
         return display_;
     }
 
-    void addWindow(
-        X11Window* window
-        );
+    void addWindow(X11Window* window);
 
 private:
     Display* display_ = nullptr;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "grain/Platform/View.hpp"
+#include <grain/UI/UIElement.hpp>
 
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Graphics/GraphicContext.hpp>
@@ -10,7 +10,7 @@ namespace Grain {
 
 class View;
 
-class Component {
+class Component : public UIElement {
 public:
     explicit Component(View* view = nullptr)
         : view_(view) {
@@ -25,6 +25,11 @@ public:
     Component(Component&&) = delete;
 
     auto operator = (Component&&) -> Component& = delete;
+
+    [[nodiscard]]
+    auto type() const -> UIElementType override {
+        return UIElementType::Component;
+    }
 
     [[nodiscard]] auto view() const -> View* {
         return view_;
@@ -66,6 +71,14 @@ public:
 
 
     virtual void draw(GraphicContext& gc) = 0;
+
+    void draw(
+        GraphicContext& gc,
+        const Rectd& dirty_rect
+    ) override;
+
+    void doSizing() override;
+
 
     virtual auto handleEvent(const Event& event) -> bool {
         (void)event;

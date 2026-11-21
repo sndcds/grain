@@ -32,8 +32,8 @@ Gtk4App::~Gtk4App() {
     g_object_unref(application_);
 }
 
-std::unique_ptr<Window> Gtk4App::createWindow(
-    WindowId id, std::string_view title, int width, int height) {
+std::unique_ptr<Window> Gtk4App::addWindow(
+    WindowId id, std::string_view title, const Recti& rect) {
     return std::make_unique<Gtk4Window>(id, application_, title, width, height, callbacks_);
 }
 

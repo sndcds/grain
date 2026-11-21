@@ -135,7 +135,7 @@ int main() {
     auto& app = App::instance();
     app.setIcon("/Users/roaldchristesen/Documents/Pippa/Pippa Logo.png");
 
-    auto *window = app.createWindow("Grain", 400,  400);
+    auto *window = app.addWindow("Grain", {100, 100, 640, 400});
 
     {
         auto view = std::make_unique<TestView>();
@@ -229,7 +229,7 @@ int main() {
             auto& text_field = view->addComponent<TextField>();
             text_field.setBounds(Rectd{500, 500, 240, 40.0});
             text_field.setText("Hello World! 1234567890");
-            text_field.setFocused(true);
+            // text_field.setFocused(true);
         }
 
 

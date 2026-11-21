@@ -36,7 +36,7 @@ public:
     Gtk4App();
     ~Gtk4App() override;
 
-    std::unique_ptr<Window> createWindow(
+    std::unique_ptr<Window> addWindow(
         WindowId id, std::string_view title, int width, int height) override;
 
     void run() override;

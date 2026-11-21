@@ -35,3 +35,18 @@ target_link_libraries(
         PRIVATE
         Grain
 )
+
+
+
+# Poisson disc image density demo
+add_executable(
+        poison_disc_image_density_demo
+        PoissonDiscImageDensityDemo.cpp
+)
+
+target_link_libraries(
+        poison_disc_image_density_demo
+        PRIVATE
+        Grain
+)
+

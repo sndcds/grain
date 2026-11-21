@@ -756,7 +756,7 @@ CFObject<CTLineRef> CoreGraphicContext::createTextLine(
             kCFAllocatorDefault,
             reinterpret_cast<const void**>(keys),
             reinterpret_cast<const void**>(values),
-            2,
+            1,
             &kCFTypeDictionaryKeyCallBacks,
             &kCFTypeDictionaryValueCallBacks
         )

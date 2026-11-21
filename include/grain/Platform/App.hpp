@@ -3,6 +3,7 @@
 #include <grain/Input/Event.hpp>
 #include <grain/Input/Input.hpp>
 #include <grain/Platform/Window.hpp>
+#include <grain/Geometry/Rect.hpp>
 
 #include <memory>
 #include <string_view>
@@ -19,7 +20,7 @@ public:
     auto operator = (App&&) -> App& = delete;
 
     auto setIcon(const std::string& path) -> bool;
-    auto createWindow(std::string_view title, int width, int height) -> Window*;
+    auto addWindow(std::string_view title, const Recti& rect) -> Window*;
 
     [[nodiscard]] auto input() -> Input&;
     [[nodiscard]] auto input() const -> const Input&;

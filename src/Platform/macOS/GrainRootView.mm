@@ -5,7 +5,7 @@
 #include "GrainRootView.hpp"
 #include "CoreGraphicContext.hpp"
 
-#include <grain/Platform/View.hpp>
+#include <grain/UI/View.hpp>
 #include <grain/Input/Event.hpp>
 #include <grain/Geometry/Rect.hpp>
 

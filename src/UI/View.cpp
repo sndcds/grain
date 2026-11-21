@@ -1,16 +1,24 @@
-#include <grain/Platform/View.hpp>
+#include <grain/UI/View.hpp>
+#include <grain/UI/UIElement.hpp>
 
-#include "Platform.hpp"
+#include <grain/Platform/Platform.hpp>
 #include <grain/Input/Event.hpp>
 
 #include <memory>
 #include <ranges>
+#include <iostream>
 
 namespace Grain {
 class View::Impl {
 public:
     std::unique_ptr<Platform::View> platformView;
+
+    Impl();
+    ~Impl();
 };
+
+View::Impl::Impl() = default;
+View::Impl::~Impl() = default;
 
 
 View::View()
@@ -76,15 +84,36 @@ void View::updateFocusedComponent(Component* component) {
 
 
 auto View::hitTest(const Vec2d& pos) -> Component* {
-    for (auto & it : std::ranges::reverse_view(components_)) {
-        Component* component = it.get();
 
-        if (!component->visible() || !component->enabled()) {
-            continue;
+    for (auto& it : std::ranges::reverse_view(children_)) {
+
+        UIElement* child = it.get();
+
+        switch (child->type()) {
+
+        case UIElementType::Component: {
+            auto* component = static_cast<Component*>(child);
+
+            if (!component->visible() || !component->enabled()) {
+                continue;
+            }
+
+            if (component->contains(pos)) {
+                return component;
+            }
+
+            break;
         }
 
-        if (component->contains(pos)) {
-            return component;
+        case UIElementType::View: {
+            auto* view = static_cast<View*>(child);
+
+            if (auto* component = view->hitTest(pos)) {
+                return component;
+            }
+
+            break;
+        }
         }
     }
 
@@ -92,14 +121,24 @@ auto View::hitTest(const Vec2d& pos) -> Component* {
 }
 
 
-void View::drawComponents(GraphicContext& gc, const Rectd& dirty_rect) {
+void View::drawComponents(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
     // updateHoveredComponent(hitTest(mousePos()));
 
     gc.clip(dirty_rect);
 
-    for (auto& component : components_) {
-        if (component->visible()) {
+    std::cout << "View::drawComponents: " << dirty_rect << std::endl;
+
+    for (auto& child : children_) {
+        if (child->type() == UIElementType::Component) {
+
+            std::cout << "Component" << std::endl;
+
+            auto* component = static_cast<Component*>(child.get());
             if (dirty_rect.intersects(component->bounds())) {
+                std::cout << "Component: " << component->bounds() << std::endl;
                 component->draw(gc);
             }
         }
@@ -107,15 +146,37 @@ void View::drawComponents(GraphicContext& gc, const Rectd& dirty_rect) {
 }
 
 
-void View::drawContent(GraphicContext& gc, const Rectd& dirty_rect) {
+void View::drawContent(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
     (void)gc;
     (void)dirty_rect;
 }
 
 
-void View::draw(GraphicContext& gc, const Rectd& dirty_rect) {
+void View::draw(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
+    auto rect = dirty_rect;
+    if (rect.y < 0) {
+        rect.height += rect.y;
+        rect.y = 0;
+    }
+    gc.setFillColor({1, 0, 0, 1});
+    gc.fillRect(rect);
+
+    gc.setFillColor({1, 1, 0, 1});
+    gc.fillRect({10, 10, 200, 200});
+
     drawContent(gc, dirty_rect);
     drawComponents(gc, dirty_rect);
+}
+
+
+void View::doSizing() {
+    std::cout << "View::doSizing()" << std::endl;
 }
 
 

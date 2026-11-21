@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Platform.hpp"
+#include <grain/Platform/Platform.hpp>
 
 #include <memory>
 #include <string_view>
@@ -16,11 +16,10 @@ public:
 
     bool setIcon(const std::string& path) override;
 
-    std::unique_ptr<Window> createWindow(
+    std::unique_ptr<Window> addWindow(
         uint64_t id,
         std::string_view title,
-        int width,
-        int height
+        const Recti& rect
         ) override;
 
     void run() override;

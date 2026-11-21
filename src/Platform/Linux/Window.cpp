@@ -2,7 +2,7 @@
 #include "X11Window.hpp"
 
 #include "CairoGraphicContext.hpp"
-#include <../../../include/grain/Platform/View.hpp>
+#include <../../../include/grain/UI/View.hpp>
 
 #include <cairo/cairo-xlib.h>
 
@@ -191,12 +191,11 @@ void X11Window::resize(
         );
 }
 
-std::unique_ptr<Window> X11App::createWindow(
+std::unique_ptr<Window> X11App::addWindow(
     WindowId id,
     std::string_view title,
-    int width,
-    int height
-    ) {
+    const Recti& rect
+) {
 
     auto window =
         std::make_unique<X11Window>(

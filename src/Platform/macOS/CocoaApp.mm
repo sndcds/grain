@@ -46,17 +46,15 @@ bool CocoaApp::setIcon(const std::string& path) {
 }
 
 
-std::unique_ptr<Window> CocoaApp::createWindow(
+std::unique_ptr<Window> CocoaApp::addWindow(
     uint64_t id,
     std::string_view title,
-    int width,
-    int height
+    const Recti& rect
 ) {
     return std::make_unique<CocoaWindow>(
         id,
         title,
-        width,
-        height,
+        rect,
         [this](const Event& event) {
             emitEvent(event);
         }

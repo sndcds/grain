@@ -1,7 +1,7 @@
 #import <AppKit/AppKit.h>
 
 #include "CocoaWindow.hpp"
-#include <grain/Platform/View.hpp>
+#include <grain/UI/View.hpp>
 
 #include <memory>
 #include <string>
@@ -56,8 +56,7 @@ public:
 CocoaWindow::CocoaWindow(
     uint64_t id,
     std::string_view title,
-    int width,
-    int height,
+    const Recti& rect,
     EventHandler event_handler
 )
     : window_id_(id),
@@ -77,16 +76,18 @@ CocoaWindow::CocoaWindow(
         ns_title = @"Grain";
     }
 
-    NSRect rect = NSMakeRect(
-        100.0,
-        100.0,
-        static_cast<CGFloat>(width),
-        static_cast<CGFloat>(height)
+    const NSRect visible_rect = [[NSScreen mainScreen] visibleFrame];
+
+    const NSRect window_rect = NSMakeRect(
+        visible_rect.origin.x + rect.x,
+        NSMaxY(visible_rect) - rect.y - rect.height,
+        rect.width,
+        rect.height
     );
 
     impl_->window_ =
         [[NSWindow alloc]
-            initWithContentRect:rect
+            initWithContentRect:window_rect
             styleMask:
                 NSWindowStyleMaskTitled |
                 NSWindowStyleMaskClosable |
@@ -102,8 +103,6 @@ CocoaWindow::CocoaWindow(
 
     [impl_->window_ setTitle:ns_title];
     [impl_->window_ setAcceptsMouseMovedEvents:YES];
-    [impl_->window_ center];
-
 
     // Install the delegate
 

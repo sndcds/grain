@@ -1,6 +1,8 @@
 #include "grain/UI/Component.hpp"
 
-#include "grain/Platform/View.hpp"
+#include "../../include/grain/UI/View.hpp"
+
+#include <iostream>
 
 namespace Grain {
 
@@ -88,5 +90,20 @@ void Component::invalidate() {
         view_->requestRedraw(bounds_);
     }
 }
+
+
+void Component::draw(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
+    // Default component drawing
+}
+
+
+void Component::doSizing() {
+    std::cout << "Component::doSizing()" << std::endl;
+}
+
+
 
 }

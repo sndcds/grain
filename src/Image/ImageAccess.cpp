@@ -204,6 +204,88 @@ auto ImageAccess::readAt(int32_t x, int32_t y) noexcept -> bool {
     return setPos(x, y) && read();
 }
 
+auto ImageAccess::readInterpolated(
+    const Vec2d& position
+) noexcept -> bool {
+
+    if (!usable_ ||
+        !data_ ||
+        !current_ptr_ ||
+        !transfer_ptr_ ||
+        component_count_ <= 0 ||
+        component_count_ > MaxComponents ||
+        width_ <= 0 ||
+        height_ <= 0 ||
+        !std::isfinite(position.x) ||
+        !std::isfinite(position.y) ||
+        position.x < 0.0 ||
+        position.y < 0.0 ||
+        position.x >= static_cast<double>(width_) ||
+        position.y >= static_cast<double>(height_)) {
+        return false;
+    }
+
+    // Preserve the current pixel cursor.
+    auto* const saved_ptr = current_ptr_;
+
+    // Calculate the four surrounding pixel coordinates.
+    const int32_t x0 = static_cast<int32_t>(std::floor(position.x));
+    const int32_t y0 = static_cast<int32_t>(std::floor(position.y));
+
+    const int32_t x1 = std::min(x0 + 1, width_ - 1);
+    const int32_t y1 = std::min(y0 + 1, height_ - 1);
+
+    const float xf1 = static_cast<float>(position.x - x0);
+    const float xf0 = 1.0f - xf1;
+
+    const float yf1 = static_cast<float>(position.y - y0);
+    const float yf0 = 1.0f - yf1;
+
+    const float coefficients[2][2] = {
+        { xf0 * yf0, xf1 * yf0 },
+        { xf0 * yf1, xf1 * yf1 }
+    };
+
+    const int32_t xs[2] = { x0, x1 };
+    const int32_t ys[2] = { y0, y1 };
+
+    float sum[MaxComponents] = {};
+
+    // Read and accumulate the four surrounding pixels.
+    for (int32_t yi = 0; yi < 2; ++yi) {
+        for (int32_t xi = 0; xi < 2; ++xi) {
+
+            const auto* const pixel_ptr =
+                data_ +
+                static_cast<size_t>(ys[yi]) * row_stride_ +
+                static_cast<size_t>(xs[xi]) * pixel_stride_;
+
+            current_ptr_ = const_cast<uint8_t*>(pixel_ptr);
+
+            if (!read()) {
+                current_ptr_ = saved_ptr;
+                return false;
+            }
+
+            const float coefficient = coefficients[yi][xi];
+
+            for (int32_t i = 0; i < component_count_; ++i) {
+                sum[i] += transfer_ptr_[i] * coefficient;
+            }
+        }
+    }
+
+    // Store the interpolated result in the transfer buffer.
+    for (int32_t i = 0; i < component_count_; ++i) {
+        transfer_ptr_[i] = sum[i];
+    }
+
+    // Restore the original pixel cursor.
+    current_ptr_ = saved_ptr;
+
+    return true;
+}
+
 auto ImageAccess::writeAt(int32_t x, int32_t y) noexcept -> bool {
     return setPos(x, y) && write();
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Platform.hpp"
+#include <grain/Platform/Platform.hpp>
 
 namespace Grain::Platform {
 

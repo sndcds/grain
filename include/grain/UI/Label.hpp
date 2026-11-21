@@ -10,9 +10,11 @@ namespace Grain {
 
 class Label : public Component {
 public:
-    explicit Label(View* view, std::string text = {});
+    explicit Label(std::string text = {});
 
     void draw(GraphicContext& gc) override;
+    void doSizing() override;
+
 
     void setText(std::string text);
     [[nodiscard]] auto text() const noexcept -> const std::string&;

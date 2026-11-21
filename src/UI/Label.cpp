@@ -3,13 +3,14 @@
 
 #include "grain/Graphics/GraphicContext.hpp"
 
+#include <iostream>
 #include <utility>
+#include <grain/UI/View.hpp>
 
 namespace Grain {
 
-Label::Label(View* view, std::string text)
-    : Component(view),
-      text_(std::move(text))
+Label::Label(std::string text)
+    : text_(std::move(text))
 {
 }
 
@@ -19,7 +20,10 @@ void Label::setText(std::string text) {
     }
 
     text_ = std::move(text);
-    view()->requestRedraw();
+
+    if (auto* parent = parentView()) {
+        parent->requestRedraw(bounds_);
+    }
 }
 
 const std::string& Label::text() const noexcept {
@@ -27,6 +31,9 @@ const std::string& Label::text() const noexcept {
 }
 
 void Label::draw(GraphicContext& gc) {
+
+    std::cout << "Label::draw()" << std::endl;
+
     static Font* font;
     if (font == nullptr) {
         font = new Grain::Font("SFPro-Regular", 15.0f);
@@ -36,6 +43,9 @@ void Label::draw(GraphicContext& gc) {
         return;
     }
 
+    gc.setFillColor({1, 0, 0, 1});
+    gc.fillRect(bounds_);
+
     // TODO: Set text color!
 
     gc.drawTextInRect(
@@ -44,5 +54,10 @@ void Label::draw(GraphicContext& gc) {
         Alignment::Left,
         font);
 }
+
+void Label::doSizing() {
+    std::cout << "Label::doSizing()" << std::endl;
+}
+
 
 }

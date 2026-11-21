@@ -1,10 +1,12 @@
 
 #pragma once
 
+#include <grain/Image/Image.hpp>
+#include <grain/Math/Vec2.hpp>
+
 #include <cstddef>
 #include <cstdint>
 
-#include <grain/Image/Image.hpp>
 
 namespace Grain {
 
@@ -109,6 +111,8 @@ public:
 
     // Read/write the current pixel without changing the cursor.
     [[nodiscard]] auto readAt(int32_t x, int32_t y) noexcept -> bool;
+    [[nodiscard]] auto readInterpolated(const Vec2d& position) noexcept -> bool;
+
     [[nodiscard]] auto writeAt(int32_t x, int32_t y) noexcept -> bool;
 
 private:

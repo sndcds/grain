@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Platform.hpp"
+#include <grain/Platform/Platform.hpp>
 
 #include <string_view>
 
@@ -11,8 +11,7 @@ public:
     CocoaWindow(
         uint64_t id,
         std::string_view title,
-        int width,
-        int height,
+        const Recti& rect,
         EventHandler event_handler
     );
 

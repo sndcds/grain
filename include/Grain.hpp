@@ -49,6 +49,8 @@
 #include "grain/Geometry/Bezier.hpp"
 #include "grain/Geometry/Geometry.hpp"
 #include "grain/Geometry/Delaunay.hpp"
+#include "grain/Geometry/PoissonDisc.hpp"
+#include "grain/Geometry/PoissonDiscDensity.hpp"
 
 
 #include "grain/Database/PSQL.hpp"
@@ -60,7 +62,7 @@
 
 #include "grain/Platform/App.hpp"
 #include "grain/Platform/Window.hpp"
-#include "grain/Platform/View.hpp"
+#include "grain/UI/View.hpp"
 #include "grain/Platform/Font.hpp"
 
 #include "grain/Color/Color.hpp"

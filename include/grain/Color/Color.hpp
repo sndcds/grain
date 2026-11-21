@@ -22,6 +22,15 @@ namespace Grain {
  * Color uses straight (unpremultiplied) alpha.
  */
 class Color {
+
+    static constexpr float kVectorscopeRedAngle = 12.905752f;
+    static constexpr float kLumina709ScaleR = 0.212593f;
+    static constexpr float kLumina709ScaleG = 0.715215f;
+    static constexpr float kLumina709ScaleB = 0.072192f;
+    static constexpr float kLumina601ScaleR = 0.29899f;
+    static constexpr float kLumina601ScaleG = 0.58702f;
+    static constexpr float kLumina601ScaleB = 0.11399f;
+
 public:
     float red = 0.0f;
     float green = 0.0f;
@@ -123,6 +132,23 @@ public:
             static_cast<float>(value & 0xff) / 255.0f
         };
     }
+
+    float lumina601() const noexcept {
+        return
+            kLumina601ScaleR * red +
+            kLumina601ScaleG * green +
+            kLumina601ScaleB * blue;
+    }
+
+
+    float lumina709() const noexcept {
+        return
+            kLumina709ScaleR * red +
+            kLumina709ScaleG * green +
+            kLumina709ScaleB * blue;
+    }
+
+
 };
 
 } // namespace Grain

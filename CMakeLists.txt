@@ -260,6 +260,7 @@ target_sources(
         src/Geometry/BezierValueCurve.cpp
         src/Geometry/CatmullRomCurve.cpp
         src/Geometry/Delaunay.cpp
+        src/Geometry/PoissonDisc.cpp
 
         src/Color/Color.cpp
         src/Color/HSVColor.cpp
@@ -291,13 +292,14 @@ target_sources(
 
         src/Input/Input.cpp
 
-        src/Platform/View.cpp
-
+        src/UI/UIElement.cpp
+        src/UI/View.cpp
         src/UI/Component.cpp
         src/UI/Label.cpp
         src/UI/Button.cpp
         src/UI/Slider.cpp
         src/UI/TextField.cpp
+        src/UI/LayoutEngine.cpp
 
         src/Animation/Animation.cpp
         src/Animation/AnimationDriver.cpp
@@ -361,6 +363,8 @@ target_sources(
         include/grain/Geometry/BezierValueCurve.hpp
         include/grain/Geometry/Geometry.hpp
         include/grain/Geometry/Delaunay.hpp
+        include/grain/Geometry/PoissonDisc.hpp
+        include/grain/Geometry/PoissonDiscDensity.hpp
 
         include/grain/String/String.hpp
         include/grain/String/StringUtf8.hpp
@@ -375,7 +379,6 @@ target_sources(
 
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
-        include/grain/Platform/View.hpp
 
         include/grain/Color/Color.hpp
         include/grain/Color/ColorLUT.hpp
@@ -406,11 +409,14 @@ target_sources(
         include/grain/Movie/Movie.hpp
         include/grain/Movie/MovieWriter.hpp
 
+        include/grain/UI/UIElement.hpp
+        include/grain/UI/View.hpp
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp
         include/grain/UI/Button.hpp
         include/grain/UI/Slider.hpp
         include/grain/UI/TextField.hpp
+        include/grain/UI/LayoutEngine.hpp
 
         include/grain/Animation/Animation.hpp
         include/grain/Animation/AnimationDriver.hpp

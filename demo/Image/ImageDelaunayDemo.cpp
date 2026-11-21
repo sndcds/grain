@@ -111,7 +111,7 @@ void delaunay(
         //  Draw background
         //----------------------------------------------------------------------
 
-        gc.setFillColor({1, 0, 0, 1});
+        gc.setFillColor({0, 0, 0, 1});
         gc.fillRect(rect);
 
 
@@ -228,11 +228,10 @@ void delaunay(
 
 
 auto main() -> int {
-    constexpr uint32_t width = 1200;
-    constexpr uint32_t height = 800;
+    constexpr uint32_t width = 4000;
+    constexpr uint32_t height = 4000;
 
     Grain::Image image;
-
 
     if (!image.create(
         width,
@@ -254,8 +253,8 @@ auto main() -> int {
     delaunay(
         *gc,
         Rectd(0.0, 0.0, image.width(), image.height()),
-        1000, // seed_n,
-        10 // pass_n
+        2000, // seed_n,
+        4 // pass_n
     );
 
 

@@ -2,7 +2,7 @@
 #include "grain/UI/Slider.hpp"
 
 #include "grain/Graphics/GraphicContext.hpp"
-#include "grain/Platform/View.hpp"
+#include "../../include/grain/UI/View.hpp"
 
 #include <algorithm>
 #include <cmath>

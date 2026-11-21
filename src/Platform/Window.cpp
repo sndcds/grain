@@ -1,7 +1,7 @@
 #include <grain/Platform/Window.hpp>
-#include <grain/Platform/View.hpp>
+#include <grain/UI/View.hpp>
 
-#include "Platform.hpp"
+#include "../../include/grain/Platform/Platform.hpp"
 
 #include <memory>
 #include <utility>
@@ -38,6 +38,15 @@ auto Window::id() const -> uint64_t {
     return impl_->id_;
 }
 
+
+auto Window::rootView() -> View& {
+    return *impl_->root_view_;
+}
+
+
+auto Window::rootView() const -> const View& {
+    return *impl_->root_view_;
+}
 
 void Window::show() {
     if (impl_ == nullptr ||
@@ -111,7 +120,15 @@ auto Window::create(
         }
     );
 
+    auto view = std::make_unique<View>();
+    window->setRootView(std::move(view));
+
     return window;
+}
+
+
+void Window::updateLayout() {
+    layout_engine_.layout(rootView());
 }
 
 

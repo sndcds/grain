@@ -28,9 +28,7 @@ X11App::~X11App() {
     }
 }
 
-void X11App::addWindow(
-    X11Window* window
-    ) {
+void X11App::addWindow(X11Window* window) {
 
     if (window == nullptr) {
         return;

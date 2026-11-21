@@ -90,7 +90,7 @@ int main() {
     auto& app = Grain::App::instance();
     app.setIcon("/Users/roaldchristesen/Documents/Pippa/Pippa Logo.png");
 
-    auto *window = app.createWindow("Grain", 400,  400);
+    auto *window = app.addWindow("Grain", {100, 100, 640, 480});
     app.run();
 
     return 0;

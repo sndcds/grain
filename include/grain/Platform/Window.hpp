@@ -1,6 +1,8 @@
 #pragma once
 
 #include <grain/Input/Event.hpp>
+#include <grain/UI/LayoutEngine.hpp>
+
 
 #include <memory>
 
@@ -19,7 +21,7 @@ class Window;
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //  Grain::Window
 //
 //  The portable public/window abstraction.
@@ -36,15 +38,23 @@ public:
 
     [[nodiscard]] auto id() const -> uint64_t;
 
+    [[nodiscard]] auto rootView() -> View&;
+    [[nodiscard]] auto rootView() const -> const View&;
+
+
     void show();
     void requestRedraw();
 
     void setRootView(std::unique_ptr<View> view);
     virtual void handleEvent(const Event& event);
 
+    void updateLayout();
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl_;
+
+    LayoutEngine layout_engine_;
 
     explicit Window(std::unique_ptr<Impl> impl);
 
