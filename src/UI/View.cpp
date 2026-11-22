@@ -263,7 +263,7 @@ void View::layoutGrow() {
     double used_space = 0.0;
     double total_grow_weight = 0.0;
 
-    // 1. Distribute space among this View's direct children.
+    // Distribute space among this View's direct children.
 
     // Calculate space already occupied by non-growing children
     // and the total Grow weight.
@@ -327,7 +327,46 @@ void View::layoutGrow() {
         }
     }
 
-    // 2. Recursively distribute space inside child Views.
+    // Allocate the cross axis.
+    //
+    // In a vertical layout, this is width.
+    // In a horizontal layout, this is height.
+
+    const double cross_available_space =
+        vertical
+            ? layout_result_.allocated_size.width
+                - element.padding.left
+                - element.padding.right
+            : layout_result_.allocated_size.height
+                - element.padding.top
+                - element.padding.bottom;
+
+    for (auto& child : children_) {
+
+        const auto& sizing = child->element().sizing;
+
+        const auto& axis =
+            vertical ? sizing.width : sizing.height;
+
+        if (axis.type != LayoutSizingType::Grow) {
+            continue;
+        }
+
+        const double allocated = std::clamp(
+            cross_available_space,
+            axis.min_value,
+            axis.max_value
+        );
+
+        if (vertical) {
+            child->layout_result_.allocated_size.width = allocated;
+        }
+        else {
+            child->layout_result_.allocated_size.height = allocated;
+        }
+    }
+
+    // Recursively distribute space inside child Views.
     for (auto& child : children_) {
         if (child->type() == UIElementType::View) {
             static_cast<View&>(*child).layoutGrow();

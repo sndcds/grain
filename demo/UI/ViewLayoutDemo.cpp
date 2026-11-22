@@ -46,7 +46,8 @@ inline auto create(UIStyles& styles) -> void {
     LayoutComponentStyle grow_h_component;
     grow_h_component.element.padding = {8.0, 8.0, 4.0, 4.0};
     grow_h_component.element.child_gap = 2.0;
-    grow_h_component.element.sizing.width.min_value = 100;
+    grow_h_component.element.sizing.width.min_value = 20;
+    grow_h_component.element.sizing.width.max_value = 100;
     grow_h_component.element.sizing.width.type = LayoutSizingType::Grow;
 
     styles.defineComponentStyle("grow_h", grow_h_component);
@@ -78,17 +79,48 @@ int main() {
     auto& label = view.addChild<Label>("Hello");
 	label.setStyle(styles.componentStyle("default"));
 
-    auto& sub_view = view.addChild<View>();
-	sub_view.setStyle(styles.viewStyle("vertical-stack"));
+    for (int32_t i = 0; i < 4; i++) {
+        auto& sub_view = view.addChild<View>();
+        sub_view.setStyle(styles.viewStyle("vertical-stack"));
+        for (int32_t j = 0; j < 3; j++) {
+            sub_view.addChild<Label>("X-100")
+                .setStyle(styles.componentStyle("grow_h"));
+            sub_view.addChild<Label>("3.1415")
+                .setStyle(styles.componentStyle("grow_h"));
+            sub_view.addChild<Label>("Yamaha DX7")
+                .setStyle(styles.componentStyle("grow_h"));
+            sub_view.addChild<Label>("Moog")
+                .setStyle(styles.componentStyle("grow_h"));
 
-    sub_view.addChild<Label>("X-100")
-		.setStyle(styles.componentStyle("grow_h"));
-    sub_view.addChild<Label>("3.1415")
-        .setStyle(styles.componentStyle("grow_h"));
-    sub_view.addChild<Label>("Yamaha DX7")
-        .setStyle(styles.componentStyle("grow_h"));
-    sub_view.addChild<Label>("Moog")
-        .setStyle(styles.componentStyle("grow_h"));
+            auto& sub_view2 = sub_view.addChild<View>();
+            sub_view2.setStyle(styles.viewStyle("vertical-stack"));
+            for (int32_t j = 0; j < 3; j++) {
+                sub_view2.addChild<Label>("X-100")
+                    .setStyle(styles.componentStyle("grow_h"));
+
+                auto& sub_view3 = sub_view2.addChild<View>();
+                sub_view3.setStyle(styles.viewStyle("vertical-stack"));
+                for (int32_t j = 0; j < 3; j++) {
+                    sub_view3.addChild<Label>("2001 - A Space Odyssey")
+                        .setStyle(styles.componentStyle("grow_h"));
+                    sub_view3.addChild<Label>("Abacus")
+                        .setStyle(styles.componentStyle("grow_h"));
+                    sub_view3.addChild<Label>("Duborg-Skolen")
+                        .setStyle(styles.componentStyle("grow_h"));
+                    sub_view3.addChild<Label>("Moog")
+                        .setStyle(styles.componentStyle("grow_h"));
+                }
+
+
+                sub_view2.addChild<Label>("3.1415")
+                    .setStyle(styles.componentStyle("grow_h"));
+                sub_view2.addChild<Label>("Yamaha DX7")
+                    .setStyle(styles.componentStyle("grow_h"));
+                sub_view2.addChild<Label>("Moog")
+                    .setStyle(styles.componentStyle("grow_h"));
+            }
+        }
+    }
 
     view.addChild<Label>("Synthesizerstudio")
 		.setStyle(styles.componentStyle("default"));
