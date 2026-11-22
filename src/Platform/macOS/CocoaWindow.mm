@@ -71,8 +71,8 @@ CocoaWindow::CocoaWindow(
     std::string_view title,
     const Recti& rect,
     EventHandler event_handler
-)
-    : window_id_(id),
+) :
+    window_id_(id),
     impl_(std::make_unique<Impl>())
 {
     impl_->event_handler = std::move(event_handler);
@@ -128,7 +128,6 @@ CocoaWindow::CocoaWindow(
     impl_->delegate.willCloseHandler = [this]() {
         Event event;
         event.type_ = EventType::WindowWillClose;
-
         emitEvent(event);
 
         impl_->closing = true;

@@ -91,6 +91,7 @@ void Window::setRootView(std::unique_ptr<View> view) {
 
 void Window::handleEvent(const Event& event) {
     (void)event;
+    updateLayout();
     // TODO: Implement behaviour! Should the window close/delete?
 }
 
@@ -123,7 +124,7 @@ auto Window::create(
 
 
 void Window::updateLayout() {
-    std::cout << "Window::updateLayout()" << std::endl;
+
     layout_engine_.layout(rootView());
 }
 

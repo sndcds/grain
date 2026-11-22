@@ -136,11 +136,6 @@ auto Slider::handleEvent(const Event& event) -> bool {
     }
 }
 
-void Slider::setBounds(const Rectd& bounds) {
-    layout_result_.bounds = bounds;
-    invalidate();
-}
-
 void Slider::setRange(double min, double max) {
     if (!std::isfinite(min) ||
         !std::isfinite(max) ||

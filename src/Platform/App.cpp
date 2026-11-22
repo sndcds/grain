@@ -2,6 +2,7 @@
 
 #include "../../include/grain/Platform/Platform.hpp"
 
+#include <chrono>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -12,7 +13,7 @@ namespace Grain {
 class App::Impl {
 public:
     std::unique_ptr<Platform::App> platform_app_;
-    std::vector<std::unique_ptr<Window> > windows_;
+    std::unordered_map<std::string, std::unique_ptr<Window>> windows_;
 
     Input input_;
     uint64_t next_window_id = 1;
@@ -51,55 +52,79 @@ auto App::setIcon(const std::string& path) -> bool {
 
 
 auto App::addWindow(
+    std::string tag,
     std::string_view title,
     const Recti& rect
 ) -> Window*
 {
-    if (impl_ == nullptr || impl_->platform_app_ == nullptr) {
+    static int32_t g_window_id = 0;
+
+    if (tag.empty() || impl_->windows_.contains(tag)) {
         return nullptr;
     }
 
-    const uint64_t window_id = impl_->next_window_id++;
+    const auto id = g_window_id++;
 
-    auto platform_window =
-        impl_->platform_app_->addWindow(
-            window_id,
-            title,
-            rect
-        );
+    auto platform_window = impl_->platform_app_->addWindow(
+        id,
+        title,
+        rect
+    );
 
-    if (platform_window == nullptr) {
+    auto window = Window::create(
+        id,
+        std::move(platform_window)
+    );
+
+    if (!window) {
         return nullptr;
     }
 
-    auto window = Window::create(window_id, std::move(platform_window));
-    if (window == nullptr) {
-        return nullptr;
-    }
+    auto* window_ptr = window.get();
 
-    Window* result = window.get();
+    impl_->windows_.emplace(
+        std::move(tag),
+        std::move(window)
+    );
 
-    impl_->windows_.push_back(std::move(window));
-
-    result->show();
-
-    return result;
+    return window_ptr;
 }
 
 
-/* TODO: ???
-View* App::addView(std::unique_ptr<View> view) {
-    std::cout << "App::addView()" << std::endl;
+auto App::getWindow(std::string_view tag) -> Window* {
 
-    if (impl_ == nullptr || impl_->platform_app == nullptr) {
+    const auto it = impl_->windows_.find(std::string(tag));
+
+    if (it == impl_->windows_.end()) {
         return nullptr;
     }
 
-
-    View* result = view.get();
-    return result;
+    return it->second.get();
 }
-*/
+
+
+auto App::getWindow(std::string_view tag) const -> const Window* {
+
+    const auto it = impl_->windows_.find(std::string(tag));
+
+    if (it == impl_->windows_.end()) {
+        return nullptr;
+    }
+
+    return it->second.get();
+}
+
+
+auto App::getWindowById(uint64_t id) -> Window* {
+
+    for (auto& [tag, window] : impl_->windows_) {
+        if (window && window->id() == id) {
+            return window.get();
+        }
+    }
+
+    return nullptr;
+}
 
 
 auto App::input() -> Input& {
@@ -134,14 +159,18 @@ void App::quit() {
 
 
 void App::processEvent(const Event& event) {
-    std::cout << (int)event.type_ << '\n';
+
     switch (event.type_) {
         case EventType::Quit: {
             quit();
             return;
         }
         case EventType::WindowResize: {
-            std::cout << "Window Resize Event: " << event.window_size_ << std::endl;
+            auto* window = getWindowById(event.window_id_);
+            if (window == nullptr) {
+                return;
+            }
+            window->handleEvent(event);
             break;
         }
         default:

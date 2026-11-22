@@ -138,7 +138,6 @@ void View::drawChildren(
     // updateHoveredComponent(hitTest(mousePos()));
 
     gc.clip(dirty_rect);
-    std::cout << "dirty_rect: " << dirty_rect << std::endl;
 
     for (auto& child : children_) {
         if (child->type() == UIElementType::Component) {
@@ -149,7 +148,6 @@ void View::drawChildren(
         }
         else if (child->type() == UIElementType::View) {
             auto* view = static_cast<View*>(child.get());
-            std::cout << "view->bounds: " << view->layout_result_.bounds << std::endl;
             if (dirty_rect.intersects(view->bounds())) {
                 view->draw(gc, dirty_rect);
             }
@@ -196,7 +194,6 @@ void View::layoutSizing() {
     for (const auto& child : children_) {
 
         const auto& child_size = child->layout_result_.preferred_size;
-        std::cout << i << ": child_size: " << child_size << std::endl;
 
         if (style_->direction == LayoutDirection::TopToBottom) {
             new_size.width = std::max(new_size.width, child_size.width);
@@ -206,7 +203,6 @@ void View::layoutSizing() {
             new_size.width += child_size.width;
             new_size.height = std::max(new_size.height, child_size.height);
         }
-        std::cout << "new_size: " << new_size << std::endl;
     }
 
     if (children_.size() > 1) {
@@ -221,11 +217,7 @@ void View::layoutSizing() {
         }
     }
 
-    layout_result_.intrinsic_size.width =
-        new_size.width + element.padding.left + element.padding.right;
-
-    layout_result_.intrinsic_size.height =
-        new_size.height + element.padding.top + element.padding.bottom;
+    layout_result_.intrinsic_size = new_size;
 
     layoutPreferredSizing();
 }
@@ -271,7 +263,6 @@ void View::layoutGrow() {
     double used_space = 0.0;
     double total_grow_weight = 0.0;
 
-
     // 1. Distribute space among this View's direct children.
 
     // Calculate space already occupied by non-growing children
@@ -293,13 +284,11 @@ void View::layoutGrow() {
 
     // Account for gaps between children.
     if (children_.size() > 1) {
-        used_space +=
-            (children_.size() - 1) * element.child_gap;
+        used_space += (children_.size() - 1) * element.child_gap;
     }
 
     // Calculate the remaining space.
-    const double remaining_space =
-        std::max(0.0, available_space - used_space);
+    const double remaining_space = std::max(0.0, available_space - used_space);
 
     if (total_grow_weight <= 0.0) {
         return;

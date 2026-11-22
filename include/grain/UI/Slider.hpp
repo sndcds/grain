@@ -30,7 +30,6 @@ public:
     void draw(GraphicContext& gc, const Rectd& dirty_rect) override;
     auto handleEvent(const Event& event) -> bool override;
 
-    void setBounds(const Rectd& bounds) override;
     void setRange(double min, double max);
     void setValue(double value);
     void setStep(double step);

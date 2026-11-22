@@ -7,17 +7,6 @@
 
 namespace Grain {
 
-void Component::setBounds(const Rectd& bounds) {
-    if (layout_result_.bounds != bounds) {
-        auto dirty_rect = bounds.united(this->bounds());
-        layout_result_.bounds = bounds;
-
-        if (view_ != nullptr) {
-            view_->requestRedraw(dirty_rect);
-        }
-    }
-}
-
 
 bool Component::contains(const Vec2d& point) const {
     const auto& rect = bounds();

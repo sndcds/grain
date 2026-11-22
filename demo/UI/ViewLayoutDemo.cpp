@@ -55,13 +55,17 @@ int main() {
 
 	UIStyles styles;
 
-    // Initialize the app
+
+    //--------------------------------------------------------------------------
+    //  Initialize the app
+    //--------------------------------------------------------------------------
+
     auto& app = App::instance();
     app.setIcon("/Users/roaldchristesen/Documents/Pippa/Pippa Logo.png");
 
 	Styles::create(styles);
 
-    auto window = app.addWindow("Grain", {0, 0, 640, 480});
+    auto window = app.addWindow("test_window", "Grain", {0, 0, 1600, 800});
 
     auto& view = window->rootView();
 	view.setStyle(styles.viewStyle("horizontal-stack"));
@@ -90,7 +94,9 @@ int main() {
     view.addChild<Label>("IBM")
 		.setStyle(styles.componentStyle("default"));
 
+
 	window->updateLayout();
+    window->show();
 
     app.run();
 }

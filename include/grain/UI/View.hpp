@@ -38,8 +38,9 @@ public:
 		return UIElementType::View;
 	}
 
-	[[nodiscard]] auto bounds() const -> const Rectd& { return bounds_; }
-	void setBounds(const Rectd& bounds) { bounds_ = bounds; }
+	[[nodiscard]] auto bounds() const -> const Rectd& {
+	        return layout_result_.bounds;
+	}
 
 	template <typename T, typename... Args>
 	requires std::derived_from<T, UIElement>
@@ -188,7 +189,6 @@ private:
     auto hitTest(const Vec2d& pos) -> Component*;
     [[nodiscard]] auto queryMousePos() const -> Vec2d;
 
-    Rectd bounds_;
     Vec2d mouse_pos_;
 
 	std::vector<std::unique_ptr<UIElement>> children_;

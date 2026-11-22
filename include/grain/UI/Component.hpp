@@ -42,8 +42,6 @@ public:
         view_ = view;
     }
 
-    virtual void setBounds(const Rectd& bounds);
-
     [[nodiscard]] auto bounds() const -> const Rectd& {
         return layout_result_.bounds;
     }

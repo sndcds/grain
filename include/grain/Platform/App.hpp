@@ -6,6 +6,7 @@
 #include <grain/Geometry/Rect.hpp>
 
 #include <memory>
+#include <string>
 #include <string_view>
 
 namespace Grain {
@@ -16,14 +17,40 @@ public:
 
     App(const App&) = delete;
     auto operator = (const App&) -> App& = delete;
+
     App(App&&) = delete;
     auto operator = (App&&) -> App& = delete;
 
     auto setIcon(const std::string& path) -> bool;
-    auto addWindow(std::string_view title, const Recti& rect) -> Window*;
+
+
+    //--------------------------------------------------------------------------
+    //  Window
+    //--------------------------------------------------------------------------
+
+    auto addWindow(
+        std::string tag,
+        std::string_view title,
+        const Recti& rect
+    ) -> Window*;
+
+    auto getWindow(std::string_view tag) -> Window*;
+    auto getWindow(std::string_view tag) const -> const Window*;
+
+    auto getWindowById(uint64_t id) -> Window*;
+
+
+    //--------------------------------------------------------------------------
+    //  Input
+    //--------------------------------------------------------------------------
 
     [[nodiscard]] auto input() -> Input&;
     [[nodiscard]] auto input() const -> const Input&;
+
+
+    //--------------------------------------------------------------------------
+    //  Run
+    //--------------------------------------------------------------------------
 
     void run();
     void quit();

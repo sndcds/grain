@@ -147,10 +147,11 @@ constexpr auto operator & (
     );
 }
 
+class Window;
+
 struct Event {
     EventType type_ = EventType::None;
 
-    uint64_t window_id_ = 0;
 
     // Keyboard
     KeyCode key_ = KeyCode::Unknown;
@@ -168,8 +169,8 @@ struct Event {
     MouseButton mouse_button_ = MouseButton::Left;
     int32_t mouse_click_count_ = 0;
 
-    // Window dimensions.
-
+    // Window
+    uint64_t window_id_ = 0;
     Vec2d window_size_;
 
     [[nodiscard]] constexpr auto hasKeyModifier(KeyModifiers modifier) const -> bool {
