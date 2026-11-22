@@ -253,10 +253,10 @@ void View::layoutGrow() {
 
     const double available_space =
         vertical
-            ? layout_result_.preferred_size.height
+            ? layout_result_.allocated_size.height
                 - element.padding.top
                 - element.padding.bottom
-            : layout_result_.preferred_size.width
+            : layout_result_.allocated_size.width
                 - element.padding.left
                 - element.padding.right;
 
@@ -271,8 +271,7 @@ void View::layoutGrow() {
 
         const auto& sizing = child->element().sizing;
         const auto& axis = vertical ? sizing.height : sizing.width;
-
-        const auto& size = child->layout_result_.preferred_size;
+        const auto& size = child->layout_result_.allocated_size;
 
         if (axis.type == LayoutSizingType::Grow) {
             total_grow_weight += axis.value;
@@ -290,8 +289,6 @@ void View::layoutGrow() {
     // Calculate the remaining space.
     const double remaining_space = std::max(0.0, available_space - used_space);
 
-    std::cout << "total_grow_weight: " << total_grow_weight << std::endl;
-    std::cout << "remaining_space: " << remaining_space << std::endl;
     if (total_grow_weight > 0.0) {
         // Distribute remaining space among growing children.
         for (auto& child : children_) {
@@ -312,7 +309,7 @@ void View::layoutGrow() {
             const double allocated = remaining_space * (weight / total_grow_weight);
 
             if (vertical) {
-                child->layout_result_.preferred_size.height =
+                child->layout_result_.allocated_size.height =
                     std::clamp(
                         allocated,
                         axis.min_value,
@@ -320,7 +317,7 @@ void View::layoutGrow() {
                     );
             }
             else {
-                child->layout_result_.preferred_size.width =
+                child->layout_result_.allocated_size.width =
                     std::clamp(
                         allocated,
                         axis.min_value,
@@ -331,7 +328,6 @@ void View::layoutGrow() {
     }
 
     // 2. Recursively distribute space inside child Views.
-
     for (auto& child : children_) {
         if (child->type() == UIElementType::View) {
             static_cast<View&>(*child).layoutGrow();
@@ -354,23 +350,6 @@ auto View::layoutPositioning(const Rectd& bounds)
 }
 
 
-auto View::layoutPositioning(const Vec2d& position)
-    -> LayoutResult&
-{
-    layout_result_.bounds.width =
-        layout_result_.preferred_size.width;
-
-    layout_result_.bounds.height =
-        layout_result_.preferred_size.height;
-
-    layout_result_.bounds.setPosition(position);
-
-    positionChildren(position);
-
-    return layout_result_;
-}
-
-
 void View::positionChildren(const Vec2d& position) {
 
     const auto& element = style_->element;
@@ -385,14 +364,14 @@ void View::positionChildren(const Vec2d& position) {
 
     for (auto& child : children_) {
 
-        const auto& preferred =
-            child->layout_result_.preferred_size;
+        const auto& allocated =
+            child->layout_result_.allocated_size;
 
         const Rectd child_bounds{
             cursor.x,
             cursor.y,
-            preferred.width,
-            preferred.height
+            allocated.width,
+            allocated.height
         };
 
         auto& result =

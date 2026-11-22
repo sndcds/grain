@@ -127,16 +127,7 @@ void Component::layoutGrow() {
 auto Component::layoutPositioning(const Rectd& bounds)
     -> LayoutResult&
 {
-    layout_result_.bounds.width =
-        layout_result_.preferred_size.width;
-
-    layout_result_.bounds.height =
-        layout_result_.preferred_size.height;
-
-    layout_result_.bounds.setPosition({
-        bounds.x,
-        bounds.y
-    });
+    layout_result_.bounds = bounds;
 
     return layout_result_;
 }

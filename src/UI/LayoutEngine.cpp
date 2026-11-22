@@ -35,11 +35,18 @@ void LayoutEngine::sizingPass(View& root) {
 void LayoutEngine::preferredSizingPass(View& root) {
 
     root.traverse(
-        [](UIElement& element) -> bool {
-            element.layoutPreferredSizing();
-            return true;
-        }
-    );
+            [](UIElement& element) -> bool {
+
+                element.layoutPreferredSizing();
+
+                element.layout_result_.allocated_size = {
+                    element.layout_result_.preferred_size.width,
+                    element.layout_result_.preferred_size.height
+                };
+
+                return true;
+            }
+        );
 }
 
 

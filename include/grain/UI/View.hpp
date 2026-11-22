@@ -44,6 +44,11 @@ public:
 
 	void setLayoutBounds(const Rectd& bounds) {
 		layout_result_.bounds = bounds;
+
+		layout_result_.allocated_size = {
+			bounds.width,
+			bounds.height
+		};
 	}
 
 	template <typename T, typename... Args>
@@ -82,8 +87,6 @@ public:
 	void layoutSizing() override;
 	void layoutPreferredSizing() override;
 	void layoutGrow() override;
-
-	auto layoutPositioning(const Vec2d& position) -> LayoutResult&;
 
 	auto layoutPositioning(const Rectd& bounds) -> LayoutResult& override;
 

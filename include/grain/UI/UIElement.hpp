@@ -10,6 +10,7 @@
 namespace Grain {
 
 class View;
+class LayoutEngine;
 struct LayoutElementStyle;
 
 
@@ -55,6 +56,7 @@ protected:
     LayoutResult layout_result_{};
 
     friend class View;
+    friend class LayoutEngine;
 };
 
 }
