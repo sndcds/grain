@@ -3,6 +3,7 @@
 
 #include "../../include/grain/Platform/Platform.hpp"
 
+#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -128,6 +129,7 @@ auto Window::create(
 
 
 void Window::updateLayout() {
+    std::cout << "Window::updateLayout()" << std::endl;
     layout_engine_.layout(rootView());
 }
 

@@ -6,9 +6,12 @@
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Input/Event.hpp>
 
+#include "LayoutStyle.hpp"
+
 namespace Grain {
 
 class View;
+class LayoutComponentStyle;
 
 class Component : public UIElement {
 public:
@@ -42,7 +45,7 @@ public:
     virtual void setBounds(const Rectd& bounds);
 
     [[nodiscard]] auto bounds() const -> const Rectd& {
-        return bounds_;
+        return layout_result_.bounds;
     }
 
     [[nodiscard]] virtual auto contains(const Vec2d& pos) const -> bool;
@@ -70,15 +73,30 @@ public:
     virtual void setNumberMode(bool number_mode);
 
 
-    virtual void draw(GraphicContext& gc) = 0;
+    // virtual void draw(GraphicContext& gc) = 0;
 
     void draw(
         GraphicContext& gc,
         const Rectd& dirty_rect
     ) override;
 
-    void doSizing() override;
+    void layoutSizing() override;
+    void layoutPreferredSizing() override;
+    void layoutGrow() override;
+    auto layoutPositioning(const Vec2d& position) -> LayoutResult& override;
 
+    void setStyle(const LayoutComponentStyle& style) {
+        style_ = &style;
+    }
+
+    [[nodiscard]]
+    auto style() const -> const LayoutComponentStyle& {
+        return *style_;
+    }
+
+    auto element() -> LayoutElementStyle override {
+        return style_->element;
+    }
 
     virtual auto handleEvent(const Event& event) -> bool {
         (void)event;
@@ -87,9 +105,9 @@ public:
 
 protected:
     void invalidate();
-
-    Rectd bounds_{};
     View* view_ = nullptr;
+
+    const LayoutComponentStyle* style_ = nullptr;
 
     Component* receiver_component_ = nullptr;
 

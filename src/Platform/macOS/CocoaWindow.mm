@@ -12,6 +12,7 @@
 
 @property(nonatomic, copy) BOOL (^shouldCloseHandler)(void);
 @property(nonatomic, copy) void (^willCloseHandler)(void);
+@property (nonatomic, copy) void (^didResizeHandler)(NSSize size);
 
 @end
 
@@ -33,6 +34,18 @@
     if (self.willCloseHandler) {
         self.willCloseHandler();
     }
+}
+
+- (void)windowDidResize:(NSNotification*)notification {
+
+    NSWindow* window = notification.object;
+
+    if (!self.didResizeHandler || !window.contentView) {
+        return;
+    }
+
+    NSSize size = window.contentView.bounds.size;
+    self.didResizeHandler(size);
 }
 
 @end
@@ -121,8 +134,18 @@ CocoaWindow::CocoaWindow(
         impl_->closing = true;
     };
 
-    impl_->window_.delegate = impl_->delegate;
+    impl_->delegate.didResizeHandler = [this](NSSize size) {
+        Event event;
+        event.type_ = EventType::WindowResize;
+        event.window_size_ = {
+                static_cast<double>(size.width),
+                static_cast<double>(size.height)
+        };
 
+        emitEvent(event);
+    };
+
+    impl_->window_.delegate = impl_->delegate;
 }
 
 

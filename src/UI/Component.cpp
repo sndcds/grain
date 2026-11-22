@@ -1,15 +1,16 @@
-#include "grain/UI/Component.hpp"
-
-#include "../../include/grain/UI/View.hpp"
+#include <grain/UI/Component.hpp>
+#include <grain/UI/View.hpp>
+#include <grain/UI/LayoutEngine.hpp>
 
 #include <iostream>
+#include <grain/UI/LayoutStyle.hpp>
 
 namespace Grain {
 
 void Component::setBounds(const Rectd& bounds) {
-    if (bounds_ != bounds) {
+    if (layout_result_.bounds != bounds) {
         auto dirty_rect = bounds.united(this->bounds());
-        bounds_ = bounds;
+        layout_result_.bounds = bounds;
 
         if (view_ != nullptr) {
             view_->requestRedraw(dirty_rect);
@@ -87,7 +88,7 @@ void Component::setNumberMode(bool number_mode) {
 
 void Component::invalidate() {
     if (view_ != nullptr) {
-        view_->requestRedraw(bounds_);
+        view_->requestRedraw(layout_result_.bounds);
     }
 }
 
@@ -100,10 +101,53 @@ void Component::draw(
 }
 
 
-void Component::doSizing() {
-    std::cout << "Component::doSizing()" << std::endl;
+void Component::layoutSizing() {
+
+    layout_result_.intrinsic_size = {0, 0, 0, 0};
 }
 
+
+void Component::layoutPreferredSizing() {
+
+    const auto& element = style_->element;
+    const auto& sizing = element.sizing;
+
+    const double width =
+        layout_result_.intrinsic_size.width +
+        element.padding.left + element.padding.right;
+
+    const double height =
+        layout_result_.intrinsic_size.height +
+        element.padding.top + element.padding.bottom;
+
+    layout_result_.preferred_size.width = std::clamp(
+        width, sizing.width.min_value, sizing.width.max_value
+    );
+
+    layout_result_.preferred_size.height = std::clamp(
+        height, sizing.height.min_value, sizing.height.max_value
+    );
+}
+
+
+void Component::layoutGrow() {
+
+}
+
+
+auto Component::layoutPositioning(const Vec2d& position)
+    -> LayoutResult&
+{
+    layout_result_.bounds.width =
+        layout_result_.preferred_size.width;
+
+    layout_result_.bounds.height =
+        layout_result_.preferred_size.height;
+
+    layout_result_.bounds.setPosition(position);
+
+    return layout_result_;
+}
 
 
 }

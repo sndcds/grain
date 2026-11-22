@@ -49,7 +49,7 @@ public:
     ~TextField() override;
 
 
-    void draw(GraphicContext& gc) override;
+    void draw(GraphicContext& gc, const Rectd& dirty_rect) override;
 
     void drawCursor(GraphicContext& gc, float x) const;
 

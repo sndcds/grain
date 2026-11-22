@@ -2,13 +2,18 @@
 
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Input/Event.hpp>
+#include <grain/UI/LayoutResult.hpp>
+
+#include "LayoutStyle.hpp"
 
 
 namespace Grain {
 
 class View;
+struct LayoutElementStyle;
 
-enum class UIElementType {
+
+enum class UIElementType : uint8_t {
     View,
     Component
 };
@@ -37,11 +42,16 @@ public:
         const Rectd& dirty_rect
     ) = 0;
 
-    virtual void doSizing() = 0;
+    virtual void layoutSizing() = 0;
+    virtual void layoutPreferredSizing() = 0;
+    virtual void layoutGrow() = 0;
+    virtual auto layoutPositioning(const Vec2d& position) -> LayoutResult& = 0;
 
+    virtual auto element() -> LayoutElementStyle = 0;
 
 protected:
     UIElement* parent_ = nullptr;
+    LayoutResult layout_result_{};
 
     friend class View;
 };

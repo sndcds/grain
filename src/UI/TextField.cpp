@@ -18,7 +18,11 @@ namespace Grain {
 
 
 
-    void TextField::draw(GraphicContext& gc) {
+    void TextField::draw(
+        GraphicContext& gc,
+        const Rectd& dirty_rect
+    ) {
+        const auto bounds = layout_result_.bounds;
         static Font* font;
         if (font == nullptr) {
             font = new Grain::Font("SFPro-Regular", 15.0f);
@@ -26,7 +30,7 @@ namespace Grain {
 
         _checkSelectionAndCursor();
 
-        content_rect_ = bounds();
+        content_rect_ = bounds;
 
         const double padding_left = 10.0;
         const double padding_right = 10.0;
@@ -44,7 +48,7 @@ namespace Grain {
         }
 
         gc.setFillColor(background_color);
-        gc.fillRect(bounds_);
+        gc.fillRect(bounds);
 
         const int32_t text_length = textLength();
 
@@ -72,7 +76,7 @@ namespace Grain {
                 );
 
                 const double text_y =
-                    bounds_.centerY() -
+                    bounds.centerY() -
                     (layout->ascent() - layout->descent()) / 2.0;
 
                 const double cursor_offset =
@@ -205,7 +209,7 @@ namespace Grain {
 
             gc.drawTextInRect(
                 info_text_,
-                bounds_,
+                bounds,
                 alignment,
                 font
             );
@@ -219,7 +223,7 @@ namespace Grain {
 
 
     void TextField::drawCursor(GraphicContext& gc, float x) const {
-        Rectd rect = bounds_;
+        Rectd rect = layout_result_.bounds;
         rect.x = x - 1.0;
         rect.width = 2.0;
 

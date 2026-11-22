@@ -11,15 +11,19 @@ Button::Button(View* view, std::string title)
 {
 }
 
-void Button::draw(GraphicContext& gc) {
+void Button::draw(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
+    const auto bounds = layout_result_.bounds;
     static Font* font;
     if (font == nullptr) {
         font = new Grain::Font("SFPro-Regular", 15.0f);
     }
 
-    auto b = bounds_;
+    auto b = bounds;
     b.inset(.5);
-    double radius = bounds_.height / 2.5;
+    double radius = bounds.height / 2.5;
 
     float alpha = 1;
     if (hovered_) {
@@ -40,7 +44,7 @@ void Button::draw(GraphicContext& gc) {
 
     gc.drawTextInRect(
         "kulturbytes",
-        bounds_,
+        bounds,
         Grain::Alignment::Center,
         font);
 }
@@ -66,7 +70,7 @@ void Button::click() {
 
 bool Button::handleEvent(const Event& event) {
     if (event.type_ == Grain::EventType::MouseButtonDown) {
-        if (bounds_.contains(event.mouse_pos_)) {
+        if (layout_result_.bounds.contains(event.mouse_pos_)) {
             click();
         }
     }

@@ -95,6 +95,12 @@
 #include "grain/UI/Label.hpp"
 #include "grain/UI/Button.hpp"
 #include "grain/UI/Slider.hpp"
+#include "grain/UI/TextField.hpp"
+#include "grain/UI/LayoutEngine.hpp"
+#include "grain/UI/LayoutResult.hpp"
+#include "grain/UI/LayoutStyle.hpp"
+#include "grain/UI/UIElement.hpp"
+#include "grain/UI/UIStyles.hpp"
 
 #include "grain/Animation/Animation.hpp"
 #include "grain/Animation/AnimationDriver.hpp"

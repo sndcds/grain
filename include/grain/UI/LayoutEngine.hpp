@@ -10,6 +10,7 @@ public:
 
 private:
     void sizingPass(View& root);
+    void preferredSizingPass(View& root);
     void growPass(View& root);
     void positioningPass(View& root);
 };

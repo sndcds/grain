@@ -17,7 +17,11 @@ Slider::Slider(View* view, double min, double max, double value)
     setValue(value);
 }
 
-void Slider::draw(GraphicContext& gc) {
+void Slider::draw(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
+    const auto bounds = layout_result_.bounds;
     const Rectd track = trackRect();
     const bool horizontal = orientation_ == Orientation::Horizontal;
     const auto handle_pos = handlePosition();
@@ -28,35 +32,35 @@ void Slider::draw(GraphicContext& gc) {
     gc.clipPath();
 
     if (horizontal) {
-        Rectd rect = bounds_;
-        rect.width = handle_pos.x - bounds_.x + 0.5;
+        Rectd rect = bounds;
+        rect.width = handle_pos.x - bounds.x + 0.5;
         gc.setFillColor(indicator_color_);
         gc.fillRect(rect);
 
         rect.x = handle_pos.x - 0.5;
-        rect.width = bounds_.right() - handle_pos.x + 0.5;
+        rect.width = bounds.right() - handle_pos.x + 0.5;
         gc.setFillColor(track_color_);
         gc.fillRect(rect);
     }
     else {
-        Rectd rect = bounds_;
+        Rectd rect = bounds;
         rect.y = handle_pos.y - 0.5;
-        rect.height = handle_pos.y - bounds_.y + 0.5;
+        rect.height = handle_pos.y - bounds.y + 0.5;
 
         gc.setFillColor(track_color_);
         gc.fillRect({
-            bounds_.x,
-            bounds_.y,
-            bounds_.width,
-            rect.y - bounds_.y
+            bounds.x,
+            bounds.y,
+            bounds.width,
+            rect.y - bounds.y
         });
 
         gc.setFillColor(indicator_color_);
         gc.fillRect({
-            bounds_.x,
+            bounds.x,
             rect.y,
-            bounds_.width,
-            bounds_.bottom() - rect.y
+            bounds.width,
+            bounds.bottom() - rect.y
         });
     }
 
@@ -85,7 +89,7 @@ auto Slider::handleEvent(const Event& event) -> bool {
 
     switch (event.type_) {
     case EventType::MouseButtonDown: {
-        if (!bounds_.contains(event.mouse_pos_)) {
+        if (!layout_result_.bounds.contains(event.mouse_pos_)) {
             return false;
         }
 
@@ -133,7 +137,7 @@ auto Slider::handleEvent(const Event& event) -> bool {
 }
 
 void Slider::setBounds(const Rectd& bounds) {
-    bounds_ = bounds;
+    layout_result_.bounds = bounds;
     invalidate();
 }
 
@@ -276,6 +280,7 @@ auto Slider::clampValue(double value) const -> double {
 }
 
 auto Slider::trackStart() const -> Vec2d {
+    const auto bounds = layout_result_.bounds;
     const bool horizontal = orientation_ == Orientation::Horizontal;
 
     const double handle_length = horizontal
@@ -283,26 +288,27 @@ auto Slider::trackStart() const -> Vec2d {
         : handle_size_.height;
 
     const double length = horizontal
-        ? bounds_.width
-        : bounds_.height;
+        ? bounds.width
+        : bounds.height;
 
     const double inset = padding_ + (handle_length * 0.5);
     const double travel = std::max(0.0, length - 2.0 * inset);
 
     if (horizontal) {
         return {
-            bounds_.x + inset,
-            bounds_.y + (bounds_.height * 0.5)
+            bounds.x + inset,
+            bounds.y + (bounds.height * 0.5)
         };
     }
 
     return {
-        bounds_.x + (bounds_.width * 0.5),
-        bounds_.y + bounds_.height - inset
+        bounds.x + (bounds.width * 0.5),
+        bounds.y + bounds.height - inset
     };
 }
 
 auto Slider::trackEnd() const -> Vec2d {
+    const auto bounds = layout_result_.bounds;
     const bool horizontal = orientation_ == Orientation::Horizontal;
 
     const double handle_length = horizontal
@@ -310,8 +316,8 @@ auto Slider::trackEnd() const -> Vec2d {
         : handle_size_.height;
 
     const double length = horizontal
-        ? bounds_.width
-        : bounds_.height;
+        ? bounds.width
+        : bounds.height;
 
     const double inset = padding_ + (handle_length * 0.5);
     const double travel = std::max(0.0, length - 2.0 * inset);
@@ -396,11 +402,12 @@ auto Slider::trackRect() const -> Rectd {
 }
 
 auto Slider::handleRect() const -> Rectd {
+    const auto bounds = layout_result_.bounds;
     const bool horizontal = orientation_ == Orientation::Horizontal;
 
     const double length = horizontal
-        ? bounds_.width
-        : bounds_.height;
+        ? bounds.width
+        : bounds.height;
 
     const double handle_length = horizontal
         ? handle_size_.width
@@ -414,8 +421,8 @@ auto Slider::handleRect() const -> Rectd {
     const double position = normalizedValue() * travel;
 
     if (horizontal) {
-        const double center_x = bounds_.x + inset + position;
-        const double center_y = bounds_.y + (bounds_.height * 0.5);
+        const double center_x = bounds.x + inset + position;
+        const double center_y = bounds.y + (bounds.height * 0.5);
 
         return {
             center_x - (handle_size_.width * 0.5),
@@ -425,8 +432,8 @@ auto Slider::handleRect() const -> Rectd {
         };
     }
 
-    const double center_x = bounds_.x + (bounds_.width * 0.5);
-    const double center_y = bounds_.y + bounds_.height - inset - position;
+    const double center_x = bounds.x + (bounds.width * 0.5);
+    const double center_y = bounds.y + bounds.height - inset - position;
 
     return {
         center_x - (handle_size_.width * 0.5),
@@ -441,11 +448,12 @@ auto Slider::handleCenter() const -> Vec2d {
 }
 
 auto Slider::valueFromPosition(const Vec2d& position) const -> double {
+    const auto bounds = layout_result_.bounds;
     const bool horizontal = orientation_ == Orientation::Horizontal;
 
     const double length = horizontal
-        ? bounds_.width
-        : bounds_.height;
+        ? bounds.width
+        : bounds.height;
 
     const double handle_length = horizontal
         ? handle_size_.width
@@ -462,8 +470,8 @@ auto Slider::valueFromPosition(const Vec2d& position) const -> double {
     // Horizontal values increase left to right.
     // Vertical values increase bottom to top.
     const double offset = horizontal
-        ? position.x - (bounds_.x + inset)
-        : (bounds_.y + bounds_.height - inset) - position.y;
+        ? position.x - (bounds.x + inset)
+        : (bounds.y + bounds.height - inset) - position.y;
 
     const double normalized = std::clamp(
         offset / travel,

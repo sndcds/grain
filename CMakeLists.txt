@@ -391,6 +391,7 @@ target_sources(
         include/grain/Graphics/GraphicCompoundPath.hpp
         include/grain/Graphics/Gradient.hpp
         include/grain/Graphics/Font.hpp
+        include/grain/Graphics/FontPath.hpp
 
         include/grain/Text/TextWordLayout.hpp
 
@@ -409,7 +410,6 @@ target_sources(
         include/grain/Movie/Movie.hpp
         include/grain/Movie/MovieWriter.hpp
 
-        include/grain/UI/UIElement.hpp
         include/grain/UI/View.hpp
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp
@@ -417,6 +417,10 @@ target_sources(
         include/grain/UI/Slider.hpp
         include/grain/UI/TextField.hpp
         include/grain/UI/LayoutEngine.hpp
+        include/grain/UI/LayoutResult.hpp
+        include/grain/UI/LayoutStyle.hpp
+        include/grain/UI/UIElement.hpp
+        include/grain/UI/UIStyles.hpp
 
         include/grain/Animation/Animation.hpp
         include/grain/Animation/AnimationDriver.hpp

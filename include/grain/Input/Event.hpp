@@ -169,8 +169,8 @@ struct Event {
     int32_t mouse_click_count_ = 0;
 
     // Window dimensions.
-    int32_t width_ = 0;
-    int32_t height_ = 0;
+
+    Vec2d window_size_;
 
     [[nodiscard]] constexpr auto hasKeyModifier(KeyModifiers modifier) const -> bool {
         return (modifiers_ & modifier) == modifier;

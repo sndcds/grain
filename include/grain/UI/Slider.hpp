@@ -27,7 +27,7 @@ public:
         double value = 0.0
     );
 
-    void draw(GraphicContext& gc) override;
+    void draw(GraphicContext& gc, const Rectd& dirty_rect) override;
     auto handleEvent(const Event& event) -> bool override;
 
     void setBounds(const Rectd& bounds) override;

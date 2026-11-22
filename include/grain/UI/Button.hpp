@@ -15,7 +15,7 @@ public:
 
     explicit Button(View* view, std::string title = {});
 
-    void draw(GraphicContext& gc) override;
+    void draw(GraphicContext& gc, const Rectd& dirty_rect) override;
 
     void setTitle(std::string title);
     [[nodiscard]] auto title() const noexcept -> const std::string&;

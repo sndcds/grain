@@ -1,7 +1,8 @@
 
-#include "grain/UI/Label.hpp"
+#include <grain/UI/Label.hpp>
 
-#include "grain/Graphics/GraphicContext.hpp"
+#include <grain/Graphics/GraphicContext.hpp>
+#include <grain/UI/UIStyles.hpp>
 
 #include <iostream>
 #include <utility>
@@ -22,7 +23,7 @@ void Label::setText(std::string text) {
     text_ = std::move(text);
 
     if (auto* parent = parentView()) {
-        parent->requestRedraw(bounds_);
+        parent->requestRedraw(layout_result_.bounds);
     }
 }
 
@@ -30,33 +31,41 @@ const std::string& Label::text() const noexcept {
     return text_;
 }
 
-void Label::draw(GraphicContext& gc) {
 
-    std::cout << "Label::draw()" << std::endl;
+void Label::draw(GraphicContext& gc,const Rectd& dirty_rect) {
 
     static Font* font;
     if (font == nullptr) {
-        font = new Grain::Font("SFPro-Regular", 15.0f);
+        font = new Font("SFPro-Regular", 15.0f);
     }
 
     if (!visible_) {
         return;
     }
 
-    gc.setFillColor({1, 0, 0, 1});
-    gc.fillRect(bounds_);
+    gc.setFillColor({1, 1, 1, .8f});
+    gc.fillRect(layout_result_.bounds);
 
     // TODO: Set text color!
 
     gc.drawTextInRect(
         text_,
-        bounds_,
-        Alignment::Left,
+        layout_result_.bounds,
+        Alignment::Center,
         font);
 }
 
-void Label::doSizing() {
-    std::cout << "Label::doSizing()" << std::endl;
+
+void Label::layoutSizing() {
+
+    static Font* font;
+    if (font == nullptr) {
+        font = new Font("SFPro-Regular", 16.0f);
+    }
+
+    layout_result_.intrinsic_size = font->textDimension(text_.c_str());
+
+    layoutPreferredSizing();
 }
 
 

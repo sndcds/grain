@@ -7,6 +7,7 @@
 namespace Grain {
 
 void LayoutEngine::layout(View& root) {
+
     sizingPass(root);
     growPass(root);
     positioningPass(root);
@@ -14,20 +15,21 @@ void LayoutEngine::layout(View& root) {
 
 
 void LayoutEngine::sizingPass(View& root) {
-    root.traverseReverse(
+
+    root.traversePostOrder(
         [](UIElement& element) -> bool {
+            element.layoutSizing();
+            return true;
+        }
+    );
+}
 
-            if (element.type() == UIElementType::View) {
-                auto& view = static_cast<View&>(element);
-                view.doSizing();
-                // Calculate intrinsic view size
-            }
-            else {
-                auto& component = static_cast<Component&>(element);
-                component.doSizing();
-                // Calculate intrinsic component size
-            }
 
+void LayoutEngine::preferredSizingPass(View& root) {
+
+    root.traverse(
+        [](UIElement& element) -> bool {
+            element.layoutPreferredSizing();
             return true;
         }
     );
@@ -35,18 +37,10 @@ void LayoutEngine::sizingPass(View& root) {
 
 
 void LayoutEngine::growPass(View& root) {
+
     root.traverse(
         [](UIElement& element) -> bool {
-
-            if (element.type() == UIElementType::View) {
-                auto& view = static_cast<View&>(element);
-                // Process view growth
-            }
-            else {
-                auto& component = static_cast<Component&>(element);
-                // Process component growth
-            }
-
+            element.layoutGrow();
             return true;
         }
     );
@@ -54,21 +48,8 @@ void LayoutEngine::growPass(View& root) {
 
 
 void LayoutEngine::positioningPass(View& root) {
-    root.traverse(
-        [](UIElement& element) -> bool {
 
-            if (element.type() == UIElementType::View) {
-                auto& view = static_cast<View&>(element);
-                // Position child view
-            }
-            else {
-                auto& component = static_cast<Component&>(element);
-                // Position component
-            }
-
-            return true;
-        }
-    );
+    root.layoutPositioning(Vec2d{0.0, 0.0});
 }
 
 }

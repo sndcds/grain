@@ -134,12 +134,19 @@ void App::quit() {
 
 
 void App::processEvent(const Event& event) {
-    if (event.type_ == EventType::Quit) {
-        quit();
-        return;
+    std::cout << (int)event.type_ << '\n';
+    switch (event.type_) {
+        case EventType::Quit: {
+            quit();
+            return;
+        }
+        case EventType::WindowResize: {
+            std::cout << "Window Resize Event: " << event.window_size_ << std::endl;
+            break;
+        }
+        default:
+            impl_->input_.processEvent(event);
     }
-
-    impl_->input_.processEvent(event);
 }
 
 } // namespace Grain
