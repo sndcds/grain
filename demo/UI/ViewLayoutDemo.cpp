@@ -19,7 +19,7 @@ inline auto create(UIStyles& styles) -> void {
     vertical_stack.child_vertical_alignment = LayoutAlignment::Start;
 
     vertical_stack.element.padding = {10.0, 10.0, 10.0, 10.0};
-    vertical_stack.element.child_gap = 10.0;
+    vertical_stack.element.child_gap = 2.0;
     vertical_stack.element.sizing.width.min_value = 100;
     vertical_stack.element.sizing.height.min_value = 100;
 
@@ -41,11 +41,16 @@ inline auto create(UIStyles& styles) -> void {
     default_component.element.child_gap = 10.0;
     default_component.element.sizing.width.min_value = 100;
 
+    styles.defineComponentStyle("default", default_component);
 
-    styles.defineComponentStyle(
-        "default",
-        default_component
-    );
+    LayoutComponentStyle grow_h_component;
+    grow_h_component.element.padding = {8.0, 8.0, 4.0, 4.0};
+    grow_h_component.element.child_gap = 2.0;
+    grow_h_component.element.sizing.width.min_value = 100;
+    grow_h_component.element.sizing.width.type = LayoutSizingType::Grow;
+
+    styles.defineComponentStyle("grow_h", grow_h_component);
+
 }
 
 }
@@ -77,7 +82,13 @@ int main() {
 	sub_view.setStyle(styles.viewStyle("vertical-stack"));
 
     sub_view.addChild<Label>("X-100")
-		.setStyle(styles.componentStyle("default"));
+		.setStyle(styles.componentStyle("grow_h"));
+    sub_view.addChild<Label>("3.1415")
+        .setStyle(styles.componentStyle("grow_h"));
+    sub_view.addChild<Label>("Yamaha DX7")
+        .setStyle(styles.componentStyle("grow_h"));
+    sub_view.addChild<Label>("Moog")
+        .setStyle(styles.componentStyle("grow_h"));
 
     view.addChild<Label>("Synthesizerstudio")
 		.setStyle(styles.componentStyle("default"));

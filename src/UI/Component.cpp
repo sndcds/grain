@@ -133,7 +133,10 @@ auto Component::layoutPositioning(const Rectd& bounds)
     layout_result_.bounds.height =
         layout_result_.preferred_size.height;
 
-    layout_result_.bounds.setPosition(position);
+    layout_result_.bounds.setPosition({
+        bounds.x,
+        bounds.y
+    });
 
     return layout_result_;
 }

@@ -19,11 +19,12 @@ public:
 
     void show() override;
 
+    [[nodiscard]]
+    auto contentBounds() const -> Rectd override;
+
     void requestRedraw() override;
 
     void setRootView(View* platform_view) override;
-
-    auto contentBounds() const -> Rectd;
 
     virtual void handleEvent(const Event& event) {}
     void setEventHandler(EventHandler event_handler) override;

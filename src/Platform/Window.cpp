@@ -51,6 +51,10 @@ auto Window::rootView() const -> const View& {
 
 
 auto Window::contentBounds() const -> Rectd {
+    if (!impl_ || !impl_->platform_window_) {
+        return {};
+    }
+
     return impl_->platform_window_->contentBounds();
 }
 

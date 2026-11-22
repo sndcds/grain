@@ -41,6 +41,8 @@ public:
     [[nodiscard]] auto rootView() -> View&;
     [[nodiscard]] auto rootView() const -> const View&;
 
+    [[nodiscard]] auto contentBounds() const -> Rectd;
+
     void show();
     void requestRedraw();
 

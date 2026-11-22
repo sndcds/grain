@@ -28,7 +28,7 @@ enum class LayoutSizingType : uint8_t {
 
 struct LayoutSizingAxis {
     LayoutSizingType type = LayoutSizingType::Fit;
-    double value = 0.0;
+    double value = 1.0;
     double min_value = 0.0;
     double max_value = std::numeric_limits<double>::max();
 };

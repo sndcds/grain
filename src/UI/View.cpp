@@ -290,44 +290,50 @@ void View::layoutGrow() {
     // Calculate the remaining space.
     const double remaining_space = std::max(0.0, available_space - used_space);
 
-    if (total_grow_weight <= 0.0) {
-        return;
+    std::cout << "total_grow_weight: " << total_grow_weight << std::endl;
+    std::cout << "remaining_space: " << remaining_space << std::endl;
+    if (total_grow_weight > 0.0) {
+        // Distribute remaining space among growing children.
+        for (auto& child : children_) {
+
+            const auto& sizing = child->element().sizing;
+            const auto& axis = vertical ? sizing.height : sizing.width;
+
+            if (axis.type != LayoutSizingType::Grow) {
+                continue;
+            }
+
+            const double weight = axis.value;
+
+            if (weight <= 0.0) {
+                continue;
+            }
+
+            const double allocated = remaining_space * (weight / total_grow_weight);
+
+            if (vertical) {
+                child->layout_result_.preferred_size.height =
+                    std::clamp(
+                        allocated,
+                        axis.min_value,
+                        axis.max_value
+                    );
+            }
+            else {
+                child->layout_result_.preferred_size.width =
+                    std::clamp(
+                        allocated,
+                        axis.min_value,
+                        axis.max_value
+                    );
+            }
+        }
     }
 
-    // Distribute remaining space proportionally.
+    // Always process nested views.
     for (auto& child : children_) {
-
-        const auto& sizing = child->element().sizing;
-        const auto& axis = vertical ? sizing.height : sizing.width;
-
-        if (axis.type != LayoutSizingType::Grow) {
-            continue;
-        }
-
-        const double weight = axis.value;
-
-        if (weight <= 0.0) {
-            continue;
-        }
-
-        const double allocated =
-            remaining_space * (weight / total_grow_weight);
-
-        if (vertical) {
-            child->layout_result_.preferred_size.height =
-                std::clamp(
-                    allocated,
-                    axis.min_value,
-                    axis.max_value
-                );
-        }
-        else {
-            child->layout_result_.preferred_size.width =
-                std::clamp(
-                    allocated,
-                    axis.min_value,
-                    axis.max_value
-                );
+        if (child->type() == UIElementType::View) {
+            static_cast<View&>(*child).layoutGrow();
         }
     }
 
@@ -386,7 +392,18 @@ void View::positionChildren(const Vec2d& position) {
 
     for (auto& child : children_) {
 
-        auto& result = child->layoutPositioning(cursor);
+        const auto& preferred =
+            child->layout_result_.preferred_size;
+
+        const Rectd child_bounds{
+            cursor.x,
+            cursor.y,
+            preferred.width,
+            preferred.height
+        };
+
+        auto& result =
+            child->layoutPositioning(child_bounds);
 
         if (vertical) {
             cursor.y += result.bounds.height + element.child_gap;

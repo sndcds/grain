@@ -11,14 +11,13 @@ void LayoutEngine::layout(
     const Rectd& bounds
 ) {
     sizingPass(root);
+    preferredSizingPass(root);
 
-    // The root is controlled by its parent Window.
     root.setLayoutBounds(bounds);
 
     growPass(root);
 
-    // Special positioning entry point for the root.
-    root.layoutPositioning(bounds);
+    positioningPass(root, bounds);
 }
 
 
@@ -46,12 +45,7 @@ void LayoutEngine::preferredSizingPass(View& root) {
 
 void LayoutEngine::growPass(View& root) {
 
-    root.traverse(
-        [](UIElement& element) -> bool {
-            element.layoutGrow();
-            return true;
-        }
-    );
+    root.layoutGrow();
 }
 
 
