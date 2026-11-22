@@ -253,10 +253,10 @@ void View::layoutGrow() {
 
     const double available_space =
         vertical
-            ? layout_result_.bounds.height
+            ? layout_result_.preferred_size.height
                 - element.padding.top
                 - element.padding.bottom
-            : layout_result_.bounds.width
+            : layout_result_.preferred_size.width
                 - element.padding.left
                 - element.padding.right;
 
@@ -327,13 +327,6 @@ void View::layoutGrow() {
                         axis.max_value
                     );
             }
-        }
-    }
-
-    // Always process nested views.
-    for (auto& child : children_) {
-        if (child->type() == UIElementType::View) {
-            static_cast<View&>(*child).layoutGrow();
         }
     }
 
