@@ -341,6 +341,20 @@ void View::layoutGrow() {
 }
 
 
+auto View::layoutPositioning(const Rectd& bounds)
+    -> LayoutResult&
+{
+    layout_result_.bounds = bounds;
+
+    positionChildren({
+        bounds.x,
+        bounds.y
+    });
+
+    return layout_result_;
+}
+
+
 auto View::layoutPositioning(const Vec2d& position)
     -> LayoutResult&
 {
@@ -352,7 +366,16 @@ auto View::layoutPositioning(const Vec2d& position)
 
     layout_result_.bounds.setPosition(position);
 
+    positionChildren(position);
+
+    return layout_result_;
+}
+
+
+void View::positionChildren(const Vec2d& position) {
+
     const auto& element = style_->element;
+
     const bool vertical =
         style_->direction == LayoutDirection::TopToBottom;
 
@@ -372,8 +395,6 @@ auto View::layoutPositioning(const Vec2d& position)
             cursor.x += result.bounds.width + element.child_gap;
         }
     }
-
-    return layout_result_;
 }
 
 

@@ -45,7 +45,7 @@ public:
     virtual void layoutSizing() = 0;
     virtual void layoutPreferredSizing() = 0;
     virtual void layoutGrow() = 0;
-    virtual auto layoutPositioning(const Vec2d& position) -> LayoutResult& = 0;
+    virtual auto layoutPositioning(const Rectd& bounds) -> LayoutResult& = 0;
 
     virtual auto element() -> LayoutElementStyle = 0;
 

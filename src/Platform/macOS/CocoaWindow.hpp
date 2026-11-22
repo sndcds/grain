@@ -23,6 +23,8 @@ public:
 
     void setRootView(View* platform_view) override;
 
+    auto contentBounds() const -> Rectd;
+
     virtual void handleEvent(const Event& event) {}
     void setEventHandler(EventHandler event_handler) override;
 

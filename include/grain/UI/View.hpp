@@ -42,6 +42,10 @@ public:
 	        return layout_result_.bounds;
 	}
 
+	void setLayoutBounds(const Rectd& bounds) {
+		layout_result_.bounds = bounds;
+	}
+
 	template <typename T, typename... Args>
 	requires std::derived_from<T, UIElement>
 	auto addChild(Args&&... args) -> T& {
@@ -78,7 +82,12 @@ public:
 	void layoutSizing() override;
 	void layoutPreferredSizing() override;
 	void layoutGrow() override;
-	auto layoutPositioning(const Vec2d& position) -> LayoutResult& override;
+
+	auto layoutPositioning(const Vec2d& position) -> LayoutResult&;
+
+	auto layoutPositioning(const Rectd& bounds) -> LayoutResult& override;
+
+	void positionChildren(const Vec2d& position);
 
 	void setStyle(const LayoutViewStyle& style) {
 		style_ = &style;

@@ -124,7 +124,7 @@ void Component::layoutGrow() {
 }
 
 
-auto Component::layoutPositioning(const Vec2d& position)
+auto Component::layoutPositioning(const Rectd& bounds)
     -> LayoutResult&
 {
     layout_result_.bounds.width =

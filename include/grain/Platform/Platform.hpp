@@ -28,8 +28,6 @@ public:
 };
 
 
-class View;
-
 class Window {
 public:
     Window(const Window&) = delete;
@@ -43,6 +41,9 @@ public:
     virtual void requestRedraw() = 0;
     virtual void setRootView(Grain::Platform::View* platformView) = 0;
     virtual void setEventHandler(EventHandler eventHandler) = 0;
+
+    [[nodiscard]]
+    virtual auto contentBounds() const -> Rectd = 0;
 
 protected:
     Window() = default;

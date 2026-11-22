@@ -6,11 +6,19 @@
 
 namespace Grain {
 
-void LayoutEngine::layout(View& root) {
-
+void LayoutEngine::layout(
+    View& root,
+    const Rectd& bounds
+) {
     sizingPass(root);
+
+    // The root is controlled by its parent Window.
+    root.setLayoutBounds(bounds);
+
     growPass(root);
-    positioningPass(root);
+
+    // Special positioning entry point for the root.
+    root.layoutPositioning(bounds);
 }
 
 
@@ -47,9 +55,9 @@ void LayoutEngine::growPass(View& root) {
 }
 
 
-void LayoutEngine::positioningPass(View& root) {
+void LayoutEngine::positioningPass(View& root, const Rectd& bounds) {
 
-    root.layoutPositioning(Vec2d{0.0, 0.0});
+    root.layoutPositioning(bounds);
 }
 
 }

@@ -49,6 +49,12 @@ auto Window::rootView() const -> const View& {
     return *impl_->root_view_;
 }
 
+
+auto Window::contentBounds() const -> Rectd {
+    return impl_->platform_window_->contentBounds();
+}
+
+
 void Window::show() {
     if (impl_ == nullptr ||
         impl_->platform_window_ == nullptr) {
@@ -125,7 +131,10 @@ auto Window::create(
 
 void Window::updateLayout() {
 
-    layout_engine_.layout(rootView());
+    layout_engine_.layout(
+        rootView(),
+        contentBounds()
+    );
 }
 
 

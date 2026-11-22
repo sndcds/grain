@@ -81,7 +81,7 @@ public:
     void layoutSizing() override;
     void layoutPreferredSizing() override;
     void layoutGrow() override;
-    auto layoutPositioning(const Vec2d& position) -> LayoutResult& override;
+    auto layoutPositioning(const Rectd& bounds) -> LayoutResult& override;
 
     void setStyle(const LayoutComponentStyle& style) {
         style_ = &style;

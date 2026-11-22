@@ -209,6 +209,23 @@ void CocoaWindow::setRootView(Grain::Platform::View* platform_view) {
 }
 
 
+auto CocoaWindow::contentBounds() const -> Rectd {
+
+    if (impl_ == nullptr || impl_->window_ == nil) {
+        return {};
+    }
+
+    NSRect bounds = impl_->window_.contentView.bounds;
+
+    return {
+        bounds.origin.x,
+        bounds.origin.y,
+        bounds.size.width,
+        bounds.size.height
+    };
+}
+
+
 void CocoaWindow::setEventHandler(EventHandler event_handler) {
     if (!impl_) {
         return;
