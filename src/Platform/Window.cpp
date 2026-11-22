@@ -115,12 +115,6 @@ auto Window::create(
 
     Window* window_ptr = window.get();
 
-    window->impl_->platform_window_->setEventHandler(
-        [window_ptr](const Event& event) -> void {
-            window_ptr->handleEvent(event);
-        }
-    );
-
     auto view = std::make_unique<View>();
     window->setRootView(std::move(view));
 
