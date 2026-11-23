@@ -5,9 +5,8 @@
 
 namespace Grain {
 
-Button::Button(View* view, std::string title)
-    : Component(view),
-      title_(std::move(title))
+Button::Button(std::string title)
+    : title_(std::move(title))
 {
 }
 
@@ -18,11 +17,11 @@ void Button::draw(
     const auto bounds = layout_result_.bounds;
     static Font* font;
     if (font == nullptr) {
-        font = new Grain::Font("SFPro-Regular", 15.0f);
+        font = new Grain::Font("SFPro-Regular", 16.0f);
     }
 
     auto b = bounds;
-    b.inset(.5);
+    b.inset(0);
     double radius = bounds.height / 2.5;
 
     float alpha = 1;
@@ -43,7 +42,7 @@ void Button::draw(
 
 
     gc.drawTextInRect(
-        "kulturbytes",
+        title_.c_str(),
         bounds,
         Grain::Alignment::Center,
         font);
@@ -77,6 +76,19 @@ bool Button::handleEvent(const Event& event) {
     else if (event.type_ == Grain::EventType::MouseMove) {
     }
     return false;
+}
+
+
+void Button::layoutSizing() {
+
+    static Font* font;
+    if (font == nullptr) {
+        font = new Font("SFPro-Regular", 16.0f);
+    }
+
+    layout_result_.intrinsic_size = font->textDimension(title_.c_str());
+
+    layoutPreferredSizing();
 }
 
 

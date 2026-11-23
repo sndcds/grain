@@ -533,6 +533,44 @@ void CoreGraphicContext::strokePath() {
 }
 
 
+void CoreGraphicContext::fillStrokedPath(
+    float line_width,
+    StrokeCapStyle cap_style,
+    StrokeJoinStyle join_style,
+    float miter_limit
+) {
+    if (context_ == nullptr) {
+        return;
+    }
+
+    CGPathRef path = CGContextCopyPath(context_);
+    if (path == nullptr) {
+        return;
+    }
+
+    CGPathRef stroked_path = CGPathCreateCopyByStrokingPath(
+        path,
+        nullptr,
+        1.5,
+        toCGLineCap(cap_style),
+        toCGLineJoin(join_style),
+        miter_limit
+    );
+
+    CGPathRelease(path);
+
+    if (stroked_path == nullptr) {
+        return;
+    }
+
+    CGContextBeginPath(context_);
+    CGContextAddPath(context_, stroked_path);
+    CGContextFillPath(context_);
+
+    CGPathRelease(stroked_path);
+}
+
+
 void CoreGraphicContext::fillGradient(
     Gradient* gradient,
     const Vec2d& start_pos,

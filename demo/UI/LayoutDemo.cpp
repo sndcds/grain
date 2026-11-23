@@ -33,7 +33,6 @@ inline auto create(UIStyles& styles) -> void {
 
     content.element.sizing.width.type = LayoutSizingType::Grow;
     content.element.sizing.height.type = LayoutSizingType::Grow;
-    left_panel.element.sizing.width.value = 4;
 
     styles.defineViewStyle("content", content);
 
@@ -47,8 +46,8 @@ inline auto create(UIStyles& styles) -> void {
     left_panel.element.padding = {8, 8, 8, 8};
     left_panel.element.child_gap = 2;
 
-    left_panel.element.sizing.width.type = LayoutSizingType::Grow;
-    left_panel.element.sizing.width.min_value = 100;
+    left_panel.element.sizing.width.type = LayoutSizingType::Fixed;
+    left_panel.element.sizing.width.min_value = 200;
     left_panel.element.sizing.width.max_value = 300;
 
     left_panel.element.sizing.height.type = LayoutSizingType::Grow;
@@ -65,8 +64,8 @@ inline auto create(UIStyles& styles) -> void {
     right_panel.element.padding = {8, 8, 8, 8};
 
     right_panel.element.sizing.width.type = LayoutSizingType::Fixed;
-    right_panel.element.sizing.width.min_value = 100;
-    right_panel.element.sizing.width.max_value = 100;
+    right_panel.element.sizing.width.min_value = 200;
+    right_panel.element.sizing.width.max_value = 200;
 
     right_panel.element.sizing.height.type = LayoutSizingType::Grow;
 
@@ -96,6 +95,7 @@ inline auto create(UIStyles& styles) -> void {
     LayoutComponentStyle panel_label;
     panel_label.element.padding = {4, 4, 2, 2};
     panel_label.element.sizing.width.type = LayoutSizingType::Grow;
+    panel_label.element.sizing.height.min_value = 26;
 
     styles.defineComponentStyle("panel-label", panel_label);
 
@@ -109,6 +109,7 @@ inline auto create(UIStyles& styles) -> void {
 
     center_label.element.sizing.width.type = LayoutSizingType::Grow;
     center_label.element.sizing.height.type = LayoutSizingType::Grow;
+    center_label.element.sizing.width.min_value = 200;
 
     styles.defineComponentStyle("center-label", center_label);
 
@@ -168,13 +169,28 @@ int main() {
     auto& left = content.addChild<View>();
     left.setStyle(styles.viewStyle("left-panel"));
 
-    for (int32_t i = 1; i <= 12; ++i) {
+    Random random;
+    for (int32_t i = 1; i <= 30; ++i) {
 
-        left.addChild<Label>(
-            "Left label " + std::to_string(i)
-        ).setStyle(
-            styles.componentStyle("panel-label")
-        );
+        if (random.chance(0.7)) {
+            left.addChild<Label>(
+                "Left label " + std::to_string(i)
+            ).setStyle(
+                styles.componentStyle("panel-label")
+            );
+        }
+        else if (random.chance(0.3)) {
+            left.addChild<Button>(
+                "Left label " + std::to_string(i)
+            ).setStyle(
+                styles.componentStyle("panel-label")
+            );
+        }
+        else {
+            left.addChild<TextField>().setStyle(
+                styles.componentStyle("panel-label")
+            );
+        }
     }
 
 

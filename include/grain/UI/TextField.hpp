@@ -44,7 +44,7 @@ protected:
     String text_;
 
 public:
-    explicit TextField(View* view);
+    explicit TextField();
 
     ~TextField() override;
 

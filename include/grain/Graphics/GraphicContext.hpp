@@ -145,6 +145,11 @@ public:
     virtual void fillEllipse(const Rectd& rect) = 0;
 
     virtual void strokePath() = 0;
+    virtual void fillStrokedPath(
+        float line_width,
+        StrokeCapStyle cap_style,
+        StrokeJoinStyle join_style,
+        float miter_limit) = 0;
     virtual void strokeRect(const Rectd& rect) = 0;
     virtual void strokeCircle(const Vec2d& center, double radius) = 0;
     virtual void strokeEllipse(const Rectd& rect) = 0;

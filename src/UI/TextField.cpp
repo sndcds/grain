@@ -4,12 +4,13 @@
 
 namespace Grain {
 
-    TextField::TextField(View* view) : Component(view) {
+    TextField::TextField() : Component() {
         can_get_focus_ = true;
         text_alignment_ = Alignment::Left;
         editable_ = true;
         number_mode_ = false;
 
+        text_ = "Hello World!";
         // setMouseCursor(App::MouseCursor::IBeam); TODO: !!!!
     }
 

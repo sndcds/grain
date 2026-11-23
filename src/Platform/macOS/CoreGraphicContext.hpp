@@ -109,6 +109,13 @@ public:
     void fillEllipse(const Rectd& rect) override;
 
     void strokePath() override;
+    void fillStrokedPath(
+        float line_width,
+        StrokeCapStyle cap_style,
+        StrokeJoinStyle join_style,
+        float miter_limit
+    ) override;
+
     void strokeRect(const Rectd& rect) override;
     void strokeCircle(const Vec2d& center, double radius) override;
     void strokeEllipse(const Rectd& rect) override;
@@ -161,6 +168,31 @@ public:
 
     void createGraphicContext(Image& image);
 
+    static CGLineCap toCGLineCap(StrokeCapStyle style) {
+        switch (style) {
+        case StrokeCapStyle::Butt:
+            return kCGLineCapButt;
+        case StrokeCapStyle::Round:
+            return kCGLineCapRound;
+        case StrokeCapStyle::Square:
+            return kCGLineCapSquare;
+        }
+
+        return kCGLineCapButt;
+    }
+
+    static CGLineJoin toCGLineJoin(StrokeJoinStyle style) {
+        switch (style) {
+        case StrokeJoinStyle::Miter:
+            return kCGLineJoinMiter;
+        case StrokeJoinStyle::Round:
+            return kCGLineJoinRound;
+        case StrokeJoinStyle::Bevel:
+            return kCGLineJoinBevel;
+        }
+
+        return kCGLineJoinMiter;
+    }
 
     //--------------------------------------------------------------------------
     //  Text

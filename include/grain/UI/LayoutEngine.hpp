@@ -13,6 +13,7 @@ private:
     void preferredSizingPass(View& root);
     void growPass(View& root);
     void positioningPass(View& root, const Rectd& bounds);
+    static void roundingPass(View& root);
 };
 
 }

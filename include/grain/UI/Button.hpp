@@ -13,7 +13,7 @@ class Button : public Component {
 public:
     using Action = std::function<void()>;
 
-    explicit Button(View* view, std::string title = {});
+    explicit Button(std::string title = {});
 
     void draw(GraphicContext& gc, const Rectd& dirty_rect) override;
 
@@ -25,6 +25,7 @@ public:
 
     auto handleEvent(const Event& event) -> bool override;
 
+    void layoutSizing() override;
 
 private:
     std::string title_;
