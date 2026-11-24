@@ -160,22 +160,41 @@ void App::quit() {
 
 void App::processEvent(const Event& event) {
 
+    // Always update global input state first.
+    impl_->input_.processEvent(event);
+
     switch (event.type_) {
+
         case EventType::Quit: {
             quit();
             return;
         }
-        case EventType::WindowResize: {
+
+        case EventType::WindowResize:
+        case EventType::MouseMove:
+        case EventType::MouseButtonDown:
+        case EventType::MouseButtonUp:
+        case EventType::MouseWheel:
+        case EventType::KeyDown:
+        case EventType::KeyUp:
+        case EventType::ModifiersChanged:
+        case EventType::WindowFocusGained:
+        case EventType::WindowFocusLost:
+        case EventType::WindowCloseRequested:
+        case EventType::WindowWillClose: {
+
             auto* window = getWindowById(event.window_id_);
-            if (window == nullptr) {
-                return;
+
+            if (window != nullptr) {
+                window->handleEvent(event);
             }
-            window->handleEvent(event);
+
             break;
         }
+
         default:
-            impl_->input_.processEvent(event);
+            break;
+        }
     }
-}
 
 } // namespace Grain

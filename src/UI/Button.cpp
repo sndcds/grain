@@ -10,6 +10,7 @@ Button::Button(std::string title)
 {
 }
 
+
 void Button::draw(
     GraphicContext& gc,
     const Rectd& dirty_rect
@@ -48,18 +49,22 @@ void Button::draw(
         font);
 }
 
+
 void Button::setTitle(std::string title) {
     title_ = std::move(title);
     view()->requestRedraw();
 }
 
+
 const std::string& Button::title() const noexcept {
     return title_;
 }
 
+
 void Button::setAction(Action action) {
     action_ = std::move(action);
 }
+
 
 void Button::click() {
     if (enabled_ && action_) {
@@ -67,15 +72,48 @@ void Button::click() {
     }
 }
 
-bool Button::handleEvent(const Event& event) {
-    if (event.type_ == Grain::EventType::MouseButtonDown) {
-        if (layout_result_.bounds.contains(event.mouse_pos_)) {
-            click();
+
+auto Button::handleEvent(const Event& event) -> bool {
+
+    switch (event.type_) {
+
+        case EventType::MouseButtonDown: {
+            if (event.mouse_button_ != MouseButton::Left) {
+                return false;
+            }
+
+            if (!contains(event.mouse_pos_)) {
+                return false;
+            }
+
+            setPressed(true);
+            return true;
         }
+
+        case EventType::MouseButtonUp: {
+            if (event.mouse_button_ != MouseButton::Left) {
+                return false;
+            }
+
+            if (!pressed()) {
+                return false;
+            }
+
+            const bool should_click =
+                contains(event.mouse_pos_);
+
+            setPressed(false);
+
+            if (should_click) {
+                click();
+            }
+
+            return true;
+        }
+
+        default:
+            return false;
     }
-    else if (event.type_ == Grain::EventType::MouseMove) {
-    }
-    return false;
 }
 
 

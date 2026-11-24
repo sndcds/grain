@@ -20,6 +20,8 @@ class View {
 public:
     virtual ~View() = default;
 
+    virtual void setEventHandler(EventHandler handler) = 0;
+
     virtual void requestRedraw() = 0;
     virtual void requestRedraw(const Rectd& dirty_rect) = 0;
 

@@ -100,9 +100,41 @@ void Window::setRootView(std::unique_ptr<View> view) {
 
 
 void Window::handleEvent(const Event& event) {
-    (void)event;
-    updateLayout();
-    // TODO: Implement behaviour! Should the window close/delete?
+
+    if (!impl_ || !impl_->root_view_) {
+        return;
+    }
+
+    switch (event.type_) {
+
+        case EventType::WindowResize: {
+            updateLayout();
+            requestRedraw();
+            break;
+        }
+
+        case EventType::MouseMove:
+        case EventType::MouseButtonDown:
+        case EventType::MouseButtonUp:
+        case EventType::MouseWheel: {
+            impl_->root_view_->handleMouseEvent(event);
+            requestRedraw();
+            break;
+        }
+
+        case EventType::KeyDown:
+        case EventType::KeyUp:
+        case EventType::ModifiersChanged: {
+            impl_->root_view_->handleKeyEvent(event);
+            requestRedraw();
+            break;
+        }
+
+        default: {
+            impl_->root_view_->handleEvent(event);
+            break;
+        }
+    }
 }
 
 

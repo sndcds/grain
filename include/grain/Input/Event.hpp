@@ -166,7 +166,7 @@ struct Event {
     Vec2d mouse_pos_;
     Vec2d mouse_delta_;
     Vec2d mouse_wheel_;
-    MouseButton mouse_button_ = MouseButton::Left;
+    MouseButton mouse_button_ = MouseButton::None;
     int32_t mouse_click_count_ = 0;
 
     // Window

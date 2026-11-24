@@ -8,6 +8,7 @@ namespace Grain::Platform {
 class CocoaView::Impl {
 public:
     NSView* native_view_ = nil;
+    EventHandler event_handler_;
 };
 
 
@@ -40,7 +41,7 @@ void CocoaView::requestRedraw(const Rectd& dirty_rect) {
 }
 
 
-void* CocoaView::nativeView() {
+auto CocoaView::nativeView() -> void* {
     if (impl_ == nullptr) {
         return nullptr;
     }
@@ -49,7 +50,7 @@ void* CocoaView::nativeView() {
 }
 
 
-Vec2d CocoaView::mousePos() const {
+auto CocoaView::mousePos() const -> Vec2d {
     if (impl_ == nullptr || impl_->native_view_ == nil) {
         return {};
     }
@@ -69,7 +70,7 @@ Vec2d CocoaView::mousePos() const {
 }
 
 
-std::unique_ptr<View> createView(Grain::View* grainView) {
+auto createView(Grain::View* grainView) -> std::unique_ptr<View> {
     return std::make_unique<CocoaView>(grainView);
 }
 

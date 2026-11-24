@@ -427,38 +427,63 @@ void View::positionChildren(const Vec2d& position) {
 
 
 void View::handleMouseEvent(const Event& event) {
+
+    mouse_pos_ = event.mouse_pos_;
+
     switch (event.type_) {
+
         case EventType::MouseMove: {
             if (mouse_capture_component_ != nullptr) {
                 mouse_capture_component_->handleEvent(event);
-            } else {
+            }
+            else {
                 updateHoveredComponent(hitTest(event.mouse_pos_));
             }
+
             break;
         }
 
         case EventType::MouseButtonDown: {
             Component* component = hitTest(event.mouse_pos_);
+            updateHoveredComponent(component);
 
-            if (component != nullptr && component->handleEvent(event)) {
+            if (component != nullptr &&
+                component->handleEvent(event))
+            {
                 mouse_capture_component_ = component;
             }
+
             break;
         }
 
         case EventType::MouseButtonUp: {
-            if (mouse_capture_component_ != nullptr) {
-                Component* component = mouse_capture_component_;
+            Component* component = mouse_capture_component_;
+            if (component != nullptr) {
+                // Release capture before dispatching the event.
                 mouse_capture_component_ = nullptr;
-
                 component->handleEvent(event);
-            } else {
-                Component* component = hitTest(event.mouse_pos_);
+            }
+            else {
+                component = hitTest(event.mouse_pos_);
 
                 if (component != nullptr) {
                     component->handleEvent(event);
                 }
             }
+
+            updateHoveredComponent(
+                hitTest(event.mouse_pos_)
+            );
+
+            break;
+        }
+
+        case EventType::MouseWheel: {
+            Component* component = hitTest(event.mouse_pos_);
+            if (component != nullptr) {
+                component->handleEvent(event);
+            }
+
             break;
         }
 

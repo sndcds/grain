@@ -78,6 +78,7 @@ void Input::processEvent(const Event& event) {
         break;
 
     case EventType::MouseButtonDown: {
+        mouse_pos_ = event.mouse_pos_;
         const auto index = mouseButtonIndex(event.mouse_button_);
         if (index < 0) {
             break;
@@ -94,6 +95,7 @@ void Input::processEvent(const Event& event) {
     }
 
     case EventType::MouseButtonUp: {
+        mouse_pos_ = event.mouse_pos_;
         const auto index = mouseButtonIndex(event.mouse_button_);
         if (index < 0) {
             break;

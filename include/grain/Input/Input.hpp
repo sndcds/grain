@@ -35,7 +35,7 @@ public:
 
 private:
     static constexpr int KeyCount = 256;
-    static constexpr int MouseButtonCount = 4;
+    static constexpr int MouseButtonCount = 5;
 
     static auto keyIndex(KeyCode key) -> int;
     static auto mouseButtonIndex(MouseButton button) -> int;

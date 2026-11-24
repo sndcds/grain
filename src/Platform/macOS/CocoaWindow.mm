@@ -195,6 +195,14 @@ void CocoaWindow::setRootView(Grain::Platform::View* platform_view) {
         return;
     }
 
+    platform_view->setEventHandler(
+        [this](const Event& source_event) -> void {
+            Event event = source_event;
+            event.window_id_ = window_id_;
+            emitEvent(event);
+        }
+    );
+
     auto nativeView = static_cast<NSView*>(platform_view->nativeView());
     if (nativeView == nil) {
         return;
@@ -235,10 +243,13 @@ void CocoaWindow::setEventHandler(EventHandler event_handler) {
 }
 
 
-void CocoaWindow::emitEvent(const Event& event) {
+void CocoaWindow::emitEvent(const Event& source_event) {
     if (!impl_ || !impl_->event_handler) {
         return;
     }
+
+    Event event = source_event;
+    event.window_id_ = window_id_;
 
     impl_->event_handler(event);
 }

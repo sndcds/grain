@@ -10,6 +10,8 @@ public:
 
     ~CocoaView() override;
 
+    void setEventHandler(EventHandler handler) override;
+
     void requestRedraw() override;
     void requestRedraw(const Rectd& dirty_rect) override;
 
