@@ -3,8 +3,8 @@
 
 #include <CoreText/CoreText.h>
 
-#include <grain/Graphics/TextLayout.hpp>
-#include <grain/Graphics/Font.hpp>
+#include <grain/Text/TextLayout.hpp>
+#include <grain/Text/Font.hpp>
 #include <grain/String/String.hpp>
 
 #include "CFObject.hpp"

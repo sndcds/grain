@@ -1,6 +1,6 @@
 #pragma once
 
-#include <grain/Graphics/FontPath.hpp>
+#include <grain/Text/FontPath.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/Size.hpp>
 #include <grain/String/String.hpp>

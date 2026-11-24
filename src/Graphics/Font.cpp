@@ -1,5 +1,5 @@
 #include <grain/Graphics/GraphicCompoundPath.hpp>
-#include <grain/Graphics/Font.hpp>
+#include <grain/Text/Font.hpp>
 #include <grain/Platform/Font.hpp>
 
 #include <utility>

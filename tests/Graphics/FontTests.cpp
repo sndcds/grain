@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <grain/Graphics/Font.hpp>
+#include <../../include/grain/Text/Font.hpp>
 
 #include <cmath>
 #include <utility>

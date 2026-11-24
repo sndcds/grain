@@ -1,10 +1,12 @@
 #include <grain/UI/TextField.hpp>
-#include "grain/String/Character.hpp"
-#include "grain/Graphics/TextLayout.hpp"
+#include <grain/String/Character.hpp>
+#include <grain/Text/TextLayout.hpp>
 
 namespace Grain {
 
-    TextField::TextField() : Component() {
+    TextField::TextField()
+        : Component()
+    {
         can_get_focus_ = true;
         text_alignment_ = Alignment::Left;
         editable_ = true;
@@ -335,7 +337,10 @@ namespace Grain {
     }
 
 
-    bool TextField::setCursor(int32_t cursor_index, bool selection_mode) {
+    bool TextField::setCursor(
+        int32_t cursor_index,
+        bool selection_mode
+    ) {
         if (selection_mode) {
             setSelection(selection_drag_start_, cursor_index);
         }
@@ -354,7 +359,10 @@ namespace Grain {
     }
 
 
-    bool TextField::moveCursor(int32_t offset, bool shift_pressed) {
+    bool TextField::moveCursor(
+        int32_t offset,
+        bool shift_pressed
+    ) {
         int32_t new_cursor_index = std::clamp<int32_t>(cursor_index_ + offset, 0, textLength());
 
         if (new_cursor_index != cursor_index_) {

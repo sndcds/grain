@@ -2,7 +2,7 @@
 #pragma once
 
 #include <grain/Graphics/GraphicPath.hpp>
-#include <grain/Graphics/FontPath.hpp>
+#include <grain/Text/FontPath.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Math/Vec2.hpp>
 #include <grain/Container/List.hpp>

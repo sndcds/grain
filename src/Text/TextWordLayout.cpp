@@ -2,10 +2,6 @@
 #include <grain/Text/TextWordLayout.hpp>
 
 #include <algorithm>
-#include <cmath>
-#include <cctype>
-#include <limits>
-#include <utility>
 
 
 namespace Grain {
@@ -14,7 +10,8 @@ namespace Grain {
 TextWordLayout::TextWordLayout(
     const char* text,
     const Font* font
-) noexcept {
+) noexcept
+{
     setFont(font);
     setText(text);
 }
@@ -32,7 +29,7 @@ void TextWordLayout::setFont(const Font* font) noexcept {
 
 void TextWordLayout::setText(const char* text) noexcept {
     try {
-        text_ = text ? text : "";
+        text_ = (text != nullptr) ? text : "";
         splitWords();
     }
     catch (...) {
@@ -49,7 +46,7 @@ void TextWordLayout::addWord(const char* text) noexcept {
     }
 
     try {
-        words_.push_back({text});
+        words_.push_back({.text=text});
         clearResult();
     }
     catch (...) {
@@ -61,7 +58,8 @@ void TextWordLayout::addWord(const char* text) noexcept {
 void TextWordLayout::setDimensions(
     double width,
     double height
-) noexcept {
+) noexcept
+{
     dimensionWidth_ = width;
     dimensionHeight_ = height;
 
@@ -72,7 +70,8 @@ void TextWordLayout::setDimensions(
 void TextWordLayout::layout(
     double width,
     double height
-) noexcept {
+) noexcept
+{
     setDimensions(width, height);
     layout();
 }
@@ -93,8 +92,8 @@ void TextWordLayout::splitWords() noexcept {
 
             // Skip whitespace.
             while (*p != '\0' &&
-                   std::isspace(static_cast<unsigned char>(*p)))
-            {
+                   (std::isspace(static_cast<unsigned char>(*p)) != 0)
+            ) {
                 ++p;
             }
 
@@ -106,13 +105,13 @@ void TextWordLayout::splitWords() noexcept {
 
             // Find the end of the word.
             while (*p != '\0' &&
-                   !std::isspace(static_cast<unsigned char>(*p)))
-            {
+                   (std::isspace(static_cast<unsigned char>(*p)) == 0)
+            ) {
                 ++p;
             }
 
             words_.push_back({
-                std::string(start, static_cast<std::size_t>(p - start))
+                .text=std::string(start, static_cast<std::size_t>(p - start))
             });
         }
     }
@@ -224,9 +223,9 @@ auto TextWordLayout::wrap(
 
             try {
                 result_.lines.push_back({
-                    firstWord,
-                    index - firstWord,
-                    lineWidth
+                    .firstWord=firstWord,
+                    .wordCount=index - firstWord,
+                    .width=lineWidth
                 });
             }
             catch (...) {
@@ -321,7 +320,7 @@ void TextWordLayout::layout() noexcept {
         previousLineCount = count;
         acceptedWidth = width;
 
-        const double nextWidth = longest - spaceWidth * 0.5;
+        const double nextWidth = longest - (spaceWidth * 0.5);
 
         // No improvement is possible for single-word lines.
         if (count == wordCount() ||

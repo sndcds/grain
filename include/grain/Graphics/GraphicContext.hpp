@@ -2,7 +2,7 @@
 
 #include <grain/Graphics/GraphicState.hpp>
 #include <grain/Color/Color.hpp>
-#include <grain/Graphics/Font.hpp>
+#include <grain/Text/Font.hpp>
 #include <grain/Graphics/GraphicPath.hpp>
 #include <grain/Graphics/GraphicCompoundPath.hpp>
 #include <grain/Geometry/Rect.hpp>

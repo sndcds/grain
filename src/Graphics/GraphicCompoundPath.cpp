@@ -1,7 +1,7 @@
 #include <grain/Graphics/GraphicCompoundPath.hpp>
 #include <grain/Graphics/GraphicPathPoint.hpp>
 #include <grain/Graphics/GraphicContext.hpp>
-#include <grain/Graphics/Font.hpp>
+#include <grain/Text/Font.hpp>
 #include <grain/String/String.hpp>
 
 #include <algorithm>

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <grain/Graphics/Font.hpp>
+#include <grain/Text/Font.hpp>
 
 #include <cstdint>
 #include <string>
@@ -17,21 +17,17 @@ public:
 
     struct Word {
         std::string text;
-
         double x = 0.0;
         double y = 0.0;
-
         double width = 0.0;
         double height = 0.0;
     };
-
 
     struct Line {
         int32_t firstWord = 0;
         int32_t wordCount = 0;
         double width = 0.0;
     };
-
 
     struct Result {
         std::vector<Line> lines;
@@ -47,8 +43,8 @@ public:
         [[nodiscard]]
         auto line(int32_t index) const noexcept -> const Line* {
             if (index < 0 ||
-                index >= static_cast<int32_t>(lines.size()))
-            {
+                static_cast<std::size_t>(index) >= lines.size()
+            ) {
                 return nullptr;
             }
 
@@ -75,12 +71,18 @@ public:
 
     void measureWords() noexcept;
 
-    void setDimensions(double width, double height) noexcept;
+    void setDimensions(
+        double width,
+        double height
+    ) noexcept;
 
 
     void layout() noexcept;
 
-    void layout(double width, double height) noexcept;
+    void layout(
+        double width,
+        double height
+    ) noexcept;
 
 
     [[nodiscard]]
@@ -100,9 +102,7 @@ public:
 
     [[nodiscard]]
     auto word(int32_t index) const noexcept -> const Word* {
-        if (index < 0 ||
-            index >= static_cast<int32_t>(words_.size()))
-        {
+        if (index < 0 || std::cmp_greater_equal(index ,words_.size())) {
             return nullptr;
         }
 

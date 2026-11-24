@@ -390,8 +390,8 @@ target_sources(
         include/grain/Graphics/GraphicPath.hpp
         include/grain/Graphics/GraphicCompoundPath.hpp
         include/grain/Graphics/Gradient.hpp
-        include/grain/Graphics/Font.hpp
-        include/grain/Graphics/FontPath.hpp
+        include/grain/Text/Font.hpp
+        include/grain/Text/FontPath.hpp
 
         include/grain/Text/TextWordLayout.hpp
 
