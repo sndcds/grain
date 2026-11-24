@@ -54,6 +54,11 @@ public:
 		};
 	}
 
+	[[nodiscard]]
+	auto contains(const Vec2d& pos) const -> bool {
+		return bounds().contains(pos);
+	}
+
 	template <typename T, typename... Args>
 	requires std::derived_from<T, UIElement>
 	auto addChild(Args&&... args) -> T& {
@@ -116,7 +121,10 @@ public:
 	virtual void handleKeyEvent(const Event& event);
 	virtual void handleEvent(const Event& event);
 
-	[[nodiscard]] auto mousePos() -> Vec2d { return queryMousePos(); }
+	[[nodiscard]]
+	auto mousePos() -> Vec2d {
+		return queryMousePos();
+	}
 
 	template <typename Visitor>
 	auto traverse(Visitor&& visitor) -> bool {
@@ -201,12 +209,16 @@ private:
 
     void attach();
 
-    [[nodiscard]] auto platformView() -> Platform::View*;
+    [[nodiscard]]
+    auto platformView() -> Platform::View*;
 
     void updateHoveredComponent(Component* component);
     void updateFocusedComponent(Component* component);
-    auto hitTest(const Vec2d& pos) -> Component*;
-    [[nodiscard]] auto queryMousePos() const -> Vec2d;
+
+	auto hitTest(const Vec2d& pos) -> Component*;
+
+	[[nodiscard]]
+	auto queryMousePos() const -> Vec2d;
 
     Vec2d mouse_pos_;
 

@@ -34,7 +34,8 @@ public:
         return UIElementType::Component;
     }
 
-    [[nodiscard]] auto view() const -> View* {
+    [[nodiscard]]
+    auto view() const -> View* {
         return view_;
     }
 
@@ -42,23 +43,29 @@ public:
         view_ = view;
     }
 
-    [[nodiscard]] auto bounds() const -> const Rectd& {
+    [[nodiscard]]
+    auto bounds() const -> const Rectd& {
         return layout_result_.bounds;
     }
 
-    [[nodiscard]] virtual auto contains(const Vec2d& pos) const -> bool;
+    [[nodiscard]]
+    virtual auto contains(const Vec2d& pos) const -> bool;
 
 
-    [[nodiscard]] auto enabled() const -> bool;
+    [[nodiscard]]
+    auto enabled() const -> bool;
     virtual void setEnabled(bool enabled);
 
-    [[nodiscard]] auto hovered() const -> bool { return hovered_; }
+    [[nodiscard]]
+    auto hovered() const -> bool { return hovered_; }
     void setHovered(bool hovered);
 
-    [[nodiscard]] auto focused() const -> bool { return focused_; }
+    [[nodiscard]]
+    auto focused() const -> bool { return focused_; }
     void setFocused(bool hovered);
 
-    [[nodiscard]] auto pressed() const -> bool { return pressed_; }
+    [[nodiscard]]
+    auto pressed() const -> bool { return pressed_; }
     void setPressed(bool pressed);
 
     [[nodiscard]] auto visible() const -> bool { return visible_; }

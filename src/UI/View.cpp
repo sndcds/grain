@@ -106,36 +106,36 @@ auto View::hitTest(const Vec2d& pos) -> Component* {
 
         switch (child->type()) {
 
-        case UIElementType::Component: {
-            auto* component = static_cast<Component*>(child);
+            case UIElementType::Component: {
+                auto* component = static_cast<Component*>(child);
 
-            if (!component->visible() || !component->enabled()) {
-                continue;
+                if (!component->visible() || !component->enabled()) {
+                    continue;
+                }
+
+                if (component->contains(pos)) {
+                    return component;
+                }
+
+                break;
             }
 
-            if (component->contains(pos)) {
-                return component;
+            case UIElementType::View: {
+                auto* view = static_cast<View*>(child);
+
+                // TODO: Implement!
+                /*
+                if (!view->visible_ || !view->enabled()) {
+                    continue;
+                }
+                */
+
+                if (auto* component = view->hitTest(pos)) {
+                    return component;
+                }
+
+                break;
             }
-
-            break;
-        }
-
-        case UIElementType::View: {
-            auto* view = static_cast<View*>(child);
-
-            // TODO: Implement!
-            /*
-            if (!view->visible_ || !view->enabled()) {
-                continue;
-            }
-            */
-
-            if (auto* component = view->hitTest(pos)) {
-                return component;
-            }
-
-            break;
-        }
         }
     }
 
@@ -187,13 +187,16 @@ void View::draw(
         rect.y = 0;
     }
 
-    Random random;
+    gc.save();
+    gc.clip(rect);
 
     gc.setFillColor({.92, .92, .92, 1});
     gc.fillRect(layout_result_.bounds);
 
     drawContent(gc, dirty_rect);
     drawChildren(gc, dirty_rect);
+
+    gc.restore();
 }
 
 

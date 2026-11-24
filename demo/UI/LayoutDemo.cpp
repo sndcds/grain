@@ -1,6 +1,7 @@
 
 #include <Grain.hpp>
 
+#include <algorithm>
 #include <cstdint>
 #include <string>
 
@@ -29,6 +30,7 @@ inline auto create(UIStyles& styles) -> void {
 
     LayoutViewStyle content;
     content.direction = LayoutDirection::LeftToRight;
+    content.element.padding = {0, 0, 0, 0};
     content.element.child_gap = 0;
 
     content.element.sizing.width.type = LayoutSizingType::Grow;
@@ -38,7 +40,22 @@ inline auto create(UIStyles& styles) -> void {
 
 
     //--------------------------------------------------------------------------
-    //  Left panel: 100 px wide
+    //  Center view: fills available space
+    //--------------------------------------------------------------------------
+
+    LayoutViewStyle center_view;
+    center_view.direction = LayoutDirection::TopToBottom;
+    center_view.element.padding = {8, 8, 8, 8};
+
+    center_view.element.sizing.width.type = LayoutSizingType::Grow;
+    center_view.element.sizing.height.type = LayoutSizingType::Grow;
+    center_view.element.sizing.width.min_value = 200;
+
+    styles.defineViewStyle("center-view", center_view);
+
+
+    //--------------------------------------------------------------------------
+    //  Left panel: 200–300 px wide
     //--------------------------------------------------------------------------
 
     LayoutViewStyle left_panel;
@@ -56,8 +73,8 @@ inline auto create(UIStyles& styles) -> void {
 
 
     //--------------------------------------------------------------------------
-    //  Right panel: 100 px wide
-    // --------------------------------------------------
+    //  Right panel: 200 px wide
+    //--------------------------------------------------------------------------
 
     LayoutViewStyle right_panel;
     right_panel.direction = LayoutDirection::TopToBottom;
@@ -89,29 +106,16 @@ inline auto create(UIStyles& styles) -> void {
 
 
     //--------------------------------------------------------------------------
-    //  Left panel labels
+    //  Left panel components
     //--------------------------------------------------------------------------
 
     LayoutComponentStyle panel_label;
     panel_label.element.padding = {4, 4, 2, 2};
+
     panel_label.element.sizing.width.type = LayoutSizingType::Grow;
     panel_label.element.sizing.height.min_value = 26;
 
     styles.defineComponentStyle("panel-label", panel_label);
-
-
-    //--------------------------------------------------------------------------
-    //  Center label: fills available space
-    //--------------------------------------------------------------------------
-
-    LayoutComponentStyle center_label;
-    center_label.element.padding = {8, 8, 8, 8};
-
-    center_label.element.sizing.width.type = LayoutSizingType::Grow;
-    center_label.element.sizing.height.type = LayoutSizingType::Grow;
-    center_label.element.sizing.width.min_value = 200;
-
-    styles.defineComponentStyle("center-label", center_label);
 
 
     //--------------------------------------------------------------------------
@@ -126,6 +130,212 @@ inline auto create(UIStyles& styles) -> void {
 
 } // namespace Grain::Styles
 
+
+//------------------------------------------------------------------------------
+//  DrawingView
+//------------------------------------------------------------------------------
+
+class DrawingView : public View {
+public:
+
+    DrawingView() = default;
+
+    void drawContent(
+        GraphicContext& gc,
+        const Rectd& dirty_rect
+    ) override {
+
+        (void)dirty_rect;
+
+        const auto& rect = bounds();
+
+        gc.save();
+        gc.clip(rect);
+
+        // Draw a frame around the view.
+        gc.setStrokeColor(Color::fromRGBA32(0x333333FF));
+        gc.setStrokeWidth(20.0);
+        gc.strokeRect(rect);
+
+        // Draw a circle in the center.
+        const Vec2d center{
+            rect.x + rect.width * 0.5,
+            rect.y + rect.height * 0.5
+        };
+
+        double radius = std::min(rect.width, rect.height) * 30.2;
+
+        while (radius > 2) {
+            gc.setFillColor(Color::fromRGBA32(0x42A5F5FF));
+            gc.fillCircle(center, radius);
+
+            gc.setStrokeColor(Color::fromRGBA32(0x1565C0FF));
+            gc.setStrokeWidth(1);
+            gc.strokeCircle(center, radius);
+
+            radius *= 0.97;
+        }
+
+        gc.restore();
+    }
+};
+
+
+class TextWordLayoutView : public View {
+public:
+    TextWordLayoutView();
+    ~TextWordLayoutView() override;
+
+    void drawContent(GraphicContext& gc, const Rectd& dirty_rect) override;
+    void handleMouseEvent(const Event& event) override;
+
+protected:
+    String text_;
+    std::unique_ptr<Font> font_{};
+    Rectd rect_ = { 400, 100, 640, 480 };
+    TextWordLayout layout_;
+    int32_t drag_mode_ = 0;
+    Vec2d drag_offset_;
+};
+
+
+
+TextWordLayoutView::TextWordLayoutView() {
+
+    font_ = std::make_unique<Font>("Geomanist Ultra", 100);
+
+    layout_.setFont(font_.get());
+    layout_.setText("The Bubble Exists Straight Behind You\u00A0II");
+}
+
+
+TextWordLayoutView::~TextWordLayoutView() {
+}
+
+
+void TextWordLayoutView::drawContent(
+    GraphicContext& gc,
+    const Rectd& dirty_rect
+) {
+    (void)dirty_rect;
+
+    const Color color  = {0.05f, 0.0f, 0.35f, 1.0f};
+    const Color color2 = {1.0f, 0.2f, 0.6f, 0.6f};
+
+    gc.save();
+
+    gc.setFillColor(Color::white());
+    gc.fillRect(bounds());
+
+    gc.setStrokeColor({0.0f, 0.0f, 0.0f, 0.1f});
+    gc.strokeRect(rect_);
+
+    layout_.layout(rect_.width, rect_.height);
+
+    const auto& result = layout_.result();
+    const double line_height = font_->lineHeight();
+
+    for (int32_t i = 0; i < result.lineCount(); ++i) {
+        const auto* line = result.line(i);
+
+        if (line == nullptr) {
+            continue;
+        }
+
+        for (int32_t j = 0; j < line->wordCount; ++j) {
+            const int32_t word_index = line->firstWord + j;
+            const auto* word = layout_.word(word_index);
+
+            if (word == nullptr) {
+                continue;
+            }
+
+            const Vec2d position{
+                rect_.x + word->x,
+                rect_.y + word->y + line_height
+            };
+
+            const String text(word->text);
+
+            // Shadow.
+            gc.setBlendMode(ColorBlendMode::Multiply);
+            gc.drawText(
+                text,
+                position + Vec2d(6, 12),
+                font_.get(),
+                color2
+            );
+
+            // Main text.
+            gc.setBlendMode(ColorBlendMode::Normal);
+            gc.drawText(
+                text,
+                position,
+                font_.get(),
+                color
+            );
+        }
+    }
+
+    // Drag handle.
+    gc.setFillColor({1.0f, 0.0f, 0.0f, 0.5f});
+    gc.fillCircle(rect_.topLeft(), 5.0);
+
+    gc.restore();
+}
+
+
+void TextWordLayoutView::handleMouseEvent(const Event& event) {
+    std::cout << event.mouse_pos_ << std::endl;
+
+    switch (event.type_) {
+
+        case EventType::MouseButtonDown: {
+            if (event.mouse_button_ != MouseButton::Left) {
+                break;
+            }
+
+            const Rectd handle_rect{
+                rect_.x - 5.0,
+                rect_.y - 5.0,
+                10.0,
+                10.0
+            };
+
+            if (handle_rect.contains(event.mouse_pos_)) {
+                drag_mode_ = 1;
+                drag_offset_ = event.mouse_pos_ - rect_.topLeft();
+            }
+
+            break;
+        }
+
+        case EventType::MouseButtonUp: {
+            drag_mode_ = 0;
+            break;
+        }
+
+        case EventType::MouseMove: {
+            if (drag_mode_ == 1) {
+                rect_.setPosition(
+                    event.mouse_pos_ - drag_offset_
+                );
+
+                requestRedraw();
+            }
+
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+//  Main
+//------------------------------------------------------------------------------
 
 int main() {
 
@@ -170,26 +380,37 @@ int main() {
     left.setStyle(styles.viewStyle("left-panel"));
 
     Random random;
+
     for (int32_t i = 1; i <= 30; ++i) {
 
         if (random.chance(0.7)) {
+
             left.addChild<Label>(
                 "Left label " + std::to_string(i)
             ).setStyle(
                 styles.componentStyle("panel-label")
             );
+
         }
         else if (random.chance(0.3)) {
-            left.addChild<Button>(
-                "Left label " + std::to_string(i)
-            ).setStyle(
+
+            auto& button = left.addChild<Button>(
+                "Left button " + std::to_string(i)
+            );
+            button.setStyle(
                 styles.componentStyle("panel-label")
             );
+
+            button.setAction([i]() {
+                std::cout << "Button " << i << " clicked!" << std::endl;
+            });
         }
         else {
-            left.addChild<TextField>().setStyle(
-                styles.componentStyle("panel-label")
-            );
+
+            left.addChild<TextField>()
+                .setStyle(
+                    styles.componentStyle("panel-label")
+                );
         }
     }
 
@@ -198,8 +419,11 @@ int main() {
     //  Center
     //--------------------------------------------------------------------------
 
-    content.addChild<Label>("Center content")
-        .setStyle(styles.componentStyle("center-label"));
+    auto& drawing_view = content.addChild<TextWordLayoutView>();
+
+    drawing_view.setStyle(
+        styles.viewStyle("center-view")
+    );
 
 
     //--------------------------------------------------------------------------
