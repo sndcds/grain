@@ -3,6 +3,8 @@
 #include "grain/Graphics/GraphicContext.hpp"
 #include "../../include/grain/UI/View.hpp"
 
+#include <iostream>
+
 namespace Grain {
 
 Button::Button(std::string title)
@@ -54,10 +56,13 @@ void Button::draw(
 
 
 void Button::setTitle(std::string title) {
-    title_ = std::move(title);
-    view()->requestRedraw();
-}
+    if (title_ == title) {
+        return;
+    }
 
+    title_ = std::move(title);
+    invalidate();
+}
 
 const std::string& Button::title() const noexcept {
     return title_;

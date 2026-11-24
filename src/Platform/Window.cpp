@@ -109,7 +109,6 @@ void Window::handleEvent(const Event& event) {
 
         case EventType::WindowResize: {
             updateLayout();
-            requestRedraw();
             break;
         }
 
@@ -118,7 +117,6 @@ void Window::handleEvent(const Event& event) {
         case EventType::MouseButtonUp:
         case EventType::MouseWheel: {
             impl_->root_view_->handleMouseEvent(event);
-            requestRedraw();
             break;
         }
 
@@ -126,7 +124,6 @@ void Window::handleEvent(const Event& event) {
         case EventType::KeyUp:
         case EventType::ModifiersChanged: {
             impl_->root_view_->handleKeyEvent(event);
-            requestRedraw();
             break;
         }
 

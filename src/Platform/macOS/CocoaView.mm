@@ -27,6 +27,7 @@ CocoaView::~CocoaView() = default;
 
 
 void CocoaView::requestRedraw() {
+
     if (impl_ == nullptr || impl_->native_view_ == nil) {
         return;
     }
@@ -36,8 +37,19 @@ void CocoaView::requestRedraw() {
 
 
 void CocoaView::requestRedraw(const Rectd& dirty_rect) {
-    (void)dirty_rect;
-    requestRedraw();
+
+    if (impl_ == nullptr || impl_->native_view_ == nil) {
+        return;
+    }
+
+    const NSRect rect = NSMakeRect(
+        dirty_rect.x,
+        dirty_rect.y,
+        dirty_rect.width,
+        dirty_rect.height
+    );
+
+    [impl_->native_view_ setNeedsDisplayInRect:rect];
 }
 
 
