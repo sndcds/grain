@@ -183,21 +183,54 @@ public:
 
 class TextWordLayoutView : public View {
 public:
-    TextWordLayoutView();
-    ~TextWordLayoutView() override;
 
-    void drawContent(GraphicContext& gc, const Rectd& dirty_rect) override;
+    TextWordLayoutView();
+    ~TextWordLayoutView() override = default;
+
+    void drawContent(
+        GraphicContext& gc,
+        const Rectd& dirty_rect
+    ) override;
+
     void onMouseEvent(const Event& event) override;
 
 protected:
-    String text_;
-    std::unique_ptr<Font> font_{};
-    Rectd rect_ = { 400, 100, 640, 480 };
-    TextWordLayout layout_;
-    int32_t drag_mode_ = 0;
-    Vec2d drag_offset_;
-};
 
+    enum class DragMode : uint8_t {
+        None,
+        Move,
+        Resize
+    };
+
+    static constexpr double handle_radius_ = 6.0;
+    static constexpr double min_width_ = 80.0;
+    static constexpr double min_height_ = 40.0;
+
+    String text_;
+
+    std::unique_ptr<Font> font_{};
+    TextWordLayout layout_;
+
+    Rectd rect_ = {20, 20, 640, 480};
+
+    DragMode drag_mode_ = DragMode::None;
+    Vec2d drag_offset_{};
+
+    [[nodiscard]]
+    auto topLeftHandle() const -> Vec2d;
+
+    [[nodiscard]]
+    auto bottomRightHandle() const -> Vec2d;
+
+    [[nodiscard]]
+    auto handleContains(
+        const Vec2d& handle,
+        const Vec2d& position
+    ) const -> bool;
+
+    void moveRectangle(const Vec2d& position);
+    void resizeRectangle(const Vec2d& position);
+};
 
 
 TextWordLayoutView::TextWordLayoutView() {
@@ -209,34 +242,57 @@ TextWordLayoutView::TextWordLayoutView() {
 }
 
 
-TextWordLayoutView::~TextWordLayoutView() {
+auto TextWordLayoutView::topLeftHandle() const -> Vec2d {
+    return rect_.topLeft();
 }
+
+
+auto TextWordLayoutView::bottomRightHandle() const -> Vec2d {
+    return {
+        rect_.x + rect_.width,
+        rect_.y + rect_.height
+    };
+}
+
+
+auto TextWordLayoutView::handleContains(
+    const Vec2d& handle,
+    const Vec2d& position
+) const -> bool {
+
+    return handle.distance(position) <= handle_radius_;
+}
+
 
 
 void TextWordLayoutView::drawContent(
     GraphicContext& gc,
     const Rectd& dirty_rect
 ) {
+
     (void)dirty_rect;
 
-    const Color color  = {0.05f, 0.0f, 0.35f, 1.0f};
-    const Color color2 = {1.0f, 0.2f, 0.6f, 0.6f};
+    const Color text_color  = {0.05f, 0.0f, 0.35f, 1.0f};
+    const Color shadow_color = {1.0f, 0.2f, 0.6f, 0.6f};
 
     gc.save();
     gc.clip(bounds());
 
+    // Background
     gc.setFillColor(Color::white());
     gc.fillRect(bounds());
 
-    gc.setStrokeColor({0.0f, 0.0f, 0.0f, 0.1f});
-    gc.strokeRect(rect_);
+    gc.translate(bounds().x, bounds().y);
 
+
+    // Text layout.
     layout_.layout(rect_.width, rect_.height);
 
     const auto& result = layout_.result();
     const double line_height = font_->lineHeight();
 
     for (int32_t i = 0; i < result.lineCount(); ++i) {
+
         const auto* line = result.line(i);
 
         if (line == nullptr) {
@@ -244,6 +300,7 @@ void TextWordLayoutView::drawContent(
         }
 
         for (int32_t j = 0; j < line->wordCount; ++j) {
+
             const int32_t word_index = line->firstWord + j;
             const auto* word = layout_.word(word_index);
 
@@ -264,7 +321,7 @@ void TextWordLayoutView::drawContent(
                 text,
                 position + Vec2d(6, 12),
                 font_.get(),
-                color2
+                shadow_color
             );
 
             // Main text.
@@ -273,16 +330,80 @@ void TextWordLayoutView::drawContent(
                 text,
                 position,
                 font_.get(),
-                color
+                text_color
             );
         }
     }
 
-    // Drag handle
+    // Rectangle outline
+    gc.setStrokeColor({0.0f, 0.0f, 0.0f, 0.3f});
+    gc.setStrokeWidth(1.0);
+    gc.strokeRect(rect_);
+
+
+    // Draw handles
+    const Vec2d top_left = rect_.topLeft();
+
+    const Vec2d bottom_right{
+        rect_.x + rect_.width,
+        rect_.y + rect_.height
+    };
+
     gc.setFillColor({1.0f, 0.0f, 0.0f, 0.5f});
-    gc.fillCircle(rect_.topLeft(), 5.0);
+    gc.fillCircle(top_left, 5.0);
+
+    gc.setFillColor({0.0f, 0.4f, 1.0f, 0.5f});
+    gc.fillCircle(bottom_right, 5.0);
+
+    // Coordinate labels.
+    gc.setBlendMode(ColorBlendMode::Normal);
+
+    gc.drawText(
+        "(" + std::to_string(static_cast<int>(top_left.x)) +
+        ", " + std::to_string(static_cast<int>(top_left.y)) + ")",
+        top_left + Vec2d(12, -12),
+        font_.get(),
+        Color::black()
+    );
+
+    gc.drawText(
+        "(" + std::to_string(static_cast<int>(bottom_right.x)) +
+        ", " + std::to_string(static_cast<int>(bottom_right.y)) + ")",
+        bottom_right + Vec2d(12, 24),
+        font_.get(),
+        Color::black()
+    );
 
     gc.restore();
+}
+
+
+void TextWordLayoutView::moveRectangle(const Vec2d& position) {
+
+    rect_.setPosition(position - drag_offset_);
+
+    requestRedraw();
+}
+
+
+void TextWordLayoutView::resizeRectangle(const Vec2d& position) {
+
+    const Vec2d top_left = rect_.topLeft();
+
+    const double width = std::max(
+        min_width_,
+        position.x - top_left.x
+    );
+
+    const double height = std::max(
+        min_height_,
+        position.y - top_left.y
+    );
+
+    rect_.width = width;
+    rect_.height = height;
+
+    requestRedraw();
 }
 
 
@@ -291,39 +412,59 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
     switch (event.type_) {
 
         case EventType::MouseButtonDown: {
+
             if (event.mouse_button_ != MouseButton::Left) {
                 break;
             }
 
-            const Rectd handle_rect{
-                rect_.x - 5.0,
-                rect_.y - 5.0,
-                10.0,
-                10.0
-            };
+            const Vec2d position = event.mouse_pos_;
 
-            if (handle_rect.contains(event.mouse_pos_)) {
-                drag_mode_ = 1;
-                drag_offset_ = event.mouse_pos_ - rect_.topLeft();
+            // Check resize handle first.
+            if (handleContains(bottomRightHandle(), position)) {
+
+                drag_mode_ = DragMode::Resize;
+                break;
+            }
+
+            // Check move handle.
+            if (handleContains(topLeftHandle(), position)) {
+
+                drag_mode_ = DragMode::Move;
+
+                drag_offset_ = position - topLeftHandle();
+                break;
             }
 
             break;
         }
 
-        case EventType::MouseButtonUp:
-            drag_mode_ = 0;
-            break;
+        case EventType::MouseButtonUp: {
 
-        case EventType::MouseMove:
-            if (drag_mode_ == 1) {
-                rect_.setPosition(
-                    event.mouse_pos_ - drag_offset_
-                );
-
-                requestRedraw();
+            if (event.mouse_button_ == MouseButton::Left) {
+                drag_mode_ = DragMode::None;
             }
 
             break;
+        }
+
+        case EventType::MouseMove: {
+
+            switch (drag_mode_) {
+
+                case DragMode::Move:
+                    moveRectangle(event.mouse_pos_);
+                    break;
+
+                case DragMode::Resize:
+                    resizeRectangle(event.mouse_pos_);
+                    break;
+
+                case DragMode::None:
+                    break;
+            }
+
+            break;
+        }
 
         default:
             break;

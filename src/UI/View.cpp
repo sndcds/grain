@@ -474,89 +474,118 @@ static void dispatchToTarget(
 }
 
 
+
 void View::dispatchMouseEvent(const Event& event) {
 
     mouse_pos_ = event.mouse_pos_;
 
-    switch (event.type_) {
+    // Update component hover independently of mouse capture.
+    auto update_hover = [this](const Vec2d& pos) -> UIElement* {
 
-    case EventType::MouseMove: {
+        UIElement* target = hitTest(pos);
 
-        UIElement* target = mouse_capture_target_;
+        Component* component = nullptr;
 
-        if (target == nullptr) {
-            target = hitTest(event.mouse_pos_);
+        if (target != nullptr &&
+            target->type() == UIElementType::Component) {
+
+            component = static_cast<Component*>(target);
         }
 
-        dispatchToTarget(target, event);
+        updateHoveredComponent(component);
 
-        break;
-    }
+        return target;
+    };
 
-    case EventType::MouseButtonDown: {
+    switch (event.type_) {
 
-        UIElement* target = hitTest(event.mouse_pos_);
+        case EventType::MouseMove: {
 
-        if (target == nullptr) {
+            // Hover always follows the actual pointer position.
+            UIElement* hovered_target =
+                update_hover(event.mouse_pos_);
+
+            // Mouse capture controls event delivery, not hover.
+            UIElement* dispatch_target =
+                mouse_capture_target_ != nullptr
+                    ? mouse_capture_target_
+                    : hovered_target;
+
+            dispatchToTarget(dispatch_target, event);
+
             break;
         }
 
-        if (target->type() == UIElementType::Component) {
+        case EventType::MouseButtonDown: {
 
-            auto* component =
-                static_cast<Component*>(target);
+            UIElement* target =
+                update_hover(event.mouse_pos_);
 
-            // Call exactly once.
-            if (component->handleEvent(event)) {
+            if (target == nullptr) {
+                break;
+            }
+
+            if (target->type() == UIElementType::Component) {
+
+                auto* component =
+                    static_cast<Component*>(target);
+
+                // A true return value requests mouse capture.
+                if (component->handleEvent(event)) {
+                    mouse_capture_target_ = target;
+                    mouse_capture_button_ = event.mouse_button_;
+                }
+            }
+            else {
+
+                dispatchToTarget(target, event);
+
                 mouse_capture_target_ = target;
                 mouse_capture_button_ = event.mouse_button_;
             }
-        }
-        else {
 
-            dispatchToTarget(target, event);
-
-            mouse_capture_target_ = target;
-            mouse_capture_button_ = event.mouse_button_;
+            break;
         }
 
-        break;
-    }
+        case EventType::MouseButtonUp: {
 
-    case EventType::MouseButtonUp: {
+            if (mouse_capture_target_ != nullptr &&
+                mouse_capture_button_ == event.mouse_button_) {
 
-        if (mouse_capture_target_ != nullptr &&
-            mouse_capture_button_ == event.mouse_button_) {
+                UIElement* target = mouse_capture_target_;
 
-            UIElement* target = mouse_capture_target_;
+                // Release capture before dispatching the event.
+                mouse_capture_target_ = nullptr;
+                mouse_capture_button_ = MouseButton::None;
 
-            mouse_capture_target_ = nullptr;
-            mouse_capture_button_ = MouseButton::None;
-
-            dispatchToTarget(target, event);
+                dispatchToTarget(target, event);
             }
-        else {
-            dispatchToTarget(
-                hitTest(event.mouse_pos_),
-                event
-            );
+            else {
+
+                UIElement* target =
+                    hitTest(event.mouse_pos_);
+
+                dispatchToTarget(target, event);
+            }
+
+            // Recalculate hover after the button event.
+            update_hover(event.mouse_pos_);
+
+            break;
         }
 
-        break;
-    }
+        case EventType::MouseWheel: {
 
-    case EventType::MouseWheel: {
+            UIElement* target =
+                update_hover(event.mouse_pos_);
 
-        dispatchToTarget(
-            hitTest(event.mouse_pos_),
-            event
-        );
+            dispatchToTarget(target, event);
 
-        break;
-    }
+            break;
+        }
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
