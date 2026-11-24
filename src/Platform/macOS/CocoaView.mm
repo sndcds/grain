@@ -74,4 +74,18 @@ auto createView(Grain::View* grainView) -> std::unique_ptr<View> {
     return std::make_unique<CocoaView>(grainView);
 }
 
+
+void CocoaView::setEventHandler(EventHandler handler) {
+    if (impl_ == nullptr) {
+        return;
+    }
+
+    impl_->event_handler_ = std::move(handler);
+
+    Grain::setGrainRootViewEventHandler(
+        impl_->native_view_,
+        impl_->event_handler_
+    );
+}
+
 } // namespace Grain::Platform

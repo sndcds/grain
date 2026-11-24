@@ -63,6 +63,10 @@ public:
 		T& result = *child;
 		result.parent_ = this;
 
+		if constexpr (std::derived_from<T, Component>) {
+			result.setView(this);
+		}
+
 		children_.push_back(std::move(child));
 
 		requestRedraw();
@@ -209,6 +213,7 @@ private:
     Component* hovered_component_ = nullptr;
     Component* focused_component_ = nullptr;
     Component* mouse_capture_component_ = nullptr;
+	MouseButton mouse_capture_button_ = MouseButton::None;
 
 	const LayoutViewStyle* style_ = nullptr;
 

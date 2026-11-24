@@ -1,6 +1,8 @@
 #import <AppKit/AppKit.h>
 
 #include "CocoaWindow.hpp"
+#include "GrainRootView.hpp"
+
 #include <grain/UI/View.hpp>
 
 #include <memory>
@@ -153,6 +155,13 @@ CocoaWindow::~CocoaWindow() {
         return;
     }
 
+    if (impl_->native_root_view_ != nil) {
+        Grain::setGrainRootViewEventHandler(
+            impl_->native_root_view_,
+            {}
+        );
+    }
+
     if (impl_->window_ != nil) {
         impl_->window_.delegate = nil;
         [impl_->window_ close];
@@ -183,9 +192,17 @@ void CocoaWindow::requestRedraw() {
 
 
 void CocoaWindow::setRootView(Grain::Platform::View* platform_view) {
+
     if (impl_ == nullptr ||
         impl_->window_ == nil) {
         return;
+    }
+
+    if (impl_->native_root_view_ != nil) {
+        Grain::setGrainRootViewEventHandler(
+            impl_->native_root_view_,
+            {}
+        );
     }
 
     [impl_->window_ setContentView:nil];

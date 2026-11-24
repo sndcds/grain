@@ -112,6 +112,7 @@ void Input::processEvent(const Event& event) {
     }
 
     case EventType::MouseWheel:
+        mouse_pos_ = event.mouse_pos_;
         mouse_wheel_delta_ += event.mouse_wheel_;
         break;
 

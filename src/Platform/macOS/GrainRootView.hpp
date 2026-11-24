@@ -13,4 +13,9 @@ class View;
 
 NSView* createGrainRootView(View* grain_view);
 
+void setGrainRootViewEventHandler(
+    NSView* native_view,
+    EventHandler handler
+);
+
 } // namespace Grain

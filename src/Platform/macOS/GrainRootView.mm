@@ -9,11 +9,12 @@
 #include <grain/Input/Event.hpp>
 #include <grain/Geometry/Rect.hpp>
 
+#include <utility>
 
 
 namespace Grain {
 
-KeyCode keyCodeFromEvent(NSEvent* event) {
+auto keyCodeFromEvent(NSEvent* event) -> KeyCode {
     switch (event.keyCode) {
         case kVK_Escape:       return KeyCode::Escape;
         case kVK_Return:       return KeyCode::Enter;
@@ -100,23 +101,23 @@ KeyCode keyCodeFromEvent(NSEvent* event) {
 //  Modifier conversion.
 //------------------------------------------------------------------------------
 
-static KeyModifiers keyModifiersFromEvent(NSEvent* event) {
+static auto keyModifiersFromEvent(NSEvent* event) -> KeyModifiers {
     KeyModifiers modifiers = KeyModifiers::None;
     NSEventModifierFlags flags = event.modifierFlags;
 
-    if (flags & NSEventModifierFlagShift) {
+    if ((flags & NSEventModifierFlagShift) != 0u) {
         modifiers = modifiers | KeyModifiers::Shift;
     }
 
-    if (flags & NSEventModifierFlagControl) {
+    if ((flags & NSEventModifierFlagControl) != 0u) {
         modifiers = modifiers | KeyModifiers::Control;
     }
 
-    if (flags & NSEventModifierFlagOption) {
+    if ((flags & NSEventModifierFlagOption) != 0u) {
         modifiers = modifiers | KeyModifiers::Alt;
     }
 
-    if (flags & NSEventModifierFlagCommand) {
+    if ((flags & NSEventModifierFlagCommand) != 0u) {
         modifiers = modifiers | KeyModifiers::Super;
     }
 
@@ -124,7 +125,7 @@ static KeyModifiers keyModifiersFromEvent(NSEvent* event) {
 }
 
 
-static MouseButton mouseButtonFromEvent(NSEvent* event) {
+static auto mouseButtonFromEvent(NSEvent* event) -> MouseButton {
     switch (event.buttonNumber) {
         case 0: return MouseButton::Left;
         case 1: return MouseButton::Right;
@@ -141,10 +142,13 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 - (instancetype)initWithFrame:(NSRect)frame
                    grain_view:(Grain::View*)grain_view;
 
+- (void)setEventHandler:(Grain::EventHandler)handler;
+
 @end
 
 @implementation GrainRootView {
     Grain::View* grain_view_;
+    Grain::EventHandler event_handler_;
 }
 
 
@@ -153,12 +157,19 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 {
     self = [super initWithFrame:frame];
 
-    if (self) {
+    if (self != nullptr) {
         grain_view_ = grain_view;
         self.wantsLayer = NO;
     }
 
     return self;
+}
+
+
+- (void)setEventHandler:
+    (Grain::EventHandler)handler
+{
+    event_handler_ = std::move(handler);
 }
 
 
@@ -225,7 +236,9 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
     grain_event.modifiers_ =
         Grain::keyModifiersFromEvent(event);
 
-    grain_view_->handleMouseEvent(grain_event);
+    if (event_handler_) {
+        event_handler_(grain_event);
+    }
 }
 
 
@@ -305,6 +318,41 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
 
 
 //------------------------------------------------------------------------------
+//  Mouse wheel
+//------------------------------------------------------------------------------
+
+- (void)scrollWheel:(NSEvent*)event {
+
+    if (!event_handler_) {
+        return;
+    }
+
+    Grain::Event grain_event;
+
+    NSPoint point =
+        [self convertPoint:event.locationInWindow
+                  fromView:nil];
+
+    grain_event.type_ = Grain::EventType::MouseWheel;
+
+    grain_event.mouse_pos_ = {
+        point.x,
+        point.y
+    };
+
+    grain_event.mouse_wheel_ = {
+        event.scrollingDeltaX,
+        event.scrollingDeltaY
+    };
+
+    grain_event.modifiers_ =
+        Grain::keyModifiersFromEvent(event);
+
+    event_handler_(grain_event);
+}
+
+
+//------------------------------------------------------------------------------
 //  Keaboard.
 //------------------------------------------------------------------------------
 
@@ -329,7 +377,9 @@ static MouseButton mouseButtonFromEvent(NSEvent* event) {
         grain_event.text_ = "";
     }
 
-    grain_view_->handleKeyEvent(grain_event);
+    if (event_handler_) {
+        event_handler_(grain_event);
+    }
 }
 
 
@@ -389,6 +439,20 @@ NSView* createGrainRootView(View* grain_view) {
     return [[GrainRootView alloc]
         initWithFrame:NSZeroRect
             grain_view:grain_view];
+}
+
+
+void setGrainRootViewEventHandler(
+    NSView* native_view,
+    EventHandler handler
+) {
+    if (native_view == nil) {
+        return;
+    }
+
+    GrainRootView* view = static_cast<GrainRootView*>(native_view);
+
+    [view setEventHandler:std::move(handler)];
 }
 
 } // namespace Grain

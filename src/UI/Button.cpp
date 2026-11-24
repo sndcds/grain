@@ -26,12 +26,15 @@ void Button::draw(
     double radius = bounds.height / 2.5;
 
     float alpha = 1;
-    if (hovered_) {
-        gc.setFillColor({1, .8, .8, 1});
+
+    if (pressed_) {
+        gc.setFillColor({0.9, 0.6, 0.6, 1});
+    }
+    else if (hovered_) {
+        gc.setFillColor({1, 0.8, 0.8, 1});
     }
     else {
-        gc.setFillColor({1, 1, 1, .4});
-        alpha = 0.4;
+        gc.setFillColor({1, 1, 1, 0.4});
     }
 
     gc.addRoundRectPath(b, radius);
