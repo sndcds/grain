@@ -117,7 +117,9 @@ public:
 		return style_->element;
 	}
 
-	virtual void handleMouseEvent(const Event& event);
+	void dispatchMouseEvent(const Event& event);
+	virtual void onMouseEvent(const Event& event);
+
 	virtual void handleKeyEvent(const Event& event);
 	virtual void handleEvent(const Event& event);
 
@@ -215,7 +217,7 @@ private:
     void updateHoveredComponent(Component* component);
     void updateFocusedComponent(Component* component);
 
-	auto hitTest(const Vec2d& pos) -> Component*;
+	auto hitTest(const Vec2d& pos) -> UIElement*;
 
 	[[nodiscard]]
 	auto queryMousePos() const -> Vec2d;
@@ -227,7 +229,8 @@ private:
     // Interaction states
     Component* hovered_component_ = nullptr;
     Component* focused_component_ = nullptr;
-    Component* mouse_capture_component_ = nullptr;
+
+	UIElement* mouse_capture_target_ = nullptr;
 	MouseButton mouse_capture_button_ = MouseButton::None;
 
 	const LayoutViewStyle* style_ = nullptr;

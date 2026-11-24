@@ -116,7 +116,7 @@ void Window::handleEvent(const Event& event) {
         case EventType::MouseButtonDown:
         case EventType::MouseButtonUp:
         case EventType::MouseWheel: {
-            impl_->root_view_->handleMouseEvent(event);
+            impl_->root_view_->dispatchMouseEvent(event);
             break;
         }
 

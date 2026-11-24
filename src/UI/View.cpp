@@ -98,7 +98,7 @@ void View::updateFocusedComponent(Component* component) {
 }
 
 
-auto View::hitTest(const Vec2d& pos) -> Component* {
+auto View::hitTest(const Vec2d& pos) -> UIElement* {
 
     for (auto& it : std::ranges::reverse_view(children_)) {
 
@@ -107,11 +107,13 @@ auto View::hitTest(const Vec2d& pos) -> Component* {
         switch (child->type()) {
 
             case UIElementType::Component: {
-                auto* component = static_cast<Component*>(child);
+                auto* component =
+                    static_cast<Component*>(child);
 
-                if (!component->visible() || !component->enabled()) {
+                if (!component->visible() ||
+                    !component->enabled()) {
                     continue;
-                }
+                    }
 
                 if (component->contains(pos)) {
                     return component;
@@ -123,18 +125,17 @@ auto View::hitTest(const Vec2d& pos) -> Component* {
             case UIElementType::View: {
                 auto* view = static_cast<View*>(child);
 
-                // TODO: Implement!
-                /*
-                if (!view->visible_ || !view->enabled()) {
+                if (!view->contains(pos)) {
                     continue;
                 }
-                */
 
-                if (auto* component = view->hitTest(pos)) {
-                    return component;
+                // First look for a deeper target.
+                if (auto* target = view->hitTest(pos)) {
+                    return target;
                 }
 
-                break;
+                // Otherwise, the View itself is the target.
+                return view;
             }
         }
     }
@@ -152,14 +153,17 @@ void View::drawChildren(
     gc.clip(dirty_rect);
 
     for (auto& child : children_) {
+
         if (child->type() == UIElementType::Component) {
             auto* component = static_cast<Component*>(child.get());
+
             if (dirty_rect.intersects(component->bounds())) {
                 component->draw(gc, dirty_rect);
             }
         }
         else if (child->type() == UIElementType::View) {
             auto* view = static_cast<View*>(child.get());
+
             if (dirty_rect.intersects(view->bounds())) {
                 view->draw(gc, dirty_rect);
             }
@@ -441,76 +445,124 @@ void View::positionChildren(const Vec2d& position) {
 }
 
 
-void View::handleMouseEvent(const Event& event) {
+static void dispatchToTarget(
+    UIElement* target,
+    const Event& event
+) {
+    if (target == nullptr) {
+        return;
+    }
+
+    switch (target->type()) {
+
+    case UIElementType::Component: {
+        auto* component =
+            static_cast<Component*>(target);
+
+        component->handleEvent(event);
+        break;
+    }
+
+    case UIElementType::View: {
+        auto* view =
+            static_cast<View*>(target);
+
+        view->onMouseEvent(event);
+        break;
+    }
+    }
+}
+
+
+void View::dispatchMouseEvent(const Event& event) {
 
     mouse_pos_ = event.mouse_pos_;
 
     switch (event.type_) {
 
-        case EventType::MouseMove: {
-            Component* component = mouse_capture_component_;
-            if (component == nullptr) {
-                component = hitTest(event.mouse_pos_);
-                updateHoveredComponent(component);
-            }
+    case EventType::MouseMove: {
 
-            if (component != nullptr) {
-                component->handleEvent(event);
-            }
+        UIElement* target = mouse_capture_target_;
 
-            break;
+        if (target == nullptr) {
+            target = hitTest(event.mouse_pos_);
         }
 
-        case EventType::MouseButtonDown: {
-            Component* component = hitTest(event.mouse_pos_);
-            updateHoveredComponent(component);
+        dispatchToTarget(target, event);
 
-            if (component != nullptr &&
-                component->handleEvent(event)
-            ) {
-                mouse_capture_component_ = component;
-                mouse_capture_button_ = event.mouse_button_;
-                component->handleEvent(event);
-            }
-
-            break;
-        }
-
-        case EventType::MouseButtonUp: {
-            if (mouse_capture_component_ != nullptr &&
-                mouse_capture_button_ == event.mouse_button_
-            ) {
-                Component* component = mouse_capture_component_;
-
-                mouse_capture_component_ = nullptr;
-                mouse_capture_button_ = MouseButton::None;
-
-                component->handleEvent(event);
-            }
-            else {
-                Component* component = hitTest(event.mouse_pos_);
-                if (component != nullptr) {
-                    component->handleEvent(event);
-                }
-            }
-
-            updateHoveredComponent(hitTest(event.mouse_pos_));
-
-            break;
-        }
-
-        case EventType::MouseWheel: {
-            Component* component = hitTest(event.mouse_pos_);
-            if (component != nullptr) {
-                component->handleEvent(event);
-            }
-
-            break;
-        }
-
-        default:
-            break;
+        break;
     }
+
+    case EventType::MouseButtonDown: {
+
+        UIElement* target = hitTest(event.mouse_pos_);
+
+        if (target == nullptr) {
+            break;
+        }
+
+        if (target->type() == UIElementType::Component) {
+
+            auto* component =
+                static_cast<Component*>(target);
+
+            // Call exactly once.
+            if (component->handleEvent(event)) {
+                mouse_capture_target_ = target;
+                mouse_capture_button_ = event.mouse_button_;
+            }
+        }
+        else {
+
+            dispatchToTarget(target, event);
+
+            mouse_capture_target_ = target;
+            mouse_capture_button_ = event.mouse_button_;
+        }
+
+        break;
+    }
+
+    case EventType::MouseButtonUp: {
+
+        if (mouse_capture_target_ != nullptr &&
+            mouse_capture_button_ == event.mouse_button_) {
+
+            UIElement* target = mouse_capture_target_;
+
+            mouse_capture_target_ = nullptr;
+            mouse_capture_button_ = MouseButton::None;
+
+            dispatchToTarget(target, event);
+            }
+        else {
+            dispatchToTarget(
+                hitTest(event.mouse_pos_),
+                event
+            );
+        }
+
+        break;
+    }
+
+    case EventType::MouseWheel: {
+
+        dispatchToTarget(
+            hitTest(event.mouse_pos_),
+            event
+        );
+
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
+
+void View::onMouseEvent(const Event& event) {
+    (void)event;
 }
 
 

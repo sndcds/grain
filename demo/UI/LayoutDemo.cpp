@@ -187,7 +187,7 @@ public:
     ~TextWordLayoutView() override;
 
     void drawContent(GraphicContext& gc, const Rectd& dirty_rect) override;
-    void handleMouseEvent(const Event& event) override;
+    void onMouseEvent(const Event& event) override;
 
 protected:
     String text_;
@@ -223,6 +223,7 @@ void TextWordLayoutView::drawContent(
     const Color color2 = {1.0f, 0.2f, 0.6f, 0.6f};
 
     gc.save();
+    gc.clip(bounds());
 
     gc.setFillColor(Color::white());
     gc.fillRect(bounds());
@@ -277,7 +278,7 @@ void TextWordLayoutView::drawContent(
         }
     }
 
-    // Drag handle.
+    // Drag handle
     gc.setFillColor({1.0f, 0.0f, 0.0f, 0.5f});
     gc.fillCircle(rect_.topLeft(), 5.0);
 
@@ -285,8 +286,7 @@ void TextWordLayoutView::drawContent(
 }
 
 
-void TextWordLayoutView::handleMouseEvent(const Event& event) {
-    std::cout << event.mouse_pos_ << std::endl;
+void TextWordLayoutView::onMouseEvent(const Event& event) {
 
     switch (event.type_) {
 
@@ -310,12 +310,11 @@ void TextWordLayoutView::handleMouseEvent(const Event& event) {
             break;
         }
 
-        case EventType::MouseButtonUp: {
+        case EventType::MouseButtonUp:
             drag_mode_ = 0;
             break;
-        }
 
-        case EventType::MouseMove: {
+        case EventType::MouseMove:
             if (drag_mode_ == 1) {
                 rect_.setPosition(
                     event.mouse_pos_ - drag_offset_
@@ -325,7 +324,6 @@ void TextWordLayoutView::handleMouseEvent(const Event& event) {
             }
 
             break;
-        }
 
         default:
             break;
