@@ -7,6 +7,12 @@
 
 namespace Grain {
 
+void Component::invalidate() {
+    if (view_ != nullptr) {
+        view_->requestRedraw(layout_result_.bounds);
+    }
+}
+
 
 bool Component::contains(const Vec2d& point) const {
     const auto& rect = bounds();
@@ -75,17 +81,10 @@ void Component::setNumberMode(bool number_mode) {
 }
 
 
-void Component::invalidate() {
-    if (view_ != nullptr) {
-        view_->requestRedraw(layout_result_.bounds);
-    }
-}
-
-
 void Component::draw(
     GraphicContext& gc,
     const Rectd& dirty_rect
-) {
+    ) {
     // Default component drawing
 }
 
@@ -111,11 +110,11 @@ void Component::layoutPreferredSizing() {
 
     layout_result_.preferred_size.width = std::clamp(
         width, sizing.width.min_value, sizing.width.max_value
-    );
+        );
 
     layout_result_.preferred_size.height = std::clamp(
         height, sizing.height.min_value, sizing.height.max_value
-    );
+        );
 }
 
 
@@ -125,8 +124,7 @@ void Component::layoutGrow() {
 
 
 auto Component::layoutPositioning(const Rectd& bounds)
-    -> LayoutResult&
-{
+    -> LayoutResult& {
     layout_result_.bounds = bounds;
 
     return layout_result_;

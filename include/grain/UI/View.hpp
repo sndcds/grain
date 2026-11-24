@@ -34,6 +34,9 @@ public:
 	auto operator = (View&&) -> View& = delete;
 
 	[[nodiscard]]
+	auto rootView() -> View*;
+
+	[[nodiscard]]
 	auto type() const -> UIElementType override {
 		return UIElementType::View;
 	}

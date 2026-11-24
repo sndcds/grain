@@ -160,7 +160,7 @@ void App::quit() {
 
 void App::processEvent(const Event& event) {
 
-    // Always update global input state first.
+    // Always update global input state first
     impl_->input_.processEvent(event);
 
     switch (event.type_) {
@@ -182,9 +182,7 @@ void App::processEvent(const Event& event) {
         case EventType::WindowFocusLost:
         case EventType::WindowCloseRequested:
         case EventType::WindowWillClose: {
-
             auto* window = getWindowById(event.window_id_);
-
             if (window != nullptr) {
                 window->handleEvent(event);
             }

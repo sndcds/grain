@@ -14,7 +14,7 @@
 namespace Grain {
 class View::Impl {
 public:
-    std::unique_ptr<Platform::View> platformView;
+    std::unique_ptr<Platform::View> platform_view_;
 
     Impl();
     ~Impl();
@@ -33,12 +33,24 @@ View::View()
 View::~View() = default;
 
 
+auto View::rootView() -> View* {
+
+    View* root = this;
+
+    while (root->parent() != nullptr) {
+        root = static_cast<View*>(root->parent());
+    }
+
+    return root;
+}
+
+
 void View::attach() {
-    if (impl_->platformView != nullptr) {
+    if (impl_->platform_view_ != nullptr) {
         return;
     }
 
-    impl_->platformView =
+    impl_->platform_view_ =
         Platform::createView(this);
 }
 
@@ -48,7 +60,7 @@ auto View::platformView() -> Platform::View* {
         return nullptr;
     }
 
-    return impl_->platformView.get();
+    return impl_->platform_view_.get();
 }
 
 
@@ -177,7 +189,7 @@ void View::draw(
 
     Random random;
 
-    gc.setFillColor({random.real(), random.real(), random.real(), 1});
+    gc.setFillColor({.92, .92, .92, 1});
     gc.fillRect(layout_result_.bounds);
 
     drawContent(gc, dirty_rect);
@@ -451,10 +463,11 @@ void View::handleMouseEvent(const Event& event) {
             updateHoveredComponent(component);
 
             if (component != nullptr &&
-                component->handleEvent(event))
-            {
+                component->handleEvent(event)
+            ) {
                 mouse_capture_component_ = component;
                 mouse_capture_button_ = event.mouse_button_;
+                component->handleEvent(event);
             }
 
             break;
@@ -462,18 +475,17 @@ void View::handleMouseEvent(const Event& event) {
 
         case EventType::MouseButtonUp: {
             if (mouse_capture_component_ != nullptr &&
-                mouse_capture_button_ == event.mouse_button_) {
-
+                mouse_capture_button_ == event.mouse_button_
+            ) {
                 Component* component = mouse_capture_component_;
 
                 mouse_capture_component_ = nullptr;
                 mouse_capture_button_ = MouseButton::None;
 
                 component->handleEvent(event);
-                }
+            }
             else {
                 Component* component = hitTest(event.mouse_pos_);
-
                 if (component != nullptr) {
                     component->handleEvent(event);
                 }
@@ -528,29 +540,43 @@ void View::handleEvent(const Event& event) {
 
 
 void View::requestRedraw() {
-    if (impl_->platformView == nullptr) {
+
+    auto* root_view = rootView();
+    if (root_view == nullptr) {
         return;
     }
 
-    impl_->platformView->requestRedraw();
+    auto* platform_view = root_view->platformView();
+    if (platform_view == nullptr) {
+        return;
+    }
+
+    platform_view->requestRedraw();
 }
 
 
 void View::requestRedraw(const Rectd& dirty_rect) {
-    if (impl_->platformView == nullptr) {
+
+    auto* root_view = rootView();
+    if (root_view == nullptr) {
         return;
     }
 
-    impl_->platformView->requestRedraw(dirty_rect);
+    auto* platform_view = root_view->platformView();
+    if (platform_view == nullptr) {
+        return;
+    }
+
+    platform_view->requestRedraw(dirty_rect);
 }
 
 
 auto View::queryMousePos() const -> Vec2d {
-    if (impl_ == nullptr || impl_->platformView == nullptr) {
+    if (impl_ == nullptr || impl_->platform_view_ == nullptr) {
         return {};
     }
 
-    return impl_->platformView->mousePos();
+    return impl_->platform_view_->mousePos();
 }
 
 
