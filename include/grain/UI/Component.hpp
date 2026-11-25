@@ -118,6 +118,8 @@ public:
         return false;
     }
 
+    Grain::Events::Emitter<bool> enabledChanged;
+
 protected:
     void invalidate();
     View* view_ = nullptr;

@@ -24,17 +24,3 @@ target_link_libraries(
         PRIVATE
         Grain
 )
-
-
-# layout_demo
-
-add_executable(
-        layout_demo
-        LayoutDemo.cpp
-)
-
-target_link_libraries(
-        layout_demo
-        PRIVATE
-        Grain
-)

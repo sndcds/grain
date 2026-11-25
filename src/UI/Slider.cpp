@@ -10,9 +10,11 @@
 
 namespace Grain {
 
-Slider::Slider(View* view, double min, double max, double value)
-    : Component(view)
-{
+Slider::Slider(
+    double min,
+    double max,
+    double value
+) {
     setRange(min, max);
     setValue(value);
 }

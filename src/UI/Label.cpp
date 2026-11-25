@@ -42,8 +42,8 @@ void Label::draw(GraphicContext& gc,const Rectd& dirty_rect) {
         return;
     }
 
-    gc.setFillColor({1, 1, 1, 1});
-    gc.fillRect(layout_result_.bounds);
+    // gc.setFillColor({1, 1, 1, 1});
+    // gc.fillRect(layout_result_.bounds);
 
     // TODO: Set text color!
 

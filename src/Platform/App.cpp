@@ -142,19 +142,27 @@ void App::run() {
         return;
     }
 
+    started.emit();
+
     impl_->running_ = true;
     impl_->input_.beginFrame();
+
     impl_->platform_app_->run();
+
     impl_->running_ = false;
+
 }
 
 
 void App::quit() {
+    stopping.emit();
+
     impl_->running_ = false;
 
     if (impl_->platform_app_ != nullptr) {
         impl_->platform_app_->quit();
     }
+
 }
 
 

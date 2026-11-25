@@ -57,6 +57,8 @@
 
 #include "grain/String/String.hpp"
 
+#include "grain/Events/Emitter.hpp"
+
 #include "grain/Input/Event.hpp"
 #include "grain/Input/Input.hpp"
 

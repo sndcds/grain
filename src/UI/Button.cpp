@@ -64,7 +64,8 @@ void Button::setTitle(std::string title) {
     invalidate();
 }
 
-const std::string& Button::title() const noexcept {
+
+auto Button::title() const noexcept -> const std::string& {
     return title_;
 }
 
@@ -75,8 +76,8 @@ void Button::setAction(Action action) {
 
 
 void Button::click() {
-    if (enabled_ && action_) {
-        action_();
+    if (enabled_) {
+        clicked.emit();
     }
 }
 

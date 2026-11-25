@@ -21,7 +21,6 @@ public:
     using ValueChanged = std::function<void(double)>;
 
     explicit Slider(
-        View* view,
         double min = 0.0,
         double max = 1.0,
         double value = 0.0

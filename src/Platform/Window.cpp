@@ -107,7 +107,13 @@ void Window::handleEvent(const Event& event) {
 
     switch (event.type_) {
 
+        case EventType::WindowWillClose: {
+            closing.emit();
+            break;
+        }
+
         case EventType::WindowResize: {
+            resized.emit(contentBounds().width, contentBounds().height);
             updateLayout();
             break;
         }

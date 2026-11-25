@@ -2,7 +2,9 @@
 
 #include <grain/Input/Event.hpp>
 #include <grain/UI/LayoutEngine.hpp>
+#include <grain/Events/Emitter.hpp>
 
+#include <sigslot/signal.hpp>
 
 #include <memory>
 
@@ -27,7 +29,7 @@ class Window;
 //  The portable public/window abstraction.
 //------------------------------------------------------------------------------
 
-class Window {
+class Window : public sigslot::observer_st {
 public:
     Window(const Window&) = delete;
     auto operator = (const Window&) -> Window& = delete;
@@ -50,6 +52,9 @@ public:
     virtual void handleEvent(const Event& event);
 
     void updateLayout();
+
+    Grain::Events::Emitter<> closing;
+    Grain::Events::Emitter<int32_t, int32_t> resized;
 
 private:
     class Impl;

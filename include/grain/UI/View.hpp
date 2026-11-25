@@ -144,6 +144,7 @@ public:
 		return traversePostOrderImpl(*this, visitor);
 	}
 
+	Grain::Events::Emitter<> layoutChanged;
 
 private:
 	class Impl;

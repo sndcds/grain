@@ -1,14 +1,19 @@
-
-#include <Grain.hpp>
+#include "LayoutWindow.hpp"
 
 #include <algorithm>
 #include <cstdint>
+#include <iostream>
+#include <memory>
 #include <string>
 
 using namespace Grain;
 
 
-namespace Grain::Styles {
+//------------------------------------------------------------------------------
+//  Styles
+//------------------------------------------------------------------------------
+
+namespace LayoutStyles {
 
 inline auto create(UIStyles& styles) -> void {
 
@@ -128,7 +133,7 @@ inline auto create(UIStyles& styles) -> void {
     styles.defineComponentStyle("right-label", right_label);
 }
 
-} // namespace Grain::Styles
+} // namespace LayoutStyles
 
 
 //------------------------------------------------------------------------------
@@ -180,6 +185,10 @@ public:
     }
 };
 
+
+//------------------------------------------------------------------------------
+//  TextWordLayoutView
+//------------------------------------------------------------------------------
 
 class TextWordLayoutView : public View {
 public:
@@ -233,14 +242,22 @@ protected:
 };
 
 
+//------------------------------------------------------------------------------
+//  Constructor
+//------------------------------------------------------------------------------
+
 TextWordLayoutView::TextWordLayoutView() {
 
     font_ = std::make_unique<Font>("Geomanist Ultra", 100);
 
     layout_.setFont(font_.get());
-    layout_.setText("The Bubble Exists Straight Behind You\u00A0II");
+    layout_.setText("The Bubble Exists Straight Behind You II");
 }
 
+
+//------------------------------------------------------------------------------
+//  Handles
+//------------------------------------------------------------------------------
 
 auto TextWordLayoutView::topLeftHandle() const -> Vec2d {
     return rect_.topLeft();
@@ -264,6 +281,10 @@ auto TextWordLayoutView::handleContains(
 }
 
 
+//------------------------------------------------------------------------------
+//  Drawing
+//------------------------------------------------------------------------------
+
 void TextWordLayoutView::drawContent(
     GraphicContext& gc,
     const Rectd& dirty_rect
@@ -271,7 +292,7 @@ void TextWordLayoutView::drawContent(
 
     (void)dirty_rect;
 
-    const Color text_color  = {0.05f, 0.0f, 0.35f, 1.0f};
+    const Color text_color   = {0.05f, 0.0f, 0.35f, 1.0f};
     const Color shadow_color = {1.0f, 0.2f, 0.6f, 0.6f};
 
     gc.save();
@@ -304,8 +325,8 @@ void TextWordLayoutView::drawContent(
             }
 
             const Vec2d position{
-                rect_.x + word->x,
-                rect_.y + word->y + line_height
+                std::round(rect_.x + word->x),
+                std::round(rect_.y + word->y)
             };
 
             const String text(word->text);
@@ -337,7 +358,6 @@ void TextWordLayoutView::drawContent(
     gc.setStrokeWidth(1.0);
     gc.strokeRect(rect_);
 
-
     // Draw handles
     const Vec2d top_left = rect_.topLeft();
 
@@ -352,6 +372,7 @@ void TextWordLayoutView::drawContent(
     gc.setFillColor({0.0f, 0.4f, 1.0f, 0.5f});
     gc.fillCircle(bottom_right, 5.0);
 
+    /*
     // Coordinate labels.
     gc.setBlendMode(ColorBlendMode::Normal);
 
@@ -370,10 +391,15 @@ void TextWordLayoutView::drawContent(
         font_.get(),
         Color::black()
     );
+    */
 
     gc.restore();
 }
 
+
+//------------------------------------------------------------------------------
+//  Move rectangle
+//------------------------------------------------------------------------------
 
 void TextWordLayoutView::moveRectangle(const Vec2d& position) {
 
@@ -382,6 +408,10 @@ void TextWordLayoutView::moveRectangle(const Vec2d& position) {
     requestRedraw();
 }
 
+
+//------------------------------------------------------------------------------
+//  Resize rectangle
+//------------------------------------------------------------------------------
 
 void TextWordLayoutView::resizeRectangle(const Vec2d& position) {
 
@@ -403,6 +433,10 @@ void TextWordLayoutView::resizeRectangle(const Vec2d& position) {
     requestRedraw();
 }
 
+
+//------------------------------------------------------------------------------
+//  Mouse events
+//------------------------------------------------------------------------------
 
 void TextWordLayoutView::onMouseEvent(const Event& event) {
 
@@ -470,34 +504,23 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
 
 
 //------------------------------------------------------------------------------
-//  Main
+//  LayoutWindow
 //------------------------------------------------------------------------------
 
-int main() {
+namespace Demo {
 
-    UIStyles styles;
-    Styles::create(styles);
+LayoutWindow::LayoutWindow(App& app) {
 
+    LayoutStyles::create(styles_);
 
-    //--------------------------------------------------------------------------
-    //  Initialize app and window
-    //--------------------------------------------------------------------------
-
-    auto& app = App::instance();
-
-    auto window = app.addWindow(
+    window_ = app.addWindow(
         "layout_demo",
         "Grain Layout Demo",
         {0, 0, 1200, 800}
     );
 
-
-    //--------------------------------------------------------------------------
-    //  Root
-    //--------------------------------------------------------------------------
-
-    auto& root = window->rootView();
-    root.setStyle(styles.viewStyle("root"));
+    auto& root = window_->rootView();
+    root.setStyle(styles_.viewStyle("root"));
 
 
     //--------------------------------------------------------------------------
@@ -505,7 +528,7 @@ int main() {
     //--------------------------------------------------------------------------
 
     auto& content = root.addChild<View>();
-    content.setStyle(styles.viewStyle("content"));
+    content.setStyle(styles_.viewStyle("content"));
 
 
     //--------------------------------------------------------------------------
@@ -513,40 +536,47 @@ int main() {
     //--------------------------------------------------------------------------
 
     auto& left = content.addChild<View>();
-    left.setStyle(styles.viewStyle("left-panel"));
+    left.setStyle(styles_.viewStyle("left-panel"));
 
     Random random;
 
-    for (int32_t i = 1; i <= 30; ++i) {
+    for (int32_t i = 1; i <= 40; ++i) {
 
-        if (random.chance(0.7)) {
+        if (random.chance(0.5)) {
 
             left.addChild<Label>(
                 "Left label " + std::to_string(i)
             ).setStyle(
-                styles.componentStyle("panel-label")
+                styles_.componentStyle("panel-label")
             );
 
         }
-        else if (random.chance(0.3)) {
+        else if (random.chance(0.7)) {
 
             auto& button = left.addChild<Button>(
                 "Left button " + std::to_string(i)
             );
+
             button.setStyle(
-                styles.componentStyle("panel-label")
+                styles_.componentStyle("panel-label")
             );
 
             button.setAction([i]() {
                 std::cout << "Button " << i << " clicked!" << std::endl;
             });
+
+        }
+        else if (random.chance(0.5)) {
+
+            left.addChild<Slider>().setStyle(
+                styles_.componentStyle("panel-label")
+            );
         }
         else {
 
-            left.addChild<TextField>()
-                .setStyle(
-                    styles.componentStyle("panel-label")
-                );
+            left.addChild<TextField>().setStyle(
+                styles_.componentStyle("panel-label")
+            );
         }
     }
 
@@ -558,7 +588,7 @@ int main() {
     auto& drawing_view = content.addChild<TextWordLayoutView>();
 
     drawing_view.setStyle(
-        styles.viewStyle("center-view")
+        styles_.viewStyle("center-view")
     );
 
 
@@ -567,28 +597,28 @@ int main() {
     //--------------------------------------------------------------------------
 
     auto& right = content.addChild<View>();
-    right.setStyle(styles.viewStyle("right-panel"));
+    right.setStyle(styles_.viewStyle("right-panel"));
 
-    right.addChild<Label>("Right")
-        .setStyle(styles.componentStyle("right-label"));
+    right.addChild<Label>("Right").setStyle(
+        styles_.componentStyle("right-label")
+    );
 
 
     //--------------------------------------------------------------------------
     //  Footer
     //--------------------------------------------------------------------------
 
-    root.addChild<Label>("Footer")
-        .setStyle(styles.componentStyle("footer"));
+    root.addChild<Label>("Footer").setStyle(
+        styles_.componentStyle("footer")
+    );
 
 
     //--------------------------------------------------------------------------
-    //  Layout and run
+    //  Layout and show
     //--------------------------------------------------------------------------
 
-    window->updateLayout();
-    window->show();
-
-    app.run();
-
-    return 0;
+    window_->updateLayout();
+    window_->show();
 }
+
+} // namespace Demo

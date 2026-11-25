@@ -600,7 +600,6 @@ static void dispatchToTarget(
 }
 
 
-
 void View::dispatchMouseEvent(const Event& event) {
 
     mouse_pos_ = event.mouse_pos_;
@@ -652,19 +651,24 @@ void View::dispatchMouseEvent(const Event& event) {
                 target->type() == UIElementType::Component
             ) {
                 auto* component = static_cast<Component*>(target);
+
                 if (component->canGetFocus()) {
                     focus_target = component;
                 }
             }
 
-            // Always update focus through the root View.
-            updateFocusedComponent(focus_target);
+            // Change focus only if a focusable component was found.
+            if (focus_target != nullptr) {
+                updateFocusedComponent(focus_target);
+            }
+
             if (target == nullptr) {
                 break;
             }
 
             if (target->type() == UIElementType::Component) {
                 auto* component = static_cast<Component*>(target);
+
                 if (component->handleEvent(event)) {
                     mouse_capture_target_ = target;
                     mouse_capture_button_ = event.mouse_button_;

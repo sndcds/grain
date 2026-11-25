@@ -4,6 +4,9 @@
 #include <grain/Input/Input.hpp>
 #include <grain/Platform/Window.hpp>
 #include <grain/Geometry/Rect.hpp>
+#include <grain/Events/Emitter.hpp>
+
+#include <sigslot/signal.hpp>
 
 #include <memory>
 #include <string>
@@ -11,7 +14,7 @@
 
 namespace Grain {
 
-class App {
+class App : public sigslot::observer_st {
 public:
     static auto instance() -> App&;
 
@@ -23,6 +26,13 @@ public:
 
     auto setIcon(const std::string& path) -> bool;
 
+
+    //--------------------------------------------------------------------------
+    //  Emitters
+    //--------------------------------------------------------------------------
+
+    Grain::Events::Emitter<> started;
+    Grain::Events::Emitter<> stopping;
 
     //--------------------------------------------------------------------------
     //  Window

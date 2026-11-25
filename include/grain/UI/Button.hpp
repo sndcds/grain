@@ -27,6 +27,8 @@ public:
 
     void layoutSizing() override;
 
+    Grain::Events::Emitter<> clicked;
+
 private:
     std::string title_;
     Action action_;

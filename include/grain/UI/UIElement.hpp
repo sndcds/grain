@@ -3,8 +3,11 @@
 #include <grain/Graphics/GraphicContext.hpp>
 #include <grain/Input/Event.hpp>
 #include <grain/UI/LayoutResult.hpp>
+#include <grain/UI/LayoutStyle.hpp>
+#include <grain/Events/Emitter.hpp>
 
-#include "LayoutStyle.hpp"
+#include <sigslot/signal.hpp>
+
 
 
 namespace Grain {
@@ -19,7 +22,7 @@ enum class UIElementType : uint8_t {
     Component
 };
 
-class UIElement {
+class UIElement : public sigslot::observer_st {
 public:
     UIElement() = default;
     UIElement(const UIElement&) = delete;
@@ -50,6 +53,9 @@ public:
     virtual auto layoutPositioning(const Rectd& bounds) -> LayoutResult& = 0;
 
     virtual auto element() -> LayoutElementStyle = 0;
+
+    Grain::Events::Emitter<> focusGained;
+    Grain::Events::Emitter<> focusLost;
 
 protected:
     UIElement* parent_ = nullptr;
