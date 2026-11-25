@@ -37,6 +37,9 @@ public:
 	auto rootView() -> View*;
 
 	[[nodiscard]]
+	auto rootView() const -> const View*;
+
+	[[nodiscard]]
 	auto type() const -> UIElementType override {
 		return UIElementType::View;
 	}
@@ -124,9 +127,7 @@ public:
 	virtual void handleEvent(const Event& event);
 
 	[[nodiscard]]
-	auto mousePos() -> Vec2d {
-		return queryMousePos();
-	}
+	auto mousePos() -> Vec2d;
 
 	template <typename Visitor>
 	auto traverse(Visitor&& visitor) -> bool {
@@ -213,6 +214,8 @@ private:
 
     [[nodiscard]]
     auto platformView() -> Platform::View*;
+
+	void focusNextComponent(bool reverse = false);
 
     void updateHoveredComponent(Component* component);
     void updateFocusedComponent(Component* component);

@@ -14,11 +14,12 @@ namespace Grain {
 
         text_ = "Hello World!";
         // setMouseCursor(App::MouseCursor::IBeam); TODO: !!!!
+
+        setCanGetFocus(true);
     }
 
     TextField::~TextField() {
     }
-
 
 
     void TextField::draw(
@@ -234,6 +235,17 @@ namespace Grain {
 
         gc.setFillColor(color);
         gc.fillRect(rect);
+    }
+
+
+    void TextField::onFocusChanged(bool focused) {
+
+        if (focused) {
+            becomeFirstResponder();
+        }
+        else {
+            resignFirstResponder();
+        }
     }
 
 
@@ -602,7 +614,7 @@ namespace Grain {
                 _handleCommandShortcut(event.character_);
             }
             else {
-                const auto key = static_cast<KeyCode>(event.character_);
+                const auto key = event.key_;
 
                 if (!_handleEditingKey(event, key, new_cursor_index)) {
                     _handleTextInput(event);
@@ -743,8 +755,11 @@ namespace Grain {
             return;
         }
 
-        // TODO: Implement text input using the platform text-input system.
-        // macOS should eventually use NSTextInputClient integration.
+        if (!editable_ || event.text_.empty()) {
+            return;
+        }
+
+        insertText(event.text_.c_str());
     }
 
 

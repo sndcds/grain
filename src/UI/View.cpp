@@ -35,13 +35,25 @@ View::~View() = default;
 
 auto View::rootView() -> View* {
 
-    View* root = this;
+    View* view = this;
 
-    while (root->parent() != nullptr) {
-        root = static_cast<View*>(root->parent());
+    while (view->parent() != nullptr) {
+        view = static_cast<View*>(view->parent());
     }
 
-    return root;
+    return view;
+}
+
+
+auto View::rootView() const -> const View* {
+
+    const View* view = this;
+
+    while (view->parentView() != nullptr) {
+        view = view->parentView();
+    }
+
+    return view;
 }
 
 
@@ -61,6 +73,71 @@ auto View::platformView() -> Platform::View* {
     }
 
     return impl_->platform_view_.get();
+}
+
+
+void View::focusNextComponent(bool reverse) {
+
+    auto* root = rootView();
+
+    std::vector<Component*> candidates;
+
+    // Collect all focusable components in hierarchy order.
+    root->traverse([&](UIElement& element) {
+
+        if (element.type() != UIElementType::Component) {
+            return true;
+        }
+
+        auto* component =
+            static_cast<Component*>(&element);
+
+        if (component->canGetFocus()) {
+            candidates.push_back(component);
+        }
+
+        return true;
+    });
+
+    if (candidates.empty()) {
+        root->updateFocusedComponent(nullptr);
+        return;
+    }
+
+    auto it = std::find(
+        candidates.begin(),
+        candidates.end(),
+        root->focused_component_
+    );
+
+    std::size_t next_index = 0;
+
+    if (it == candidates.end()) {
+        // No current focus: start at the appropriate end.
+        next_index = reverse
+            ? candidates.size() - 1
+            : 0;
+    }
+    else {
+        const auto current_index =
+            static_cast<std::size_t>(
+                std::distance(candidates.begin(), it)
+            );
+
+        if (reverse) {
+            next_index = current_index == 0
+                ? candidates.size() - 1
+                : current_index - 1;
+        }
+        else {
+            next_index = (current_index + 1)
+                % candidates.size();
+        }
+    }
+
+    root->updateFocusedComponent(
+        candidates[next_index]
+    );
 }
 
 
@@ -185,20 +262,45 @@ void View::draw(
     GraphicContext& gc,
     const Rectd& dirty_rect
 ) {
-    auto rect = dirty_rect;
-    if (rect.y < 0) {
-        rect.height += rect.y;
-        rect.y = 0;
+    const Rectd view_bounds = bounds();
+
+    // Only draw the part that is both dirty and inside this View.
+    const Rectd clipped_dirty =
+        view_bounds.intersection(dirty_rect);
+
+    if (!clipped_dirty.isValid()) {
+        return;
     }
 
     gc.save();
-    gc.clip(rect);
 
+    // This clip remains active for the View and all its descendants.
+    gc.clip(view_bounds);
+    gc.clip(clipped_dirty);
+
+    // Draw the background in global coordinates.
     gc.setFillColor({.92, .92, .92, 1});
-    gc.fillRect(layout_result_.bounds);
+    gc.fillRect(view_bounds);
 
-    drawContent(gc, dirty_rect);
-    drawChildren(gc, dirty_rect);
+    // Switch to local coordinates for this View's own content.
+    gc.save();
+
+    gc.translate(view_bounds.x, view_bounds.y);
+
+    const Rectd local_dirty_rect{
+        clipped_dirty.x - view_bounds.x,
+        clipped_dirty.y - view_bounds.y,
+        clipped_dirty.width,
+        clipped_dirty.height
+    };
+
+    drawContent(gc, local_dirty_rect);
+
+    gc.restore();
+
+    // Children still use global coordinates.
+    // The View's clipping region is still active.
+    drawChildren(gc, clipped_dirty);
 
     gc.restore();
 }
@@ -455,21 +557,31 @@ static void dispatchToTarget(
 
     switch (target->type()) {
 
-    case UIElementType::Component: {
-        auto* component =
-            static_cast<Component*>(target);
+        case UIElementType::Component: {
+            auto* component =
+                static_cast<Component*>(target);
 
-        component->handleEvent(event);
-        break;
-    }
+            component->handleEvent(event);
+            break;
+        }
 
-    case UIElementType::View: {
-        auto* view =
-            static_cast<View*>(target);
+        case UIElementType::View: {
+            auto* view =
+                static_cast<View*>(target);
 
-        view->onMouseEvent(event);
-        break;
-    }
+            Event local_event = event;
+
+            const auto& bounds = view->bounds();
+
+            local_event.mouse_pos_ = {
+                event.mouse_pos_.x - bounds.x,
+                event.mouse_pos_.y - bounds.y
+            };
+
+            view->onMouseEvent(local_event);
+
+            break;
+        }
     }
 }
 
@@ -530,7 +642,10 @@ void View::dispatchMouseEvent(const Event& event) {
                 auto* component =
                     static_cast<Component*>(target);
 
-                // A true return value requests mouse capture.
+                updateFocusedComponent(
+                    component->canGetFocus() ? component : nullptr
+                );
+
                 if (component->handleEvent(event)) {
                     mouse_capture_target_ = target;
                     mouse_capture_button_ = event.mouse_button_;
@@ -596,16 +711,47 @@ void View::onMouseEvent(const Event& event) {
 
 
 void View::handleKeyEvent(const Event& event) {
-    switch (event.type_) {
-        case EventType::KeyDown: {
-            if (focused_component_ != nullptr) {
-            }
-            break;
-        }
 
-        default:
-            break;
+    auto* root = rootView();
+
+    // Focus is owned by the root View.
+    if (root != this) {
+        root->handleKeyEvent(event);
+        return;
     }
+
+    if (event.type_ == EventType::KeyDown) {
+
+        if (event.key_ == KeyCode::Tab) {
+
+            // Let modified Tab combinations pass through.
+            if (!event.hasKeyModifier(KeyModifiers::Control) &&
+                !event.hasKeyModifier(KeyModifiers::Alt) &&
+                !event.hasKeyModifier(KeyModifiers::Super) &&
+                !event.hasKeyModifier(KeyModifiers::Command)) {
+
+                focusNextComponent(
+                    event.hasKeyModifier(KeyModifiers::Shift)
+                );
+
+                return;
+                }
+        }
+    }
+
+    // Dispatch keyboard events to the focused component.
+    auto* component = focused_component_;
+
+    if (component == nullptr) {
+        return;
+    }
+
+    if (!component->canGetFocus()) {
+        updateFocusedComponent(nullptr);
+        return;
+    }
+
+    component->handleEvent(event);
 }
 
 
@@ -620,6 +766,19 @@ void View::handleEvent(const Event& event) {
             break;
         }
     }
+}
+
+
+auto View::mousePos() -> Vec2d {
+
+    Vec2d pos = queryMousePos();
+
+    const auto& b = bounds();
+
+    return {
+        pos.x - b.x,
+        pos.y - b.y
+    };
 }
 
 
@@ -656,12 +815,16 @@ void View::requestRedraw(const Rectd& dirty_rect) {
 
 
 auto View::queryMousePos() const -> Vec2d {
-    if (impl_ == nullptr || impl_->platform_view_ == nullptr) {
+
+    auto* root = rootView();
+
+    if (root == nullptr ||
+        root->impl_ == nullptr ||
+        root->impl_->platform_view_ == nullptr) {
         return {};
-    }
+        }
 
-    return impl_->platform_view_->mousePos();
+    return root->impl_->platform_view_->mousePos();
 }
-
 
 } // namespace Grain

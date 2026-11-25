@@ -42,10 +42,20 @@ void Component::setHovered(bool hovered) {
 
 
 void Component::setFocused(bool focused) {
-    if (focused_ != focused) {
-        focused_ = focused;
-        invalidate();
+
+    if (focused_ == focused) {
+        return;
     }
+
+    focused_ = focused;
+    invalidate();
+
+    onFocusChanged(focused);
+}
+
+
+void Component::onFocusChanged(bool focused) {
+    (void)focused;
 }
 
 

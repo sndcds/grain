@@ -61,8 +61,16 @@ public:
     void setHovered(bool hovered);
 
     [[nodiscard]]
+    auto canGetFocus() const -> bool {
+        return can_get_focus_ && enabled_ && visible_;
+    }
+    void setCanGetFocus(bool can_get_focus) {
+        can_get_focus_ = can_get_focus;
+    }
+
+    [[nodiscard]]
     auto focused() const -> bool { return focused_; }
-    void setFocused(bool hovered);
+    void setFocused(bool focused);
 
     [[nodiscard]]
     auto pressed() const -> bool { return pressed_; }
@@ -124,6 +132,8 @@ protected:
     bool visible_ = true;
     bool editable_ = false;
     bool number_mode_ = false;
+
+    virtual void onFocusChanged(bool focused);
 };
 
 }

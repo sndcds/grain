@@ -264,7 +264,6 @@ auto TextWordLayoutView::handleContains(
 }
 
 
-
 void TextWordLayoutView::drawContent(
     GraphicContext& gc,
     const Rectd& dirty_rect
@@ -276,16 +275,12 @@ void TextWordLayoutView::drawContent(
     const Color shadow_color = {1.0f, 0.2f, 0.6f, 0.6f};
 
     gc.save();
-    gc.clip(bounds());
 
     // Background
     gc.setFillColor(Color::white());
-    gc.fillRect(bounds());
+    gc.fillRect({0, 0, bounds().width, bounds().height});
 
-    gc.translate(bounds().x, bounds().y);
-
-
-    // Text layout.
+    // Text layout
     layout_.layout(rect_.width, rect_.height);
 
     const auto& result = layout_.result();
@@ -325,13 +320,15 @@ void TextWordLayoutView::drawContent(
             );
 
             // Main text.
-            gc.setBlendMode(ColorBlendMode::Normal);
+            gc.setBlendMode(ColorBlendMode::Multiply);
             gc.drawText(
                 text,
                 position,
                 font_.get(),
                 text_color
             );
+
+            gc.setBlendMode(ColorBlendMode::Normal);
         }
     }
 

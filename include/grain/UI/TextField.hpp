@@ -53,6 +53,8 @@ public:
 
     void drawCursor(GraphicContext& gc, float x) const;
 
+    void onFocusChanged(bool focused) override;
+
     [[nodiscard]] virtual auto beamWidth() const -> float {
         return beam_width_;
     }

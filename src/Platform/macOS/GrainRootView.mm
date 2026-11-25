@@ -378,7 +378,7 @@ static auto mouseButtonFromEvent(NSEvent* event) -> MouseButton {
     }
 
     if (event_handler_) {
-        event_handler_(grain_event);
+        grain_view_->handleKeyEvent(grain_event);
     }
 }
 
