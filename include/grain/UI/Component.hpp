@@ -68,6 +68,8 @@ public:
         can_get_focus_ = can_get_focus;
     }
 
+    virtual void onFocusChanged(bool focused) {}
+
     [[nodiscard]]
     auto focused() const -> bool { return focused_; }
     void setFocused(bool focused);
@@ -132,8 +134,6 @@ protected:
     bool visible_ = true;
     bool editable_ = false;
     bool number_mode_ = false;
-
-    virtual void onFocusChanged(bool focused);
 };
 
 }

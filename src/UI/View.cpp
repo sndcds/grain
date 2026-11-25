@@ -80,6 +80,11 @@ void View::focusNextComponent(bool reverse) {
 
     auto* root = rootView();
 
+    if (root != this) {
+        root->focusNextComponent(reverse);
+        return;
+    }
+
     std::vector<Component*> candidates;
 
     // Collect all focusable components in hierarchy order.
@@ -159,6 +164,15 @@ void View::updateHoveredComponent(Component* component) {
 
 
 void View::updateFocusedComponent(Component* component) {
+
+    auto* root = rootView();
+
+    // Only the root View owns focus.
+    if (root != this) {
+        root->updateFocusedComponent(component);
+        return;
+    }
+
     if (focused_component_ == component) {
         return;
     }
@@ -630,29 +644,33 @@ void View::dispatchMouseEvent(const Event& event) {
 
         case EventType::MouseButtonDown: {
 
-            UIElement* target =
-                update_hover(event.mouse_pos_);
+            UIElement* target = update_hover(event.mouse_pos_);
 
+            Component* focus_target = nullptr;
+
+            if (target != nullptr &&
+                target->type() == UIElementType::Component
+            ) {
+                auto* component = static_cast<Component*>(target);
+                if (component->canGetFocus()) {
+                    focus_target = component;
+                }
+            }
+
+            // Always update focus through the root View.
+            updateFocusedComponent(focus_target);
             if (target == nullptr) {
                 break;
             }
 
             if (target->type() == UIElementType::Component) {
-
-                auto* component =
-                    static_cast<Component*>(target);
-
-                updateFocusedComponent(
-                    component->canGetFocus() ? component : nullptr
-                );
-
+                auto* component = static_cast<Component*>(target);
                 if (component->handleEvent(event)) {
                     mouse_capture_target_ = target;
                     mouse_capture_button_ = event.mouse_button_;
                 }
             }
             else {
-
                 dispatchToTarget(target, event);
 
                 mouse_capture_target_ = target;
@@ -714,32 +732,27 @@ void View::handleKeyEvent(const Event& event) {
 
     auto* root = rootView();
 
-    // Focus is owned by the root View.
     if (root != this) {
         root->handleKeyEvent(event);
         return;
     }
 
-    if (event.type_ == EventType::KeyDown) {
+    if (event.type_ == EventType::KeyDown &&
+        event.key_ == KeyCode::Tab
+    ) {
+        if (!event.hasKeyModifier(KeyModifiers::Control) &&
+            !event.hasKeyModifier(KeyModifiers::Alt) &&
+            !event.hasKeyModifier(KeyModifiers::Super) &&
+            !event.hasKeyModifier(KeyModifiers::Command)
+        ) {
+            focusNextComponent(
+                event.hasKeyModifier(KeyModifiers::Shift)
+            );
 
-        if (event.key_ == KeyCode::Tab) {
-
-            // Let modified Tab combinations pass through.
-            if (!event.hasKeyModifier(KeyModifiers::Control) &&
-                !event.hasKeyModifier(KeyModifiers::Alt) &&
-                !event.hasKeyModifier(KeyModifiers::Super) &&
-                !event.hasKeyModifier(KeyModifiers::Command)) {
-
-                focusNextComponent(
-                    event.hasKeyModifier(KeyModifiers::Shift)
-                );
-
-                return;
-                }
+            return;
         }
     }
 
-    // Dispatch keyboard events to the focused component.
     auto* component = focused_component_;
 
     if (component == nullptr) {
@@ -756,15 +769,17 @@ void View::handleKeyEvent(const Event& event) {
 
 
 void View::handleEvent(const Event& event) {
-    switch (event.type_) {
-        default: {
-            if (focused_component_ != nullptr &&
-                focused_component_->visible() &&
-                focused_component_->enabled()) {
-                focused_component_->handleEvent(event);
-                }
-            break;
-        }
+
+    auto* root = rootView();
+    if (root != this) {
+        root->handleEvent(event);
+        return;
+    }
+
+    if (focused_component_ != nullptr &&
+        focused_component_->canGetFocus()
+    ) {
+        focused_component_->handleEvent(event);
     }
 }
 

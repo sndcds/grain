@@ -48,14 +48,10 @@ void Component::setFocused(bool focused) {
     }
 
     focused_ = focused;
-    invalidate();
 
     onFocusChanged(focused);
-}
 
-
-void Component::onFocusChanged(bool focused) {
-    (void)focused;
+    invalidate();
 }
 
 

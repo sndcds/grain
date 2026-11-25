@@ -215,6 +215,15 @@ private:
     [[nodiscard]]
     auto platformView() -> Platform::View*;
 
+	[[nodiscard]]
+	auto focusedComponent() const -> Component* {
+		return rootView()->focused_component_;
+	}
+
+	void setFocusedComponent(Component* component) {
+		rootView()->updateFocusedComponent(component);
+	}
+
 	void focusNextComponent(bool reverse = false);
 
     void updateHoveredComponent(Component* component);
