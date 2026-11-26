@@ -94,6 +94,7 @@ if(GRAIN_BUILD_TESTS)
 
 endif()
 
+
 CPMAddPackage("gh:palacaze/sigslot@1.2.3")
 
 find_package(libpqxx CONFIG REQUIRED)
@@ -565,6 +566,7 @@ target_link_libraries(
         Grain
         PUBLIC
         pqxx
+        Pal::Sigslot
 )
 
 target_link_libraries(
@@ -577,7 +579,6 @@ target_link_libraries(
         PkgConfig::WEBP
         PkgConfig::FFMPEG
         PkgConfig::LUA
-        Pal::Sigslot
 )
 
 

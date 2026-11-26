@@ -196,9 +196,6 @@ int main() {
             // slider.setTrackColor(Color{random.real(), random.real(), random.real(), 1.0f});
             // slider.setIndicatorColor(Color{random.real(), random.real(), random.real(), 1.0f});
             // slider.setHandleColor(Color{random.real(), random.real(), random.real(), 1.0f});
-
-            slider.setAction([](double value) -> void {
-            });
         }
 
         std::cout << "Component count: " << view->componentCount() << '\n';

@@ -11,8 +11,6 @@ namespace Grain {
 
 class Button : public Component {
 public:
-    using Action = std::function<void()>;
-
     explicit Button(std::string title = {});
 
     void draw(GraphicContext& gc, const Rectd& dirty_rect) override;
@@ -20,7 +18,6 @@ public:
     void setTitle(std::string title);
     [[nodiscard]] auto title() const noexcept -> const std::string&;
 
-    void setAction(Action action);
     void click();
 
     auto handleEvent(const Event& event) -> bool override;
@@ -31,7 +28,6 @@ public:
 
 private:
     std::string title_;
-    Action action_;
 };
 
 }

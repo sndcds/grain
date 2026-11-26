@@ -37,7 +37,7 @@ public:
     }
 
     [[nodiscard]]
-    auto slotCount() const {
+    auto slotCount() {
         return signal_.slot_count();
     }
 

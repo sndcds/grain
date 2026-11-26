@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 using namespace Grain;
 
@@ -203,6 +204,14 @@ public:
 
     void onMouseEvent(const Event& event) override;
 
+	void onButtonClicked();
+
+	void setTextWidth(double width) {
+		std::cout << width << std::endl;
+	    rect_.width = std::max(min_width_, width);
+    	requestRedraw();
+	}
+
 protected:
 
     enum class DragMode : uint8_t {
@@ -221,6 +230,8 @@ protected:
     TextWordLayout layout_;
 
     Rectd rect_ = {20, 20, 640, 480};
+
+	std::uint32_t click_count_ = 0;
 
     DragMode drag_mode_ = DragMode::None;
     Vec2d drag_offset_{};
@@ -503,6 +514,19 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
 }
 
 
+void TextWordLayoutView::onButtonClicked() {
+
+    ++click_count_;
+
+    const std::string message =
+        "Button clicks received: " + std::to_string(click_count_);
+
+    layout_.setText(message.c_str());
+
+    requestRedraw();
+}
+
+
 //------------------------------------------------------------------------------
 //  LayoutWindow
 //------------------------------------------------------------------------------
@@ -522,9 +546,8 @@ LayoutWindow::LayoutWindow(App& app) {
     auto& root = window_->rootView();
     root.setStyle(styles_.viewStyle("root"));
 
-
     //--------------------------------------------------------------------------
-    //  Content row
+	//  Content Row
     //--------------------------------------------------------------------------
 
     auto& content = root.addChild<View>();
@@ -532,15 +555,18 @@ LayoutWindow::LayoutWindow(App& app) {
 
 
     //--------------------------------------------------------------------------
-    //  Left panel
+	//  Left panel
     //--------------------------------------------------------------------------
 
     auto& left = content.addChild<View>();
     left.setStyle(styles_.viewStyle("left-panel"));
 
+    std::vector<Button*> buttons;
+
     Random random;
 
-    for (int32_t i = 1; i <= 40; ++i) {
+    // Create the left-panel controls.
+    for (int32_t i = 1; i <= 30; ++i) {
 
         if (random.chance(0.5)) {
 
@@ -550,29 +576,25 @@ LayoutWindow::LayoutWindow(App& app) {
                 styles_.componentStyle("panel-label")
             );
 
-        }
-        else if (random.chance(0.7)) {
+        } else if (random.chance(0.7)) {
 
             auto& button = left.addChild<Button>(
                 "Left button " + std::to_string(i)
             );
 
+            buttons.push_back(&button);
+
             button.setStyle(
                 styles_.componentStyle("panel-label")
             );
 
-            button.setAction([i]() {
-                std::cout << "Button " << i << " clicked!" << std::endl;
-            });
-
-        }
-        else if (random.chance(0.5)) {
+        } else if (random.chance(0.5)) {
 
             left.addChild<Slider>().setStyle(
                 styles_.componentStyle("panel-label")
             );
-        }
-        else {
+
+        } else {
 
             left.addChild<TextField>().setStyle(
                 styles_.componentStyle("panel-label")
@@ -580,20 +602,39 @@ LayoutWindow::LayoutWindow(App& app) {
         }
     }
 
-
-    //--------------------------------------------------------------------------
-    //  Center
-    //--------------------------------------------------------------------------
-
-    auto& drawing_view = content.addChild<TextWordLayoutView>();
-
-    drawing_view.setStyle(
-        styles_.viewStyle("center-view")
+    // Dedicated slider for controlling the text layout width.
+	// auto& width_slider = left.addChild<Slider>(80.0, 640.0, 640.0);
+	auto& width_slider = left.addChild<Slider>(80.0, 640.0, 640.0);
+    width_slider.setStyle(
+        styles_.componentStyle("panel-label")
     );
 
 
     //--------------------------------------------------------------------------
-    //  Right panel
+	//  Center view
+    //--------------------------------------------------------------------------
+
+    auto& drawing_view = content.addChild<TextWordLayoutView>();
+    drawing_view.setStyle(
+        styles_.viewStyle("center-view")
+    );
+
+    width_slider.valueChanged.connect(
+        &TextWordLayoutView::setTextWidth,
+        &drawing_view
+    );
+
+    // Connect all buttons to the drawing view.
+    for (auto* button : buttons) {
+        button->clicked.connect(
+            &TextWordLayoutView::onButtonClicked,
+            &drawing_view
+        );
+    }
+
+
+    //--------------------------------------------------------------------------
+	//  Right panel
     //--------------------------------------------------------------------------
 
     auto& right = content.addChild<View>();
@@ -605,7 +646,7 @@ LayoutWindow::LayoutWindow(App& app) {
 
 
     //--------------------------------------------------------------------------
-    //  Footer
+	//  Footer
     //--------------------------------------------------------------------------
 
     root.addChild<Label>("Footer").setStyle(
@@ -614,7 +655,7 @@ LayoutWindow::LayoutWindow(App& app) {
 
 
     //--------------------------------------------------------------------------
-    //  Layout and show
+	//  Layout and show
     //--------------------------------------------------------------------------
 
     window_->updateLayout();

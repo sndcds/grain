@@ -153,6 +153,7 @@ void Slider::setRange(double min, double max) {
     invalidate();
 }
 
+
 void Slider::setValue(double value) {
     const double new_value = clampValue(value);
 
@@ -162,7 +163,10 @@ void Slider::setValue(double value) {
 
     value_ = new_value;
     invalidate();
+
+    valueChanged.emit(value_);
 }
+
 
 void Slider::setStep(double step) {
     step_ = std::isfinite(step)
@@ -171,6 +175,7 @@ void Slider::setStep(double step) {
 
     setValue(value_);
 }
+
 
 void Slider::setOrientation(Orientation orientation) {
     if (orientation_ == orientation) {
@@ -237,10 +242,6 @@ void Slider::setHandleSize(const Sized& handle_size) {
 void Slider::setIndicatorColor(const Color& color) {
     indicator_color_ = color;
     invalidate();
-}
-
-void Slider::setAction(ValueChanged action) {
-    action_ = std::move(action);
 }
 
 auto Slider::normalizedValue() const -> double {
@@ -480,18 +481,7 @@ auto Slider::valueFromPosition(const Vec2d& position) const -> double {
 }
 
 void Slider::updateValueFromPosition(const Vec2d& position) {
-    const double new_value = clampValue(valueFromPosition(position));
-
-    if (value_ == new_value) {
-        return;
-    }
-
-    value_ = new_value;
-    invalidate();
-
-    if (action_) {
-        action_(value_);
-    }
+    setValue(valueFromPosition(position));
 }
 
 }

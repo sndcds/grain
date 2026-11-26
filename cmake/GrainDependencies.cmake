@@ -3,11 +3,16 @@
 # Dependencies
 #--------------------------------------------------------------------------#
 
+include("${CMAKE_CURRENT_LIST_DIR}/CPM.cmake")
+CPMAddPackage("gh:palacaze/sigslot@1.2.3")
+
 find_package(libpqxx CONFIG REQUIRED)
 find_package(CURL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
+
 pkg_check_modules(LUA REQUIRED IMPORTED_TARGET lua)
+
 
 #--------------------------------------------------------------------------
 # WebP
@@ -117,10 +122,10 @@ add_library(Grain STATIC IMPORTED GLOBAL)
 
 set_target_properties(Grain PROPERTIES
         IMPORTED_LOCATION
-        "${CMAKE_CURRENT_LIST_DIR}/../build-release/libGrain.a"
+            "${CMAKE_CURRENT_LIST_DIR}/../build-release/libGrain.a"
 
         INTERFACE_INCLUDE_DIRECTORIES
-        "${CMAKE_CURRENT_LIST_DIR}/../include"
+            "${CMAKE_CURRENT_LIST_DIR}/../include"
 )
 
 target_compile_features(Grain INTERFACE cxx_std_23)
@@ -133,6 +138,7 @@ target_link_libraries(Grain INTERFACE
         WebP::WebP
         FFmpeg
         PkgConfig::LUA
+        Pal::Sigslot
 
         "-framework AppKit"
         "-framework CoreGraphics"

@@ -4,7 +4,7 @@
 #include <cmath>
 #include <type_traits>
 
-#include "grain/Geometry/Layout.hpp"
+#include <grain/Geometry/Geometry.hpp>
 #include "grain/Geometry/Rect.hpp"
 #include "../Math/Vec2.hpp"
 

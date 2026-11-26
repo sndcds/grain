@@ -70,15 +70,13 @@ auto Button::title() const noexcept -> const std::string& {
 }
 
 
-void Button::setAction(Action action) {
-    action_ = std::move(action);
-}
-
-
 void Button::click() {
-    if (enabled_) {
-        clicked.emit();
+
+    if (!enabled_) {
+        return;
     }
+
+    clicked.emit();
 }
 
 

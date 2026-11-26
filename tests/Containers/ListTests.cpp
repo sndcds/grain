@@ -5,7 +5,7 @@
 #include <string>
 #include <utility>
 
-#include <grain/Containers/List.hpp>
+#include <grain/Container/List.hpp>
 
 namespace Grain::Tests {
 

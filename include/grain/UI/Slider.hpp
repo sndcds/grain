@@ -6,6 +6,8 @@
 #include <grain/Geometry/Size.hpp>
 #include <grain/Color/Color.hpp>
 
+#include <grain/Events/Emitter.hpp>
+
 #include <cstdint>
 #include <functional>
 
@@ -17,8 +19,6 @@ public:
         Horizontal,
         Vertical
     };
-
-    using ValueChanged = std::function<void(double)>;
 
     explicit Slider(
         double min = 0.0,
@@ -53,8 +53,6 @@ public:
 
     void setIndicatorColor(const Color& color);
 
-    void setAction(ValueChanged action);
-
     [[nodiscard]] auto min() const -> double {
         return min_;
     }
@@ -74,6 +72,8 @@ public:
     [[nodiscard]] auto normalizedValue() const -> double;
 
     [[nodiscard]] auto orientation() const -> Orientation;
+
+    Grain::Events::Emitter<double> valueChanged;
 
 private:
     [[nodiscard]] auto clampValue(double value) const -> double;
@@ -113,8 +113,6 @@ private:
     Color track_color_ = {0.5f, 0.5f, 0.5f, 0.5f};
     Color indicator_color_ = {0.2f, 0.5f, 1.0f, 1.0f};
     Color handle_color_ = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    ValueChanged action_;
 };
 
 }
