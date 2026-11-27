@@ -260,6 +260,15 @@ void CocoaWindow::setEventHandler(EventHandler event_handler) {
 }
 
 
+auto CocoaWindow::nativeWindow() const -> void* {
+    if (impl_ == nullptr || impl_->window_ == nil) {
+        return nullptr;
+    }
+
+    return static_cast<void*>(impl_->window_);
+}
+
+
 void CocoaWindow::emitEvent(const Event& source_event) {
     if (!impl_ || !impl_->event_handler) {
         return;

@@ -50,8 +50,16 @@ auto Window::rootView() const -> const View& {
 }
 
 
+auto Window::platformWindow() -> Platform::Window* {
+    if (impl_ == nullptr) {
+        return nullptr;
+    }
+
+    return impl_->platform_window_.get();
+}
+
 auto Window::contentBounds() const -> Rectd {
-    if (!impl_ || !impl_->platform_window_) {
+    if (impl_ == nullptr || impl_->platform_window_ == nullptr) {
         return {};
     }
 
@@ -101,7 +109,7 @@ void Window::setRootView(std::unique_ptr<View> view) {
 
 void Window::handleEvent(const Event& event) {
 
-    if (!impl_ || !impl_->root_view_) {
+    if (impl_ == nullptr || impl_->root_view_ == nullptr) {
         return;
     }
 

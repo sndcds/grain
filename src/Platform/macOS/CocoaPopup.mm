@@ -1,0 +1,244 @@
+#import <AppKit/AppKit.h>
+
+#include "CocoaPopup.hpp"
+#include "CocoaWindow.hpp"
+
+namespace Grain::Platform {
+
+class CocoaPopup::Impl {
+public:
+    NSPanel* panel_ = nil;
+    NSWindow* parent_ = nil;
+    NSView* content_view_ = nil;
+
+    Rectd anchor_;
+    Sized size_;
+    PopupOptions options_;
+
+    void updatePosition() {
+        if (panel_ == nil || parent_ == nil ||
+            parent_.contentView == nil) {
+            return;
+        }
+
+        const NSRect anchor_rect = NSMakeRect(
+            anchor_.x,
+            anchor_.y,
+            anchor_.width,
+            anchor_.height
+        );
+
+        const NSRect window_anchor =
+            [parent_.contentView convertRect:anchor_rect toView:nil];
+
+        const NSRect screen_anchor =
+            [parent_ convertRectToScreen:window_anchor];
+
+        const CGFloat width = size_.width;
+        const CGFloat height = size_.height;
+
+        CGFloat x = 0.0;
+        CGFloat y = 0.0;
+
+        switch (options_.placement) {
+            case PopupPlacement::Below:
+            case PopupPlacement::Above:
+                switch (options_.alignment) {
+                    case PopupAlignment::Start:
+                        x = NSMinX(screen_anchor);
+                        break;
+                    case PopupAlignment::Center:
+                        x = NSMidX(screen_anchor) - width / 2.0;
+                        break;
+                    case PopupAlignment::End:
+                        x = NSMaxX(screen_anchor) - width;
+                        break;
+                }
+
+                if (options_.placement == PopupPlacement::Below) {
+                    y = NSMinY(screen_anchor) - height
+                        - options_.offset_y;
+                }
+                else {
+                    y = NSMaxY(screen_anchor) + options_.offset_y;
+                }
+
+                x += options_.offset_x;
+                break;
+
+            case PopupPlacement::Right:
+            case PopupPlacement::Left:
+                switch (options_.alignment) {
+                    case PopupAlignment::Start:
+                        y = NSMaxY(screen_anchor) - height;
+                        break;
+                    case PopupAlignment::Center:
+                        y = NSMidY(screen_anchor) - height / 2.0;
+                        break;
+                    case PopupAlignment::End:
+                        y = NSMinY(screen_anchor);
+                        break;
+                }
+
+                if (options_.placement == PopupPlacement::Right) {
+                    x = NSMaxX(screen_anchor) + options_.offset_x;
+                }
+                else {
+                    x = NSMinX(screen_anchor) - width
+                        - options_.offset_x;
+                }
+
+                y -= options_.offset_y;
+                break;
+        }
+
+        [panel_ setFrame:NSMakeRect(x, y, width, height)
+                 display:YES];
+    }
+
+};
+
+
+CocoaPopup::CocoaPopup()
+    : impl_(std::make_unique<Impl>())
+{
+}
+
+
+CocoaPopup::~CocoaPopup() {
+    hide();
+
+    if (impl_ == nullptr) {
+        return;
+    }
+
+    if (impl_->panel_ != nil) {
+        [impl_->panel_ setContentView:nil];
+        [impl_->panel_ release];
+        impl_->panel_ = nil;
+    }
+}
+
+
+void CocoaPopup::show(
+    Window& parent,
+    View* content,
+    const Rectd& anchor,
+    const Sized& size,
+    const PopupOptions& options
+) {
+    if (impl_ == nullptr || content == nullptr) {
+        return;
+    }
+
+    auto* cocoa_parent = dynamic_cast<CocoaWindow*>(&parent);
+    if (cocoa_parent == nullptr) {
+        return;
+    }
+
+    auto* native_parent =
+        static_cast<NSWindow*>(cocoa_parent->nativeWindow());
+
+    auto* native_content =
+        static_cast<NSView*>(content->nativeView());
+
+    if (native_parent == nil || native_content == nil) {
+        return;
+    }
+
+    impl_->parent_ = native_parent;
+    impl_->content_view_ = native_content;
+    impl_->anchor_ = anchor;
+    impl_->size_ = size;
+    impl_->options_ = options;
+
+    if (impl_->panel_ == nil) {
+        impl_->panel_ =
+            [[NSPanel alloc]
+                initWithContentRect:NSMakeRect(
+                    0.0,
+                    0.0,
+                    size.width,
+                    size.height
+                )
+                styleMask:NSWindowStyleMaskBorderless
+                backing:NSBackingStoreBuffered
+                defer:NO
+            ];
+
+        if (impl_->panel_ == nil) {
+            return;
+        }
+
+        [impl_->panel_ setReleasedWhenClosed:NO];
+        [impl_->panel_ setOpaque:NO];
+        [impl_->panel_ setBackgroundColor:[NSColor clearColor]];
+        [impl_->panel_ setHasShadow:YES];
+        [impl_->panel_ setLevel:NSPopUpMenuWindowLevel];
+        [impl_->panel_ setAcceptsMouseMovedEvents:YES];
+    }
+
+    [impl_->panel_ setContentView:native_content];
+
+    [native_content setAutoresizingMask:
+        NSViewWidthSizable | NSViewHeightSizable];
+
+    // A child window follows its parent when the parent moves,
+    // minimizes, or closes.
+    if (impl_->panel_.parentWindow != native_parent) {
+        if (impl_->panel_.parentWindow != nil) {
+            [impl_->panel_.parentWindow
+                removeChildWindow:impl_->panel_];
+        }
+
+        [native_parent addChildWindow:impl_->panel_
+                              ordered:NSWindowAbove];
+    }
+
+    impl_->updatePosition();
+
+    [impl_->panel_ orderFront:nil];
+}
+
+
+void CocoaPopup::hide() {
+    if (impl_ == nullptr || impl_->panel_ == nil) {
+        return;
+    }
+
+    [impl_->panel_ orderOut:nil];
+}
+
+
+void CocoaPopup::reposition(const Rectd& anchor) {
+    if (impl_ == nullptr) {
+        return;
+    }
+
+    impl_->anchor_ = anchor;
+    impl_->updatePosition();
+}
+
+
+void CocoaPopup::resize(const Sized& size) {
+    if (impl_ == nullptr) {
+        return;
+    }
+
+    impl_->size_ = size;
+    impl_->updatePosition();
+}
+
+
+auto CocoaPopup::isVisible() const -> bool {
+    return impl_ != nullptr &&
+           impl_->panel_ != nil &&
+           impl_->panel_.isVisible;
+}
+
+
+auto createPopup() -> std::unique_ptr<Popup> {
+    return std::make_unique<CocoaPopup>();
+}
+
+} // namespace Grain::Platform

@@ -168,16 +168,14 @@ int main() {
     );
 
     if (!source_image.isUsable()) {
-        std::cerr << "Could not load: "
-                  << input_filename << '\n';
+        std::cerr << "Could not load: " << input_filename << '\n';
         return 1;
     }
 
     const int32_t width = source_image.width();
     const int32_t height = source_image.height();
 
-    std::cout << "Image: "
-              << width << " x " << height << '\n';
+    std::cout << "Image: " << width << " x " << height << '\n';
 
 
     // Create density from image brightness.
@@ -207,8 +205,7 @@ int main() {
     // Generate points.
     const std::vector<Vec2d> points = sampler.all();
 
-    std::cout << "Generated points: "
-              << points.size() << '\n';
+    std::cout << "Generated points: " << points.size() << '\n';
 
 
     // Create output image.
@@ -250,8 +247,7 @@ int main() {
         true
     );
 
-    std::cout << "Saved: "
-              << output_filename << '\n';
+    std::cout << "Saved: " << output_filename << '\n';
 
     return 0;
 }

@@ -64,8 +64,8 @@
 
 #include "grain/Platform/App.hpp"
 #include "grain/Platform/Window.hpp"
-#include "grain/UI/View.hpp"
 #include "grain/Platform/Font.hpp"
+#include <grain/Platform/Platform.hpp>
 
 #include "grain/Color/Color.hpp"
 #include "grain/Color/ColorLUT.hpp"
@@ -94,6 +94,7 @@
 #include "grain/Movie/MovieWriter.hpp"
 
 #include "grain/UI/Component.hpp"
+#include "grain/UI/View.hpp"
 #include "grain/UI/Label.hpp"
 #include "grain/UI/Button.hpp"
 #include "grain/UI/Slider.hpp"

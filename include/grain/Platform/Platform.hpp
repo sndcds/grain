@@ -2,7 +2,9 @@
 
 #include <grain/Input/Event.hpp>
 #include <grain/Geometry/Rect.hpp>
+#include <grain/Geometry/Size.hpp>
 #include <grain/String/String.hpp>
+#include <grain/Platform/Popup.hpp>
 
 #include <functional>
 #include <memory>
@@ -52,7 +54,44 @@ protected:
 };
 
 
+class Popup {
+public:
+    Popup(const Popup&) = delete;
+    auto operator = (const Popup&) -> Popup& = delete;
+    Popup(Popup&&) = delete;
+    auto operator = (Popup&&) -> Popup& = delete;
+
+    virtual ~Popup() = default;
+
+    virtual void show(
+        Window& parent,
+        View* content,
+        const Rectd& anchor,
+        const Sized& size,
+        const PopupOptions& options
+    ) = 0;
+
+    virtual void hide() = 0;
+
+    virtual void reposition(
+        const Rectd& anchor
+    ) = 0;
+
+    virtual void resize(
+        const Sized& size
+    ) = 0;
+
+    [[nodiscard]]
+    virtual auto isVisible() const -> bool = 0;
+
+protected:
+    Popup() = default;
+};
+
+
 auto createView(Grain::View* view) -> std::unique_ptr<View>;
+
+auto createPopup() -> std::unique_ptr<Popup>;
 
 
 class App {

@@ -29,6 +29,9 @@ public:
     virtual void handleEvent(const Event& event) {}
     void setEventHandler(EventHandler event_handler) override;
 
+    [[nodiscard]]
+    auto nativeWindow() const -> void*;
+
 private:
     class Impl;
 

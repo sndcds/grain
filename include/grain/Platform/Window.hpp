@@ -40,10 +40,16 @@ public:
 
     [[nodiscard]] auto id() const -> uint64_t;
 
-    [[nodiscard]] auto rootView() -> View&;
-    [[nodiscard]] auto rootView() const -> const View&;
+    [[nodiscard]]
+    auto rootView() -> View&;
+    [[nodiscard]]
+    auto rootView() const -> const View&;
 
-    [[nodiscard]] auto contentBounds() const -> Rectd;
+    [[nodiscard]]
+    auto platformWindow() -> Platform::Window*;
+
+    [[nodiscard]]
+    auto contentBounds() const -> Rectd;
 
     void show();
     void requestRedraw();

@@ -14,6 +14,12 @@ private:
 
     // The App owns the actual Window.
     Grain::Window* window_ = nullptr;
+
+    // Popup test objects. Declaration order is intentional:
+    // destruction happens in reverse order.
+    std::unique_ptr<Grain::View> popup_content_;
+    std::unique_ptr<Grain::Platform::View> popup_platform_view_;
+    std::unique_ptr<Grain::Platform::Popup> popup_;
 };
 
 } // namespace Demo

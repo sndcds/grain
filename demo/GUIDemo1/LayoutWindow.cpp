@@ -188,6 +188,33 @@ public:
 
 
 //------------------------------------------------------------------------------
+//  PopupContentView
+//------------------------------------------------------------------------------
+
+class PopupContentView final : public Grain::View {
+public:
+    void drawContent(
+        GraphicContext& gc,
+        const Rectd& dirty_rect
+    ) override {
+        (void)dirty_rect;
+
+        const auto& b = bounds();
+
+        gc.setFillColor(Color::fromRGBA32(0xFFF3CDFF));
+        gc.fillRect({0, 0, b.width, b.height});
+
+        gc.setStrokeColor(Color::fromRGBA32(0xD39E00FF));
+        gc.setStrokeWidth(2.0);
+        gc.strokeRect({1, 1, b.width - 2, b.height - 2});
+
+        gc.setFillColor(Color::fromRGBA32(0x42A5F5FF));
+        gc.fillCircle({40, 40}, 20);
+    }
+};
+
+
+//------------------------------------------------------------------------------
 //  TextWordLayoutView
 //------------------------------------------------------------------------------
 
@@ -212,6 +239,16 @@ public:
     	requestRedraw();
 	}
 
+
+    void setRotation(double degrees) {
+	    rotation_degrees_ = degrees;
+	    requestRedraw();
+	}
+
+    auto toLocalPosition(
+        const Vec2d& view_position
+    ) const -> Vec2d;
+
 protected:
 
     enum class DragMode : uint8_t {
@@ -232,6 +269,7 @@ protected:
     Rectd rect_ = {20, 20, 640, 480};
 
 	std::uint32_t click_count_ = 0;
+    double rotation_degrees_ = 0.0;
 
     DragMode drag_mode_ = DragMode::None;
     Vec2d drag_offset_{};
@@ -306,11 +344,22 @@ void TextWordLayoutView::drawContent(
     const Color text_color   = {0.05f, 0.0f, 0.35f, 1.0f};
     const Color shadow_color = {1.0f, 0.2f, 0.6f, 0.6f};
 
+
+    const Vec2d center{
+        bounds().width * 0.5,
+        bounds().height * 0.5
+    };
+
     gc.save();
 
     // Background
     gc.setFillColor(Color::white());
     gc.fillRect({0, 0, bounds().width, bounds().height});
+
+    gc.translate(center.x, center.y);
+    gc.rotate(rotation_degrees_ * std::numbers::pi / 180.0);
+    gc.translate(-center.x, -center.y);
+
 
     // Text layout
     layout_.layout(rect_.width, rect_.height);
@@ -459,7 +508,7 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
                 break;
             }
 
-            const Vec2d position = event.mouse_pos_;
+            const Vec2d position = toLocalPosition(event.mouse_pos_);
 
             // Check resize handle first.
             if (handleContains(bottomRightHandle(), position)) {
@@ -491,14 +540,16 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
 
         case EventType::MouseMove: {
 
+            const Vec2d position = toLocalPosition(event.mouse_pos_);
+
             switch (drag_mode_) {
 
                 case DragMode::Move:
-                    moveRectangle(event.mouse_pos_);
+                    moveRectangle(position);
                     break;
 
                 case DragMode::Resize:
-                    resizeRectangle(event.mouse_pos_);
+                    resizeRectangle(position);
                     break;
 
                 case DragMode::None:
@@ -526,6 +577,29 @@ void TextWordLayoutView::onButtonClicked() {
     requestRedraw();
 }
 
+
+auto TextWordLayoutView::toLocalPosition(
+    const Vec2d& view_position
+) const -> Vec2d {
+
+    const Vec2d center{
+        bounds().width * 0.5,
+        bounds().height * 0.5
+    };
+
+    const double radians =
+        -rotation_degrees_ * std::numbers::pi / 180.0;
+
+    const double cosine = std::cos(radians);
+    const double sine = std::sin(radians);
+
+    const Vec2d offset = view_position - center;
+
+    return {
+        center.x + offset.x * cosine - offset.y * sine,
+        center.y + offset.x * sine + offset.y * cosine
+    };
+}
 
 //------------------------------------------------------------------------------
 //  LayoutWindow
@@ -609,6 +683,17 @@ LayoutWindow::LayoutWindow(App& app) {
         styles_.componentStyle("panel-label")
     );
 
+    left.addChild<Label>("View rotation").setStyle(
+        styles_.componentStyle("panel-label")
+    );
+
+    auto& rotation_slider = left.addChild<Slider>(
+        0.0, 360.0, 0.0
+    );
+    rotation_slider.setStyle(
+        styles_.componentStyle("panel-label")
+    );
+
 
     //--------------------------------------------------------------------------
 	//  Center view
@@ -631,6 +716,12 @@ LayoutWindow::LayoutWindow(App& app) {
             &drawing_view
         );
     }
+
+    rotation_slider.valueChanged.connect(
+        &TextWordLayoutView::setRotation,
+        &drawing_view
+    );
+
 
 
     //--------------------------------------------------------------------------
@@ -660,6 +751,49 @@ LayoutWindow::LayoutWindow(App& app) {
 
     window_->updateLayout();
     window_->show();
+
+
+    // Create the Grain view used as popup content.
+    popup_content_ = std::make_unique<PopupContentView>();
+    popup_content_->setLayoutBounds({0, 0, 240, 140});
+
+    // Create its native platform view.
+    popup_platform_view_ =
+        Platform::createView(popup_content_.get());
+
+    if (popup_platform_view_ == nullptr) {
+        return;
+    }
+
+    // Create the platform popup.
+    popup_ = Platform::createPopup();
+
+    if (popup_ == nullptr) {
+        return;
+    }
+
+    auto* platform_parent = window_->platformWindow();
+
+    if (platform_parent == nullptr) {
+        return;
+    }
+
+    PopupOptions options;
+    options.placement = PopupPlacement::Below;
+    options.alignment = PopupAlignment::Start;
+    options.offset_x = 0.0;
+    options.offset_y = 6.0;
+
+    popup_->show(
+        *platform_parent,
+        popup_platform_view_.get(),
+        {100, 100, 24, 24},
+        {240, 140},
+        options
+    );
+
+    // Request the initial drawing.
+    popup_platform_view_->requestRedraw();
 }
 
 } // namespace Demo

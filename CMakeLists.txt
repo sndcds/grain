@@ -385,6 +385,7 @@ target_sources(
 
         include/grain/Platform/App.hpp
         include/grain/Platform/Window.hpp
+        include/grain/Platform/Popup.hpp
 
         include/grain/Color/Color.hpp
         include/grain/Color/ColorLUT.hpp
@@ -449,6 +450,7 @@ if(APPLE)
             src/Platform/Window.cpp
             src/Platform/macOS/CocoaApp.mm
             src/Platform/macOS/CocoaWindow.mm
+            src/Platform/macOS/CocoaPopup.mm
             src/Platform/macOS/CocoaView.mm
             src/Platform/macOS/CoreGraphicContext.mm
             src/Platform/macOS/CoreTextLayout.mm
