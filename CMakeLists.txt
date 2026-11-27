@@ -298,6 +298,7 @@ target_sources(
 
         src/UI/UIElement.cpp
         src/UI/View.cpp
+        src/UI/Popup.cpp
         src/UI/Component.cpp
         src/UI/Label.cpp
         src/UI/Button.cpp
@@ -418,6 +419,7 @@ target_sources(
         include/grain/Movie/MovieWriter.hpp
 
         include/grain/UI/View.hpp
+        include/grain/UI/Popup.hpp
         include/grain/UI/Component.hpp
         include/grain/UI/Label.hpp
         include/grain/UI/Button.hpp

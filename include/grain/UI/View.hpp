@@ -14,8 +14,10 @@
 namespace Grain {
 
 class Window;
+class Popup;
 class Component;
-class LayoutViewStyle;
+struct LayoutViewStyle;
+
 
 namespace Platform {
 class View;
@@ -249,6 +251,7 @@ private:
 	const LayoutViewStyle* style_ = nullptr;
 
     friend class Window;
+	friend class Popup;
 };
 
 } // namespace Grain

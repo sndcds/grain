@@ -231,7 +231,7 @@ auto View::hitTest(const Vec2d& pos) -> UIElement* {
         }
     }
 
-    return nullptr;
+    return contains(pos) ? this : nullptr;
 }
 
 

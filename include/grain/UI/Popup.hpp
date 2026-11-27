@@ -1,0 +1,50 @@
+
+#pragma once
+
+#include <grain/Platform/Popup.hpp>
+#include <grain/Geometry/Rect.hpp>
+#include <grain/Geometry/Size.hpp>
+
+#include <memory>
+
+namespace Grain {
+
+class Window;
+class View;
+
+class Popup {
+public:
+    Popup(
+        Window& parent,
+        std::unique_ptr<View> content,
+        const Rectd& anchor,
+        const Sized& size,
+        const PopupOptions& options = {}
+    );
+
+    Popup(const Popup&) = delete;
+    auto operator=(const Popup&) -> Popup& = delete;
+
+    Popup(Popup&&) = delete;
+    auto operator=(Popup&&) -> Popup& = delete;
+
+    ~Popup();
+
+    void show();
+    void hide();
+
+    void reposition(const Rectd& anchor);
+    void resize(const Sized& size);
+
+    [[nodiscard]]
+    auto isVisible() const -> bool;
+
+    [[nodiscard]]
+    auto contentView() -> View&;
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> impl_;
+};
+
+} // namespace Grain

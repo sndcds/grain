@@ -20,6 +20,7 @@ class View;
 
 namespace Platform {
 class Window;
+class Popup;
 }
 
 
@@ -44,9 +45,6 @@ public:
     auto rootView() -> View&;
     [[nodiscard]]
     auto rootView() const -> const View&;
-
-    [[nodiscard]]
-    auto platformWindow() -> Platform::Window*;
 
     [[nodiscard]]
     auto contentBounds() const -> Rectd;
@@ -76,7 +74,11 @@ private:
         ) -> std::unique_ptr<Window>;
 
 
+    [[nodiscard]]
+    auto platformWindow() -> Platform::Window*;
+
     friend class App;
+    friend class Popup;
 };
 
 } // namespace Grain

@@ -753,28 +753,15 @@ LayoutWindow::LayoutWindow(App& app) {
     window_->show();
 
 
-    // Create the Grain view used as popup content.
-    popup_content_ = std::make_unique<PopupContentView>();
-    popup_content_->setLayoutBounds({0, 0, 240, 140});
-
-    // Create its native platform view.
-    popup_platform_view_ =
-        Platform::createView(popup_content_.get());
-
-    if (popup_platform_view_ == nullptr) {
-        return;
-    }
-
     // Create the platform popup.
-    popup_ = Platform::createPopup();
+    popup_ = std::make_unique<Grain::Popup>(
+        *window_,
+        std::make_unique<PopupContentView>(),
+        Rectd{100, 100, 24, 24},
+        Sized{240, 140}
+    );
 
     if (popup_ == nullptr) {
-        return;
-    }
-
-    auto* platform_parent = window_->platformWindow();
-
-    if (platform_parent == nullptr) {
         return;
     }
 
@@ -784,16 +771,7 @@ LayoutWindow::LayoutWindow(App& app) {
     options.offset_x = 0.0;
     options.offset_y = 6.0;
 
-    popup_->show(
-        *platform_parent,
-        popup_platform_view_.get(),
-        {100, 100, 24, 24},
-        {240, 140},
-        options
-    );
-
-    // Request the initial drawing.
-    popup_platform_view_->requestRedraw();
+    popup_->show();
 }
 
 } // namespace Demo
