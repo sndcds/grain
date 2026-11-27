@@ -132,6 +132,22 @@ inline auto create(UIStyles& styles) -> void {
     right_label.element.padding = {4, 4, 4, 4};
 
     styles.defineComponentStyle("right-label", right_label);
+
+
+    //--------------------------------------------------------------------------
+    //  Popup buttons
+    //--------------------------------------------------------------------------
+
+    LayoutComponentStyle popup_button;
+    popup_button.element.padding = {6, 6, 4, 4};
+
+    popup_button.element.sizing.width.type = LayoutSizingType::Grow;
+
+    popup_button.element.sizing.height.type = LayoutSizingType::Fixed;
+    popup_button.element.sizing.height.min_value = 32;
+    popup_button.element.sizing.height.max_value = 32;
+
+    styles.defineComponentStyle("popup-button", popup_button);
 }
 
 } // namespace LayoutStyles
@@ -193,10 +209,26 @@ public:
 
 class PopupContentView final : public Grain::View {
 public:
+
+    explicit PopupContentView(
+        const LayoutComponentStyle& button_style
+    ) {
+        for (int i = 1; i <= 5; ++i) {
+
+            auto& button = addChild<Button>(
+                "Popup Button " + std::to_string(i)
+            );
+
+            button.setStyle(button_style);
+        }
+    }
+
+
     void drawContent(
         GraphicContext& gc,
         const Rectd& dirty_rect
     ) override {
+
         (void)dirty_rect;
 
         const auto& b = bounds();
@@ -207,9 +239,6 @@ public:
         gc.setStrokeColor(Color::fromRGBA32(0xD39E00FF));
         gc.setStrokeWidth(2.0);
         gc.strokeRect({1, 1, b.width - 2, b.height - 2});
-
-        gc.setFillColor(Color::fromRGBA32(0x42A5F5FF));
-        gc.fillCircle({40, 40}, 20);
     }
 };
 
@@ -782,11 +811,21 @@ LayoutWindow::LayoutWindow(App& app) {
 
     popup_ = std::make_unique<Grain::Popup>(
         *window_,
-        std::make_unique<PopupContentView>(),
+        std::make_unique<PopupContentView>(
+            styles_.componentStyle("popup-button")
+        ),
         Rectd{0, 0, 1, 1},
-        Sized{240, 140},
+        Sized{240, 200},
         options
     );
+
+    LayoutViewStyle popup_content_style;
+
+    popup_content_style.direction = LayoutDirection::TopToBottom;
+    popup_content_style.element.padding = {8, 8, 8, 8};
+    popup_content_style.element.child_gap = 4;
+
+    popup_->setContentStyle(popup_content_style);
 
     // Connect right-clicks in the drawing view to the popup.
     drawing_view.setContextMenuHandler(
