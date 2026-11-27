@@ -753,18 +753,6 @@ LayoutWindow::LayoutWindow(App& app) {
     window_->show();
 
 
-    // Create the platform popup.
-    popup_ = std::make_unique<Grain::Popup>(
-        *window_,
-        std::make_unique<PopupContentView>(),
-        Rectd{100, 100, 24, 24},
-        Sized{240, 140}
-    );
-
-    if (popup_ == nullptr) {
-        return;
-    }
-
     PopupOptions options;
     options.placement = PopupPlacement::Below;
     options.alignment = PopupAlignment::Start;

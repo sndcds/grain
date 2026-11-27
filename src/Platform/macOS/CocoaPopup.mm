@@ -4,6 +4,9 @@
 #include "CocoaPopup.hpp"
 #include "CocoaWindow.hpp"
 
+#import <dispatch/dispatch.h>
+
+
 namespace Grain::Platform {
 
 class CocoaPopup::Impl
@@ -127,53 +130,63 @@ public:
 
         std::weak_ptr<Impl> weak_self = weak_from_this();
 
-        const NSEventMask event_mask =
-            NSEventMaskLeftMouseDown |
-            NSEventMaskRightMouseDown |
-            NSEventMaskOtherMouseDown |
-            NSEventMaskKeyDown;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            auto self = weak_self.lock();
 
-        event_monitor_ =
-            [NSEvent addLocalMonitorForEventsMatchingMask:event_mask
-                                                 handler:^NSEvent*(NSEvent* event) {
-                auto self = weak_self.lock();
+            if (!self ||
+                self->event_monitor_ != nil ||
+                self->panel_ == nil ||
+                !self->panel_.isVisible) {
+                return;
+            }
 
-                if (!self) {
-                    return event;
-                }
+            const NSEventMask event_mask =
+                NSEventMaskLeftMouseDown |
+                NSEventMaskRightMouseDown |
+                NSEventMaskOtherMouseDown |
+                NSEventMaskKeyDown;
 
-                if (self->panel_ == nil || !self->panel_.isVisible) {
-                    return event;
-                }
+            self->event_monitor_ =
+                [NSEvent addLocalMonitorForEventsMatchingMask:event_mask
+                                                     handler:^NSEvent*(NSEvent* event) {
+                    auto self = weak_self.lock();
 
-                if (event.type == NSEventTypeKeyDown) {
-                    if (event.keyCode == kVK_Escape &&
-                        (event.window == self->parent_ ||
-                         event.window == self->panel_)) {
+                    if (!self ||
+                        self->panel_ == nil ||
+                        !self->panel_.isVisible) {
+                        return event;
+                    }
+
+                    // Escape dismisses the popup.
+                    if (event.type == NSEventTypeKeyDown) {
+                        if (event.keyCode == kVK_Escape &&
+                            (event.window == self->parent_ ||
+                             event.window == self->panel_)) {
+                            self->dismiss();
+                            return nil;
+                        }
+
+                        return event;
+                    }
+
+                    if (!self->options_.dismiss_on_outside_click) {
+                        return event;
+                    }
+
+                    // Clicks inside the popup must not dismiss it.
+                    if (event.window == self->panel_) {
+                        return event;
+                    }
+
+                    const NSPoint mouse_location = [NSEvent mouseLocation];
+
+                    if (!NSPointInRect(mouse_location, self->panel_.frame)) {
                         self->dismiss();
-                        return nil;
                     }
 
                     return event;
-                }
-
-                if (!self->options_.dismiss_on_outside_click) {
-                    return event;
-                }
-
-                // Only dismiss when the click is outside the popup.
-                if (event.window == self->panel_) {
-                    return event;
-                }
-
-                const NSPoint mouse_location = [NSEvent mouseLocation];
-
-                if (!NSPointInRect(mouse_location, self->panel_.frame)) {
-                    self->dismiss();
-                }
-
-                return event;
-            }];
+                }];
+        });
     }
 };
 
