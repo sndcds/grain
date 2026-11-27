@@ -758,7 +758,7 @@ LayoutWindow::LayoutWindow(App& app) {
     options.alignment = PopupAlignment::Start;
     options.offset_x = 0.0;
     options.offset_y = 6.0;
-    options.dismiss_on_outside_click = true;
+    options.dismiss_on_outside_click = false;
 
     popup_ = std::make_unique<Grain::Popup>(
         *window_,
