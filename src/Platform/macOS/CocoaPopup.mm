@@ -6,7 +6,8 @@
 
 namespace Grain::Platform {
 
-class CocoaPopup::Impl {
+class CocoaPopup::Impl
+    : public std::enable_shared_from_this<CocoaPopup::Impl> {
 public:
     NSPanel* panel_ = nil;
     NSWindow* parent_ = nil;
@@ -124,7 +125,7 @@ public:
             return;
         }
 
-        Impl* self = this;
+        std::weak_ptr<Impl> weak_self = weak_from_this();
 
         const NSEventMask event_mask =
             NSEventMaskLeftMouseDown |
@@ -135,6 +136,12 @@ public:
         event_monitor_ =
             [NSEvent addLocalMonitorForEventsMatchingMask:event_mask
                                                  handler:^NSEvent*(NSEvent* event) {
+                auto self = weak_self.lock();
+
+                if (!self) {
+                    return event;
+                }
+
                 if (self->panel_ == nil || !self->panel_.isVisible) {
                     return event;
                 }
@@ -143,7 +150,7 @@ public:
                     if (event.keyCode == kVK_Escape &&
                         (event.window == self->parent_ ||
                          event.window == self->panel_)) {
-                        [self dismiss];
+                        self->dismiss();
                         return nil;
                     }
 
@@ -157,7 +164,7 @@ public:
                 const NSPoint mouse_location = [NSEvent mouseLocation];
 
                 if (!NSPointInRect(mouse_location, self->panel_.frame)) {
-                    [self dismiss];
+                    self->dismiss();
                 }
 
                 return event;
@@ -167,7 +174,7 @@ public:
 
 
 CocoaPopup::CocoaPopup()
-    : impl_(std::make_unique<Impl>())
+    : impl_(std::make_shared<Impl>())
 {
 }
 
