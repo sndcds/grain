@@ -1,4 +1,5 @@
 #import <AppKit/AppKit.h>
+#import <Carbon/Carbon.h>
 
 #include "CocoaPopup.hpp"
 #include "CocoaWindow.hpp"
@@ -10,6 +11,7 @@ public:
     NSPanel* panel_ = nil;
     NSWindow* parent_ = nil;
     NSView* content_view_ = nil;
+    id event_monitor_ = nil;
 
     Rectd anchor_;
     Sized size_;
@@ -96,6 +98,71 @@ public:
                  display:YES];
     }
 
+
+    void stopEventMonitor() {
+        if (event_monitor_ == nil) {
+            return;
+        }
+
+        id monitor = event_monitor_;
+        event_monitor_ = nil;
+
+        [NSEvent removeMonitor:monitor];
+    }
+
+
+    void dismiss() {
+        if (panel_ != nil) {
+            [panel_ orderOut:nil];
+        }
+
+        stopEventMonitor();
+    }
+
+    void startEventMonitor() {
+        if (event_monitor_ != nil) {
+            return;
+        }
+
+        Impl* self = this;
+
+        const NSEventMask event_mask =
+            NSEventMaskLeftMouseDown |
+            NSEventMaskRightMouseDown |
+            NSEventMaskOtherMouseDown |
+            NSEventMaskKeyDown;
+
+        event_monitor_ =
+            [NSEvent addLocalMonitorForEventsMatchingMask:event_mask
+                                                 handler:^NSEvent*(NSEvent* event) {
+                if (self->panel_ == nil || !self->panel_.isVisible) {
+                    return event;
+                }
+
+                if (event.type == NSEventTypeKeyDown) {
+                    if (event.keyCode == kVK_Escape &&
+                        (event.window == self->parent_ ||
+                         event.window == self->panel_)) {
+                        [self dismiss];
+                        return nil;
+                    }
+
+                    return event;
+                }
+
+                if (!self->options_.dismiss_on_outside_click) {
+                    return event;
+                }
+
+                const NSPoint mouse_location = [NSEvent mouseLocation];
+
+                if (!NSPointInRect(mouse_location, self->panel_.frame)) {
+                    [self dismiss];
+                }
+
+                return event;
+            }];
+    }
 };
 
 
@@ -208,15 +275,17 @@ void CocoaPopup::show(
     impl_->updatePosition();
 
     [impl_->panel_ orderFront:nil];
+
+    impl_->startEventMonitor();
 }
 
 
 void CocoaPopup::hide() {
-    if (impl_ == nullptr || impl_->panel_ == nil) {
+    if (impl_ == nullptr) {
         return;
     }
 
-    [impl_->panel_ orderOut:nil];
+    impl_->dismiss();
 }
 
 
