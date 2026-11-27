@@ -16,6 +16,17 @@ namespace Grain {
 class Image;
 class Window;
 
+
+//------------------------------------------------------------------------------
+//  Popup item type
+//------------------------------------------------------------------------------
+
+enum class PopupItemType : std::uint8_t {
+    Action,
+    Separator
+};
+
+
 //------------------------------------------------------------------------------
 //  Popup item status
 //------------------------------------------------------------------------------
@@ -64,6 +75,7 @@ struct PopupItem {
     // Non-owning pointer. The Image must outlive the MenuPopup.
     const Image* icon = nullptr;
 
+    PopupItemType type = PopupItemType::Action;
     PopupItemStatus status = PopupItemStatus::None;
 
     std::uint64_t tag = 0;
@@ -76,6 +88,7 @@ struct PopupItem {
 struct MenuPopupLayout {
     LayoutViewStyle view;
     LayoutComponentStyle item;
+    LayoutComponentStyle separator;
 
     MenuPopupLayout() {
         view.direction = LayoutDirection::TopToBottom;
@@ -97,6 +110,20 @@ struct MenuPopupLayout {
         };
 
         item.element.padding = {8.0, 8.0, 0.0, 0.0};
+
+        separator.element.sizing.width = {
+            LayoutSizingType::Grow,
+            1.0,
+            0.0,
+            std::numeric_limits<double>::max()
+        };
+
+        separator.element.sizing.height = {
+            LayoutSizingType::Fixed,
+            9.0,
+            9.0,
+            9.0
+        };
     }
 };
 
