@@ -16,6 +16,7 @@ public:
     NSWindow* parent_ = nil;
     NSView* content_view_ = nil;
     NSTimeInterval show_event_timestamp_ = 0.0;
+    NSTimeInterval shown_at_ = 0.0;
     id event_monitor_ = nil;
 
     Rectd anchor_;
@@ -171,16 +172,13 @@ public:
                     }
 
 
-                    // Ignore mouse events that occurred before or while the popup
-                    // was being opened.
+                    // Give the popup a short period to become visible before
+                    // enabling outside-click dismissal.
 
-                    NSLog(
-                        @"Event timestamp: %f, show timestamp: %f",
-                        event.timestamp,
-                        self->show_event_timestamp_
-                    );
+                    const NSTimeInterval elapsed =
+                        NSProcessInfo.processInfo.systemUptime - self->shown_at_;
 
-                    if (event.timestamp <= self->show_event_timestamp_) {
+                    if (elapsed < 0.25) {
                         return event;
                     }
 
@@ -329,6 +327,8 @@ void CocoaPopup::show(
     impl_->show_event_timestamp_ =
         current_event != nil ? current_event.timestamp : 0.0;
     NSLog(@"show_event_timestamp_ %f", impl_->show_event_timestamp_);
+
+    impl_->shown_at_ = NSProcessInfo.processInfo.systemUptime;
 
     [impl_->panel_ orderFront:nil];
 
