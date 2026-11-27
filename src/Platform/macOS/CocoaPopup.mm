@@ -161,6 +161,11 @@ public:
                     return event;
                 }
 
+                // Only dismiss when the click is outside the popup.
+                if (event.window == self->panel_) {
+                    return event;
+                }
+
                 const NSPoint mouse_location = [NSEvent mouseLocation];
 
                 if (!NSPointInRect(mouse_location, self->panel_.frame)) {
