@@ -96,6 +96,7 @@
 #include "grain/UI/Component.hpp"
 #include "grain/UI/View.hpp"
 #include "grain/UI/Popup.hpp"
+#include "grain/UI/MenuPopup.hpp"
 #include "grain/UI/Label.hpp"
 #include "grain/UI/Button.hpp"
 #include "grain/UI/Slider.hpp"
