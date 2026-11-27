@@ -4,6 +4,7 @@
 #include <grain/Platform/Popup.hpp>
 #include <grain/Geometry/Rect.hpp>
 #include <grain/Geometry/Size.hpp>
+#include <grain/UI/LayoutStyle.hpp>
 
 #include <memory>
 
@@ -12,6 +13,13 @@ namespace Grain {
 class Window;
 class View;
 
+
+//------------------------------------------------------------------------------
+//  A Popup is associated with an existing Window.
+//
+//  The parent Window must outlive the Popup. Destroy the Popup before
+//  destroying its parent Window.
+//------------------------------------------------------------------------------
 class Popup {
 public:
     Popup(
@@ -36,11 +44,14 @@ public:
     void reposition(const Rectd& anchor);
     void resize(const Sized& size);
 
+    void setContentStyle(const LayoutViewStyle& style);
+
     [[nodiscard]]
     auto isVisible() const -> bool;
 
     [[nodiscard]]
     auto contentView() -> View&;
+
 
 private:
     class Impl;

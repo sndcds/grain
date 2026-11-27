@@ -772,6 +772,20 @@ LayoutWindow::LayoutWindow(App& app) {
     options.offset_y = 6.0;
 
     popup_->show();
+    popup_->hide();
+    popup_->show();
+    popup_->hide();
+    popup_->show();
+    popup_->resize({321, 234});
+
+    const auto& bounds = popup_->contentView().bounds();
+
+    std::cout
+        << "Popup content bounds: "
+        << bounds.width << " x "
+        << bounds.height << '\n';
+
+    // popup_.reset();
 }
 
 } // namespace Demo

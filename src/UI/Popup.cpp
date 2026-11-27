@@ -11,9 +11,13 @@
 
 namespace Grain {
 
+
 class Popup::Impl {
 public:
     Window* parent_ = nullptr;
+
+    // The root style must outlive the content View that references it.
+    LayoutViewStyle content_style_;
 
     std::unique_ptr<View> content_;
     std::unique_ptr<Platform::Popup> platform_popup_;
@@ -51,6 +55,24 @@ public:
         platform_popup_.reset();
     }
 
+    void updateContentLayout() {
+        if (content_ == nullptr) {
+            return;
+        }
+
+        layout_engine_.layout(
+            *content_,
+            Rectd{
+                0,
+                0,
+                size_.width,
+                size_.height
+            }
+        );
+
+        content_->requestRedraw();
+    }
+
     void initialize() {
         if (initialized_ ||
             parent_ == nullptr ||
@@ -59,12 +81,12 @@ public:
             return;
         }
 
-        content_->setLayoutBounds({
-            0,
-            0,
-            size_.width,
-            size_.height
-        });
+        // The popup owns this style, so the View's style pointer
+        // remains valid for the entire lifetime of the content View.
+        content_->setStyle(content_style_);
+
+        // Calculate initial bounds before creating the native view.
+        updateContentLayout();
 
         content_->attach();
 
@@ -108,25 +130,15 @@ public:
         }
     }
 
-    void updateContentBounds() {
-        if (content_ == nullptr) {
-            return;
-        }
-
-        content_->setLayoutBounds({
-            0,
-            0,
-            size_.width,
-            size_.height
-        });
-    }
-
     void show() {
         initialize();
 
         if (!initialized_) {
             return;
         }
+
+        // Recalculate in case content changed while the popup was hidden.
+        updateContentLayout();
 
         auto* parent_platform = parent_->platformWindow();
         auto* content_platform = content_->platformView();
@@ -145,6 +157,7 @@ public:
         );
     }
 };
+
 
 
 Popup::Popup(
@@ -201,10 +214,27 @@ void Popup::resize(const Sized& size) {
     }
 
     impl_->size_ = size;
-    impl_->updateContentBounds();
+
+    if (impl_->initialized_) {
+        impl_->updateContentLayout();
+    }
 
     if (impl_->platform_popup_) {
         impl_->platform_popup_->resize(size);
+    }
+}
+
+
+void Popup::setContentStyle(const LayoutViewStyle& style) {
+    if (!impl_ || !impl_->content_) {
+        return;
+    }
+
+    impl_->content_style_ = style;
+    impl_->content_->setStyle(impl_->content_style_);
+
+    if (impl_->initialized_) {
+        impl_->updateContentLayout();
     }
 }
 

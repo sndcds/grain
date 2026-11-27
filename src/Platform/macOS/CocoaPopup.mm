@@ -108,15 +108,25 @@ CocoaPopup::CocoaPopup()
 CocoaPopup::~CocoaPopup() {
     hide();
 
-    if (impl_ == nullptr) {
+    if (impl_ == nullptr || impl_->panel_ == nil) {
         return;
     }
 
-    if (impl_->panel_ != nil) {
-        [impl_->panel_ setContentView:nil];
-        [impl_->panel_ release];
-        impl_->panel_ = nil;
+    // Detach the popup from its parent window.
+    NSWindow* parent = impl_->panel_.parentWindow;
+
+    if (parent != nil) {
+        [parent removeChildWindow:impl_->panel_];
     }
+
+    // Release the native content view.
+    [impl_->panel_ setContentView:nil];
+
+    [impl_->panel_ release];
+    impl_->panel_ = nil;
+
+    impl_->parent_ = nil;
+    impl_->content_view_ = nil;
 }
 
 
