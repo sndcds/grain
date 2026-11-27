@@ -15,6 +15,7 @@ public:
     NSPanel* panel_ = nil;
     NSWindow* parent_ = nil;
     NSView* content_view_ = nil;
+    NSTimeInterval show_event_timestamp_ = 0.0;
     id event_monitor_ = nil;
 
     Rectd anchor_;
@@ -169,6 +170,20 @@ public:
                         return event;
                     }
 
+
+                    // Ignore mouse events that occurred before or while the popup
+                    // was being opened.
+
+                    NSLog(
+                        @"Event timestamp: %f, show timestamp: %f",
+                        event.timestamp,
+                        self->show_event_timestamp_
+                    );
+
+                    if (event.timestamp <= self->show_event_timestamp_) {
+                        return event;
+                    }
+
                     if (!self->options_.dismiss_on_outside_click) {
                         return event;
                     }
@@ -181,6 +196,16 @@ public:
                     const NSPoint mouse_location = [NSEvent mouseLocation];
 
                     if (!NSPointInRect(mouse_location, self->panel_.frame)) {
+                        NSLog(
+                            @"Popup outside click: type=%ld, timestamp=%f, "
+                            @"event window=%@, panel frame=%@, mouse location=%@",
+                            (long)event.type,
+                            event.timestamp,
+                            event.window,
+                            NSStringFromRect(self->panel_.frame),
+                            NSStringFromPoint(mouse_location)
+                        );
+
                         self->dismiss();
                     }
 
@@ -298,6 +323,12 @@ void CocoaPopup::show(
     }
 
     impl_->updatePosition();
+
+
+    NSEvent* current_event = NSApp.currentEvent;
+    impl_->show_event_timestamp_ =
+        current_event != nil ? current_event.timestamp : 0.0;
+    NSLog(@"show_event_timestamp_ %f", impl_->show_event_timestamp_);
 
     [impl_->panel_ orderFront:nil];
 
