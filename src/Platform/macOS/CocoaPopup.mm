@@ -185,14 +185,20 @@ public:
                         return event;
                     }
 
+                    // Ignore events that do not belong to the parent window
+                    // or the popup window.
+                    if (event.window != self->parent_ &&
+                        event.window != self->panel_) {
+                        return event;
+                    }
+
                     // Clicks inside the popup must not dismiss it.
                     if (event.window == self->panel_) {
                         return event;
                     }
 
-                    const NSPoint mouse_location = [NSEvent mouseLocation];
-
-                    if (!NSPointInRect(mouse_location, self->panel_.frame)) {
+                    // A click in the parent window dismisses the popup.
+                    if (event.window == self->parent_) {
                         self->dismiss();
                     }
 

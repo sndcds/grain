@@ -239,15 +239,22 @@ public:
     	requestRedraw();
 	}
 
-
     void setRotation(double degrees) {
 	    rotation_degrees_ = degrees;
 	    requestRedraw();
 	}
 
+    void setContextMenuHandler(
+        std::function<void(const Vec2d&)> handler
+    ) {
+	    context_menu_handler_ = std::move(handler);
+	}
+
+
     auto toLocalPosition(
         const Vec2d& view_position
     ) const -> Vec2d;
+
 
 protected:
 
@@ -270,6 +277,8 @@ protected:
 
 	std::uint32_t click_count_ = 0;
     double rotation_degrees_ = 0.0;
+
+    std::function<void(const Vec2d&)> context_menu_handler_;
 
     DragMode drag_mode_ = DragMode::None;
     Vec2d drag_offset_{};
@@ -504,6 +513,16 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
 
         case EventType::MouseButtonDown: {
 
+            // Right-click opens the context popup.
+            if (event.mouse_button_ == MouseButton::Right) {
+
+                if (context_menu_handler_) {
+                    context_menu_handler_(event.mouse_pos_);
+                }
+
+                break;
+            }
+
             if (event.mouse_button_ != MouseButton::Left) {
                 break;
             }
@@ -512,16 +531,13 @@ void TextWordLayoutView::onMouseEvent(const Event& event) {
 
             // Check resize handle first.
             if (handleContains(bottomRightHandle(), position)) {
-
                 drag_mode_ = DragMode::Resize;
                 break;
             }
 
             // Check move handle.
             if (handleContains(topLeftHandle(), position)) {
-
                 drag_mode_ = DragMode::Move;
-
                 drag_offset_ = position - topLeftHandle();
                 break;
             }
@@ -753,37 +769,44 @@ LayoutWindow::LayoutWindow(App& app) {
     window_->show();
 
 
+    //--------------------------------------------------------------------------
+    //  Popup
+    //--------------------------------------------------------------------------
+
     PopupOptions options;
     options.placement = PopupPlacement::Below;
     options.alignment = PopupAlignment::Start;
     options.offset_x = 0.0;
     options.offset_y = 6.0;
-    options.dismiss_on_outside_click = false;
+    options.dismiss_on_outside_click = true;
 
     popup_ = std::make_unique<Grain::Popup>(
         *window_,
         std::make_unique<PopupContentView>(),
-        Rectd{100, 100, 24, 24},
+        Rectd{0, 0, 1, 1},
         Sized{240, 140},
         options
     );
 
-    popup_->show();
+    // Connect right-clicks in the drawing view to the popup.
+    drawing_view.setContextMenuHandler(
+        [this, &drawing_view](const Vec2d& position) {
 
-    // popup_->hide();
-    // popup_->show();
-    // popup_->hide();
-    // popup_->show();
-    // popup_->resize({321, 234});
+            const Rectd& view_bounds = drawing_view.bounds();
 
-    const auto& bounds = popup_->contentView().bounds();
+            // Convert the drawing view's local mouse position
+            // into coordinates relative to the window content view.
+            const Rectd anchor{
+                view_bounds.x + position.x,
+                view_bounds.y + position.y,
+                1.0,
+                1.0
+            };
 
-    std::cout
-        << "Popup content bounds: "
-        << bounds.width << " x "
-        << bounds.height << '\n';
-
-    // popup_.reset();
+            popup_->reposition(anchor);
+            popup_->show();
+        }
+    );
 }
 
 } // namespace Demo
