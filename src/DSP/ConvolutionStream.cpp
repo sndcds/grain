@@ -479,7 +479,7 @@ auto ConvolutionStream::finish(
 
         impl_->finish_started_ = true;
     }
-    
+
     std::size_t outputOffset = 0;
 
     while (outputOffset < output.size()) {
