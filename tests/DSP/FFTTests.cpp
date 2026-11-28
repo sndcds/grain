@@ -429,4 +429,168 @@ TEST_CASE("FFT Accelerate inverse matches portable backend", "[DSP][FFT]")
 #endif
 }
 
+
+
+TEST_CASE("FFT Accelerate handles DC and Nyquist signals", "[DSP][FFT]")
+{
+#if defined(__APPLE__)
+    constexpr std::size_t size = 16;
+    constexpr std::size_t nyquist_bin = size / 2;
+
+    std::unique_ptr<FFT> fft;
+
+    REQUIRE(
+        FFT::create(
+            FFTConfiguration{size, FFTBackendType::Accelerate},
+            fft
+        ) == Result::Success
+    );
+
+    std::array<float, size> input{};
+    std::array<float, size> output{};
+    std::array<std::complex<float>, size / 2 + 1> spectrum{};
+
+    SECTION("DC-only signal")
+    {
+        input.fill(0.75f);
+
+        REQUIRE(fft->forward(input, spectrum) == Result::Success);
+
+        REQUIRE_THAT(
+            spectrum[0].real(),
+            WithinAbs(static_cast<float>(size) * 0.75f, kTolerance)
+        );
+        REQUIRE_THAT(spectrum[0].imag(), WithinAbs(0.0f, kTolerance));
+
+        for (std::size_t i = 1; i < spectrum.size(); ++i) {
+            REQUIRE_THAT(spectrum[i].real(), WithinAbs(0.0f, kTolerance));
+            REQUIRE_THAT(spectrum[i].imag(), WithinAbs(0.0f, kTolerance));
+        }
+
+        REQUIRE(fft->inverse(spectrum, output) == Result::Success);
+
+        for (std::size_t i = 0; i < size; ++i) {
+            REQUIRE_THAT(output[i], WithinAbs(0.75f, kTolerance));
+        }
+    }
+
+    SECTION("Nyquist-only signal")
+    {
+        for (std::size_t i = 0; i < size; ++i) {
+            input[i] = i % 2 == 0 ? 0.5f : -0.5f;
+        }
+
+        REQUIRE(fft->forward(input, spectrum) == Result::Success);
+
+        REQUIRE_THAT(spectrum[0].real(), WithinAbs(0.0f, kTolerance));
+        REQUIRE_THAT(spectrum[0].imag(), WithinAbs(0.0f, kTolerance));
+
+        for (std::size_t i = 1; i < nyquist_bin; ++i) {
+            REQUIRE_THAT(spectrum[i].real(), WithinAbs(0.0f, kTolerance));
+            REQUIRE_THAT(spectrum[i].imag(), WithinAbs(0.0f, kTolerance));
+        }
+
+        REQUIRE_THAT(
+            spectrum[nyquist_bin].real(),
+            WithinAbs(static_cast<float>(size) * 0.5f, kTolerance)
+        );
+        REQUIRE_THAT(
+            spectrum[nyquist_bin].imag(),
+            WithinAbs(0.0f, kTolerance)
+        );
+
+        REQUIRE(fft->inverse(spectrum, output) == Result::Success);
+
+        for (std::size_t i = 0; i < size; ++i) {
+            REQUIRE_THAT(output[i], WithinAbs(input[i], kTolerance));
+        }
+    }
+#endif
+}
+
+
+TEST_CASE("FFT Accelerate supports the smallest transform size", "[DSP][FFT]")
+{
+#if defined(__APPLE__)
+    constexpr std::size_t size = 2;
+
+    std::unique_ptr<FFT> fft;
+
+    REQUIRE(
+        FFT::create(
+            FFTConfiguration{size, FFTBackendType::Accelerate},
+            fft
+        ) == Result::Success
+    );
+
+    REQUIRE(fft->size() == size);
+    REQUIRE(fft->binCount() == 2);
+    REQUIRE(fft->backend() == FFTBackendType::Accelerate);
+
+    const std::array<float, size> input = { 1.0f, -1.0f };
+
+    std::array<std::complex<float>, size / 2 + 1> spectrum{};
+    std::array<float, size> output{};
+
+    REQUIRE(fft->forward(input, spectrum) == Result::Success);
+
+    REQUIRE_THAT(spectrum[0].real(), WithinAbs(0.0f, kTolerance));
+    REQUIRE_THAT(spectrum[0].imag(), WithinAbs(0.0f, kTolerance));
+
+    REQUIRE_THAT(spectrum[1].real(), WithinAbs(2.0f, kTolerance));
+    REQUIRE_THAT(spectrum[1].imag(), WithinAbs(0.0f, kTolerance));
+
+    REQUIRE(fft->inverse(spectrum, output) == Result::Success);
+
+    for (std::size_t i = 0; i < size; ++i) {
+        REQUIRE_THAT(output[i], WithinAbs(input[i], kTolerance));
+    }
+#endif
+}
+
+
+TEST_CASE("FFT Accelerate round trips across transform sizes", "[DSP][FFT]")
+{
+#if defined(__APPLE__)
+    constexpr std::array<std::size_t, 5> sizes = {
+        2, 4, 8, 16, 32
+    };
+
+    for (const std::size_t size : sizes) {
+        CAPTURE(size);
+
+        std::unique_ptr<FFT> fft;
+
+        REQUIRE(
+            FFT::create(
+                FFTConfiguration{size, FFTBackendType::Accelerate},
+                fft
+            ) == Result::Success
+        );
+
+        std::vector<float> input(size);
+        std::vector<float> output(size);
+        std::vector<std::complex<float>> spectrum(size / 2 + 1);
+
+        for (std::size_t i = 0; i < size; ++i) {
+            input[i] =
+                static_cast<float>(std::sin(
+                    2.0 * std::numbers::pi_v<double>
+                    * static_cast<double>(i)
+                    / static_cast<double>(size)
+                ))
+                + static_cast<float>(i % 3) * 0.125f;
+        }
+
+        REQUIRE(fft->forward(input, spectrum) == Result::Success);
+        REQUIRE(fft->inverse(spectrum, output) == Result::Success);
+
+        for (std::size_t i = 0; i < size; ++i) {
+            REQUIRE_THAT(output[i], WithinAbs(input[i], kTolerance));
+        }
+    }
+#endif
+}
+
+
 } // namespace Grain::DSP::Tests
