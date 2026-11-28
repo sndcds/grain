@@ -2,6 +2,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 
+#include <grain/DSP/FFT/FFT.hpp>
 #include <grain/DSP/Partials.hpp>
 
 #include <array>
@@ -211,6 +212,34 @@ TEST_CASE("Partials validates bin access", "[DSP][Partials]")
     SECTION("rejects a negative magnitude")
     {
         REQUIRE(partials->setMagnitude(1, -1.0f) == Result::InvalidArgument);
+    }
+}
+
+
+TEST_CASE("Partials integrates with FFT forward transform", "[DSP][Partials]")
+{
+    constexpr std::size_t fftSize = 64;
+
+    FFTConfiguration configuration;
+    configuration.size = fftSize;
+    configuration.backend = FFTBackendType::Portable;
+
+    std::unique_ptr<FFT> fft;
+    std::unique_ptr<Partials> partials;
+
+    REQUIRE(FFT::create(configuration, fft) == Result::Success);
+    REQUIRE(Partials::create(fftSize, partials) == Result::Success);
+
+    std::array<float, fftSize> samples{};
+    samples[0] = 1.0f;
+
+    REQUIRE(
+        fft->forward(samples, partials->mutSpectrum())
+        == Result::Success
+    );
+
+    for (const std::complex<float>& bin : partials->spectrum()) {
+        REQUIRE(std::abs(bin - std::complex<float>{1.0f, 0.0f}) < 1.0e-5f);
     }
 }
 
