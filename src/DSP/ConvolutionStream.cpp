@@ -33,7 +33,6 @@ public:
         std::fill(input_partition_.begin(), input_partition_.end(), 0.0f);
         std::fill(output_partition_.begin(), output_partition_.end(), 0.0f);
         std::fill(overlap_.begin(), overlap_.end(), 0.0f);
-
         std::fill(input_spectra_.begin(), input_spectra_.end(), std::complex<float>{});
 
         input_partition_fill_ = 0;
@@ -43,11 +42,119 @@ public:
         output_available_ = 0;
 
         input_samples_total_ = 0;
+        output_samples_generated_ = 0;
         output_samples_total_ = 0;
+        finish_target_samples_ = 0;
 
-        tail_blocks_remaining_ = 0;
         finish_started_ = false;
         finished_ = false;
+    }
+
+    auto processPartition(std::size_t validOutputSamples) noexcept -> Result {
+        if (impulse_partition_count_ == 0 ||
+            validOutputSamples > partition_size_) {
+            return Result::InvalidArgument;
+        }
+
+        // Transform the current input partition.
+        const std::size_t writeOffset =
+            input_spectrum_write_index_ * bin_count_;
+
+        std::span<std::complex<float>> inputSpectrum(
+            input_spectra_.data() + writeOffset,
+            bin_count_
+        );
+
+        Result result = fft_->forward(time_buffer_, inputSpectrum);
+
+        if (result != Result::Success) {
+            return result;
+        }
+
+        // Accumulate the frequency-domain products.
+        std::fill(spectrum_buffer_.begin(), spectrum_buffer_.end(),
+                  std::complex<float>{});
+
+        for (std::size_t partitionIndex = 0;
+             partitionIndex < impulse_partition_count_;
+             ++partitionIndex) {
+
+            const std::size_t historyIndex =
+                (input_spectrum_write_index_ +
+                 impulse_partition_count_ -
+                 partitionIndex) % impulse_partition_count_;
+
+            const std::size_t inputOffset = historyIndex * bin_count_;
+            const std::size_t impulseOffset = partitionIndex * bin_count_;
+
+            for (std::size_t binIndex = 0; binIndex < bin_count_; ++binIndex) {
+                spectrum_buffer_[binIndex] +=
+                    input_spectra_[inputOffset + binIndex] *
+                    impulse_spectra_[impulseOffset + binIndex];
+            }
+        }
+
+        // Transform the accumulated spectrum back to the time domain.
+        result = fft_->inverse(spectrum_buffer_, inverse_buffer_);
+
+        if (result != Result::Success) {
+            return result;
+        }
+
+        // Overlap-add.
+        for (std::size_t sampleIndex = 0;
+             sampleIndex < partition_size_;
+             ++sampleIndex) {
+
+            output_partition_[sampleIndex] =
+                inverse_buffer_[sampleIndex] + overlap_[sampleIndex];
+
+            overlap_[sampleIndex] =
+                inverse_buffer_[partition_size_ + sampleIndex];
+        }
+
+        output_read_index_ = 0;
+        output_available_ = validOutputSamples;
+
+        output_samples_generated_ += validOutputSamples;
+
+        // Advance the circular input-spectrum history.
+        input_spectrum_write_index_ =
+            (input_spectrum_write_index_ + 1) % impulse_partition_count_;
+
+        std::fill(input_partition_.begin(), input_partition_.end(), 0.0f);
+        input_partition_fill_ = 0;
+
+        return Result::Success;
+    }
+
+    void copyPendingOutput(
+        std::span<float> output,
+        std::size_t& outputOffset
+    ) noexcept {
+        const std::size_t copyCount = std::min(
+            output_available_,
+            output.size() - outputOffset
+        );
+
+        if (copyCount == 0) {
+            return;
+        }
+
+        std::copy_n(
+            output_partition_.data() + output_read_index_,
+            copyCount,
+            output.data() + outputOffset
+        );
+
+        output_read_index_ += copyCount;
+        output_available_ -= copyCount;
+        outputOffset += copyCount;
+        output_samples_total_ += copyCount;
+
+        if (output_available_ == 0) {
+            output_read_index_ = 0;
+        }
     }
 
     std::unique_ptr<FFT> fft_;
@@ -59,13 +166,9 @@ public:
     std::size_t impulse_partition_count_ = 0;
     bool impulse_response_set_ = false;
 
-    // Precomputed impulse-response spectra.
     std::vector<std::complex<float>> impulse_spectra_;
-
-    // Circular history of input spectra.
     std::vector<std::complex<float>> input_spectra_;
 
-    // Time-domain and frequency-domain working buffers.
     std::vector<float> input_partition_;
     std::vector<float> output_partition_;
     std::vector<float> overlap_;
@@ -74,7 +177,6 @@ public:
     std::vector<float> time_buffer_;
     std::vector<float> inverse_buffer_;
 
-    // Streaming state.
     std::size_t input_partition_fill_ = 0;
     std::size_t input_spectrum_write_index_ = 0;
 
@@ -82,9 +184,9 @@ public:
     std::size_t output_available_ = 0;
 
     std::size_t input_samples_total_ = 0;
+    std::size_t output_samples_generated_ = 0;
     std::size_t output_samples_total_ = 0;
-
-    std::size_t tail_blocks_remaining_ = 0;
+    std::size_t finish_target_samples_ = 0;
 
     bool finish_started_ = false;
     bool finished_ = false;
@@ -117,24 +219,24 @@ auto ConvolutionStream::create(
     }
 
     try {
-        FFTConfiguration fft_configuration;
-        fft_configuration.size = configuration.partitionSize * 2;
-        fft_configuration.backend = configuration.backend;
+        FFTConfiguration fftConfiguration;
+        fftConfiguration.size = configuration.partitionSize * 2;
+        fftConfiguration.backend = configuration.backend;
 
         std::unique_ptr<FFT> fft;
 
-        const Result fft_result = FFT::create(fft_configuration, fft);
+        const Result fftResult = FFT::create(fftConfiguration, fft);
 
-        if (fft_result != Result::Success) {
-            return fft_result;
+        if (fftResult != Result::Success) {
+            return fftResult;
         }
 
-        const std::size_t bin_count = fft->binCount();
+        const std::size_t binCount = fft->binCount();
 
         std::unique_ptr<Impl> impl = std::make_unique<Impl>(
             std::move(fft),
             configuration.partitionSize,
-            bin_count
+            binCount
         );
 
         output.reset(new ConvolutionStream(std::move(impl)));
@@ -206,7 +308,7 @@ auto ConvolutionStream::setImpulseResponse(
                 impl_->time_buffer_.data()
             );
 
-            const std::span<std::complex<float>> spectrum(
+            std::span<std::complex<float>> spectrum(
                 impulseSpectra.data() + partitionIndex * binCount,
                 binCount
             );
@@ -221,7 +323,6 @@ auto ConvolutionStream::setImpulseResponse(
             }
         }
 
-        // Commit the new impulse response only after successful preparation.
         impl_->impulse_spectra_.swap(impulseSpectra);
         impl_->input_spectra_.swap(inputSpectra);
 
@@ -242,6 +343,208 @@ auto ConvolutionStream::setImpulseResponse(
     catch (...) {
         return Result::Error;
     }
+}
+
+
+auto ConvolutionStream::process(
+    std::span<const float> input,
+    std::span<float> output,
+    std::size_t& inputConsumed,
+    std::size_t& outputProduced
+) noexcept -> Result {
+
+    inputConsumed = 0;
+    outputProduced = 0;
+
+    if (!impl_) {
+        return Result::NotInitialized;
+    }
+
+    if (!impl_->impulse_response_set_) {
+        return Result::NotInitialized;
+    }
+
+    if (impl_->finish_started_) {
+        return Result::InvalidArgument;
+    }
+
+    if (input.size() >
+        std::numeric_limits<std::size_t>::max() - impl_->input_samples_total_) {
+        return Result::InvalidArgument;
+    }
+
+    std::size_t outputOffset = 0;
+
+    while (true) {
+        // First deliver any output left from the previous call.
+        impl_->copyPendingOutput(output, outputOffset);
+
+        if (outputOffset == output.size()) {
+            break;
+        }
+
+        if (impl_->output_available_ > 0) {
+            break;
+        }
+
+        // No more input to consume.
+        if (inputConsumed == input.size()) {
+            break;
+        }
+
+        // Collect samples until one complete partition is available.
+        const std::size_t copyCount = std::min(
+            impl_->partition_size_ - impl_->input_partition_fill_,
+            input.size() - inputConsumed
+        );
+
+        std::copy_n(
+            input.data() + inputConsumed,
+            copyCount,
+            impl_->input_partition_.data() + impl_->input_partition_fill_
+        );
+
+        inputConsumed += copyCount;
+        impl_->input_partition_fill_ += copyCount;
+        impl_->input_samples_total_ += copyCount;
+
+        if (impl_->input_partition_fill_ < impl_->partition_size_) {
+            break;
+        }
+
+        // The input partition is complete. Prepare the FFT input.
+        std::copy(
+            impl_->input_partition_.begin(),
+            impl_->input_partition_.end(),
+            impl_->time_buffer_.begin()
+        );
+
+        std::fill(
+            impl_->time_buffer_.begin() +
+                static_cast<std::ptrdiff_t>(impl_->partition_size_),
+            impl_->time_buffer_.end(),
+            0.0f
+        );
+
+        const Result result = impl_->processPartition(impl_->partition_size_);
+
+        if (result != Result::Success) {
+            return result;
+        }
+    }
+
+    outputProduced = outputOffset;
+
+    return Result::Success;
+}
+
+
+auto ConvolutionStream::finish(
+    std::span<float> output,
+    std::size_t& outputProduced,
+    bool& finished
+) noexcept -> Result {
+
+    outputProduced = 0;
+    finished = false;
+
+    if (!impl_) {
+        return Result::NotInitialized;
+    }
+
+    if (!impl_->impulse_response_set_) {
+        return Result::NotInitialized;
+    }
+
+    if (impl_->finished_) {
+        finished = true;
+        return Result::Success;
+    }
+
+    if (!impl_->finish_started_) {
+        impl_->finish_started_ = true;
+
+        if (impl_->input_samples_total_ == 0) {
+            impl_->finished_ = true;
+            finished = true;
+            return Result::Success;
+        }
+
+        if (impl_->impulse_response_size_ - 1 >
+            std::numeric_limits<std::size_t>::max() - impl_->input_samples_total_) {
+            return Result::InvalidArgument;
+        }
+
+        impl_->finish_target_samples_ =
+            impl_->input_samples_total_ + impl_->impulse_response_size_ - 1;
+    }
+
+    std::size_t outputOffset = 0;
+
+    while (outputOffset < output.size()) {
+        // Deliver any output already waiting.
+        impl_->copyPendingOutput(output, outputOffset);
+
+        if (outputOffset == output.size()) {
+            break;
+        }
+
+        if (impl_->output_available_ > 0) {
+            break;
+        }
+
+        if (impl_->output_samples_generated_ >= impl_->finish_target_samples_) {
+            break;
+        }
+
+        // Prepare the next partition. This is either the final partial
+        // input partition or a zero-input partition used to flush the tail.
+        if (impl_->input_partition_fill_ < impl_->partition_size_) {
+            std::fill(
+                impl_->input_partition_.begin() +
+                    static_cast<std::ptrdiff_t>(impl_->input_partition_fill_),
+                impl_->input_partition_.end(),
+                0.0f
+            );
+        }
+
+        std::copy(
+            impl_->input_partition_.begin(),
+            impl_->input_partition_.end(),
+            impl_->time_buffer_.begin()
+        );
+
+        std::fill(
+            impl_->time_buffer_.begin() +
+                static_cast<std::ptrdiff_t>(impl_->partition_size_),
+            impl_->time_buffer_.end(),
+            0.0f
+        );
+
+        const std::size_t remainingSamples =
+            impl_->finish_target_samples_ - impl_->output_samples_generated_;
+
+        const std::size_t validOutputSamples = std::min(
+            impl_->partition_size_,
+            remainingSamples
+        );
+
+        const Result result = impl_->processPartition(validOutputSamples);
+
+        if (result != Result::Success) {
+            return result;
+        }
+    }
+
+    outputProduced = outputOffset;
+
+    impl_->finished_ =
+        impl_->output_samples_total_ == impl_->finish_target_samples_ &&
+        impl_->output_available_ == 0;
+
+    finished = impl_->finished_;
+
+    return Result::Success;
 }
 
 

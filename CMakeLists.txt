@@ -263,6 +263,7 @@ target_sources(
         src/DSP/FFT/Portable/PortableFFT.cpp
         src/DSP/Partials.cpp
         src/DSP/Convolution.cpp
+        src/DSP/ConvolutionStream.cpp
 
         src/String/String.cpp
         src/String/StringUtf8.cpp
