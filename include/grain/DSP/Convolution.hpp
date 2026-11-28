@@ -30,6 +30,8 @@ public:
      * The output vector is replaced with the result.
      *
      * Both input signals must contain at least one sample.
+     *
+     * The output vector must not share storage with either input signal.
      */
     [[nodiscard]]
     static auto process(

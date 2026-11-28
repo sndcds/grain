@@ -6,6 +6,7 @@
 #include <limits>
 #include <new>
 #include <vector>
+#include <stdexcept>
 
 namespace Grain {
 
@@ -39,11 +40,11 @@ auto Convolution::process(
 
     const std::size_t fftSize = partitionSize * 2;
     const std::size_t inputPartitionCount =
-        (input.size() + partitionSize - 1) / partitionSize;
+        1 + (input.size() - 1) / partitionSize;
     const std::size_t irPartitionCount =
-        (impulseResponse.size() + partitionSize - 1) / partitionSize;
+        1 + (impulseResponse.size() - 1) / partitionSize;
     const std::size_t outputPartitionCount =
-        (outputSize + partitionSize - 1) / partitionSize;
+        1 + (outputSize - 1) / partitionSize;
 
     try {
         //----------------------------------------------------------------------
@@ -64,6 +65,23 @@ auto Convolution::process(
 
         const std::size_t binCount = fft->binCount();
 
+
+        //----------------------------------------------------------------------
+        //  Validate allocation sizes
+        //----------------------------------------------------------------------
+
+        const std::vector<std::complex<float>> spectrumStorage;
+
+        if (inputPartitionCount > spectrumStorage.max_size() / binCount ||
+            irPartitionCount > spectrumStorage.max_size() / binCount) {
+            return Result::InvalidArgument;
+            }
+
+        if (outputSize > output.max_size()) {
+            return Result::InvalidArgument;
+        }
+
+
         //----------------------------------------------------------------------
         //  Allocate working memory
         //----------------------------------------------------------------------
@@ -82,6 +100,7 @@ auto Convolution::process(
         std::vector<std::complex<float>> spectrumBuffer(binCount);
 
         output.assign(outputSize, 0.0f);
+
 
         //----------------------------------------------------------------------
         //  Transform input partitions
@@ -234,6 +253,10 @@ auto Convolution::process(
     catch (const std::bad_alloc&) {
         output.clear();
         return Result::OutOfMemory;
+    }
+    catch (const std::length_error&) {
+        output.clear();
+        return Result::InvalidArgument;
     }
     catch (...) {
         output.clear();
