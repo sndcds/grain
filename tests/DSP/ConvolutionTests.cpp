@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <vector>
 #include <cmath>
+#include <random>
 
 namespace Grain::DSP::Tests {
 
@@ -200,6 +201,63 @@ TEST_CASE("Convolution longer signals", "[DSP][Convolution]")
     }
 
     verifyConvolution(input, impulseResponse, 256);
+}
+
+
+TEST_CASE("Convolution deterministic random signals", "[DSP][Convolution]")
+{
+    std::mt19937 generator(12345);
+    std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+
+    std::vector<float> input(2048);
+    std::vector<float> impulseResponse(513);
+
+    for (float& sample : input) {
+        sample = distribution(generator);
+    }
+
+    for (float& sample : impulseResponse) {
+        sample = distribution(generator);
+    }
+
+    verifyConvolution(input, impulseResponse, 128);
+}
+
+
+TEST_CASE("Convolution preserves impulse response alignment", "[DSP][Convolution]")
+{
+    const std::vector<float> input = {
+        1.0f, 0.0f, 0.0f, 0.0f
+    };
+
+    const std::vector<float> impulseResponse = {
+        0.0f, 0.0f, 0.5f, 0.0f, 0.25f
+    };
+
+    const std::vector<float> expected = {
+        0.0f, 0.0f, 0.5f, 0.0f, 0.25f, 0.0f, 0.0f, 0.0f
+    };
+
+    std::vector<float> actual;
+
+    ConvolutionConfiguration configuration;
+    configuration.partitionSize = 2;
+    configuration.backend = FFTBackendType::Portable;
+
+    REQUIRE(
+        Convolution::process(
+            input,
+            impulseResponse,
+            actual,
+            configuration
+        ) == Result::Success
+    );
+
+    REQUIRE(actual.size() == expected.size());
+
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(actual[i] == Catch::Approx(expected[i]).margin(1.0e-5f));
+    }
 }
 
 
