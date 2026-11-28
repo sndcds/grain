@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <memory>
 #include <numbers>
+#include <limits>
 
 namespace Grain::DSP::Tests {
 
@@ -258,6 +259,7 @@ TEST_CASE("Partials Nyquist bin for even FFT size", "[DSP][Partials]")
     REQUIRE(partials->nyquist() == Catch::Approx(0.75f));
 }
 
+
 TEST_CASE("Partials has no Nyquist bin for odd FFT size", "[DSP][Partials]")
 {
     std::unique_ptr<Partials> partials;
@@ -267,6 +269,86 @@ TEST_CASE("Partials has no Nyquist bin for odd FFT size", "[DSP][Partials]")
     REQUIRE_FALSE(partials->hasNyquistBin());
 
     REQUIRE(partials->nyquist() == Catch::Approx(0.0f));
+}
+
+
+TEST_CASE("Partials spectrum scaling", "[DSP][Partials]")
+{
+    std::unique_ptr<Partials> partials;
+
+    REQUIRE(Partials::create(8, partials) == Result::Success);
+
+    REQUIRE(partials->setBin(0, {1.0f, 0.0f}) == Result::Success);
+    REQUIRE(partials->setBin(1, {2.0f, 3.0f}) == Result::Success);
+    REQUIRE(partials->setBin(2, {-1.0f, 2.0f}) == Result::Success);
+
+    SECTION("scales all bins")
+    {
+        REQUIRE(partials->scale(2.0f) == Result::Success);
+
+        REQUIRE(partials->spectrum()[0] == std::complex<float>{2.0f, 0.0f});
+        REQUIRE(partials->spectrum()[1] == std::complex<float>{4.0f, 6.0f});
+        REQUIRE(partials->spectrum()[2] == std::complex<float>{-2.0f, 4.0f});
+    }
+
+    SECTION("supports negative scaling")
+    {
+        REQUIRE(partials->scale(-1.0f) == Result::Success);
+
+        REQUIRE(partials->spectrum()[0] == std::complex<float>{-1.0f, 0.0f});
+        REQUIRE(partials->spectrum()[1] == std::complex<float>{-2.0f, -3.0f});
+    }
+
+    SECTION("rejects a non-finite factor")
+    {
+        REQUIRE(
+            partials->scale(std::numeric_limits<float>::infinity())
+            == Result::InvalidArgument
+        );
+
+        REQUIRE(partials->spectrum()[0] == std::complex<float>{1.0f, 0.0f});
+    }
+}
+
+
+TEST_CASE("Partials spectrum multiplication", "[DSP][Partials]")
+{
+    std::unique_ptr<Partials> first;
+    std::unique_ptr<Partials> second;
+
+    REQUIRE(Partials::create(8, first) == Result::Success);
+    REQUIRE(Partials::create(8, second) == Result::Success);
+
+    REQUIRE(first->setBin(0, {1.0f, 0.0f}) == Result::Success);
+    REQUIRE(first->setBin(1, {2.0f, 1.0f}) == Result::Success);
+
+    REQUIRE(second->setBin(0, {2.0f, 0.0f}) == Result::Success);
+    REQUIRE(second->setBin(1, {1.0f, -1.0f}) == Result::Success);
+
+    SECTION("multiplies corresponding complex bins")
+    {
+        REQUIRE(first->multiply(*second) == Result::Success);
+
+        REQUIRE(first->spectrum()[0] == std::complex<float>{2.0f, 0.0f});
+        REQUIRE(first->spectrum()[1] == std::complex<float>{3.0f, -1.0f});
+    }
+
+    SECTION("rejects different FFT sizes")
+    {
+        std::unique_ptr<Partials> differentSize;
+
+        REQUIRE(Partials::create(16, differentSize) == Result::Success);
+
+        REQUIRE(first->multiply(*differentSize) == Result::InvalidArgument);
+    }
+
+    SECTION("supports multiplication with itself")
+    {
+        REQUIRE(first->multiply(*first) == Result::Success);
+
+        REQUIRE(first->spectrum()[0] == std::complex<float>{1.0f, 0.0f});
+        REQUIRE(first->spectrum()[1] == std::complex<float>{3.0f, 4.0f});
+    }
 }
 
 

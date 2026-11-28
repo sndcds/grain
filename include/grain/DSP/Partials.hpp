@@ -96,6 +96,21 @@ public:
 
     void clear() noexcept;
 
+    /**
+     * Scales all spectrum bins by a scalar factor.
+     *
+     * Negative factors are supported.
+     * Non-finite factors are rejected.
+     */
+    auto scale(float factor) noexcept -> Result;
+
+    /**
+     * Multiplies this spectrum with another spectrum, bin by bin.
+     *
+     * Both spectra must have the same FFT size.
+     */
+    auto multiply(const Partials& other) noexcept -> Result;
+
 private:
     explicit Partials(std::size_t fftSize);
 

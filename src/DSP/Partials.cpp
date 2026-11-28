@@ -194,4 +194,30 @@ void Partials::clear() noexcept {
     );
 }
 
+
+auto Partials::scale(float factor) noexcept -> Result {
+    if (!std::isfinite(factor)) {
+        return Result::InvalidArgument;
+    }
+
+    for (std::complex<float>& bin : bins_) {
+        bin *= factor;
+    }
+
+    return Result::Success;
+}
+
+
+auto Partials::multiply(const Partials& other) noexcept -> Result {
+    if (fft_size_ != other.fft_size_) {
+        return Result::InvalidArgument;
+    }
+
+    for (std::size_t i = 0; i < bins_.size(); ++i) {
+        bins_[i] *= other.bins_[i];
+    }
+
+    return Result::Success;
+}
+
 } // namespace Grain
