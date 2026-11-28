@@ -31,6 +31,7 @@ add_executable(
         Input/InputTests.cpp
         DSP/FFTTests.cpp
         DSP/PartialsTests.cpp
+        DSP/ConvolutionTests.cpp
 )
 
 target_link_libraries(
