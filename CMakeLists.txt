@@ -261,6 +261,7 @@ target_sources(
         src/DSP/WeightedSamples.cpp
         src/DSP/FFT/FFT.cpp
         src/DSP/FFT/Portable/PortableFFT.cpp
+        src/DSP/Partials.cpp
 
         src/String/String.cpp
         src/String/StringUtf8.cpp
@@ -366,6 +367,7 @@ target_sources(
 
         include/grain/DSP/WeightedSamples.hpp
         include/grain/DSP/FFT/FFT.hpp
+        include/grain/DSP/Partials.hpp
 
         include/grain/Geometry/Arc.hpp
         include/grain/Geometry/Circle.hpp

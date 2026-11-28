@@ -30,6 +30,7 @@ add_executable(
         String/StringUtf8Tests.cpp
         Input/InputTests.cpp
         DSP/FFTTests.cpp
+        DSP/PartialsTests.cpp
 )
 
 target_link_libraries(
