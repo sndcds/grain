@@ -11,6 +11,12 @@ find_package(CURL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 
+find_library(
+        ACCELERATE_FRAMEWORK
+        Accelerate
+        REQUIRED
+)
+
 pkg_check_modules(LUA REQUIRED IMPORTED_TARGET lua)
 
 
@@ -145,4 +151,5 @@ target_link_libraries(Grain INTERFACE
         "-framework CoreText"
         "-framework CoreFoundation"
         "-framework CoreVideo"
+        ${ACCELERATE_FRAMEWORK}
 )

@@ -8,3 +8,15 @@ target_link_libraries(
         PRIVATE
         Grain
 )
+
+
+add_executable(
+        convolution_demo
+        ConvolutionDemo.cpp
+)
+
+target_link_libraries(
+        convolution_demo
+        PRIVATE
+        Grain
+)
