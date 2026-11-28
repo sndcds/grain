@@ -1,13 +1,17 @@
+
 #pragma once
 
 #include <grain/DSP/FFT/FFT.hpp>
 #include "../FFTBackend.hpp"
 
+#include <complex>
+#include <vector>
+
 namespace Grain {
 
 class PortableFFT final : public FFTBackend {
 public:
-    explicit PortableFFT(std::size_t size) noexcept;
+    explicit PortableFFT(std::size_t size);
 
     [[nodiscard]]
     auto size() const noexcept -> std::size_t override;
@@ -31,6 +35,9 @@ public:
 private:
     std::size_t size_ = 0;
     std::size_t bin_count_ = 0;
+
+    // e^(-i * 2 * pi * index / size), calculated once at construction.
+    std::vector<std::complex<double>> twiddles_;
 };
 
 } // namespace Grain

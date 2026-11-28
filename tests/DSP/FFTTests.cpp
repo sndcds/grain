@@ -593,4 +593,50 @@ TEST_CASE("FFT Accelerate round trips across transform sizes", "[DSP][FFT]")
 }
 
 
+TEST_CASE("FFT Portable round trips across transform sizes", "[DSP][FFT]")
+{
+    constexpr std::array<std::size_t, 7> sizes = {
+        1, 2, 7, 8, 16, 31, 32
+    };
+
+    for (const std::size_t size : sizes) {
+        CAPTURE(size);
+
+        std::unique_ptr<FFT> fft;
+
+        REQUIRE(
+            FFT::create(
+                FFTConfiguration{size, FFTBackendType::Portable},
+                fft
+            ) == Result::Success
+        );
+
+        std::vector<float> input(size);
+        std::vector<float> output(size);
+        std::vector<std::complex<float>> spectrum(size / 2 + 1);
+
+        for (std::size_t i = 0; i < size; ++i) {
+            input[i] =
+                static_cast<float>(std::sin(
+                    2.0 * std::numbers::pi_v<double>
+                    * static_cast<double>(i)
+                    / static_cast<double>(size)
+                ))
+                + static_cast<float>(i % 3) * 0.125f;
+        }
+
+        // Reuse the same FFT instance to verify that the twiddle table
+        // remains valid across repeated transforms.
+        for (int iteration = 0; iteration < 3; ++iteration) {
+            REQUIRE(fft->forward(input, spectrum) == Result::Success);
+            REQUIRE(fft->inverse(spectrum, output) == Result::Success);
+
+            for (std::size_t i = 0; i < size; ++i) {
+                REQUIRE_THAT(output[i], WithinAbs(input[i], kTolerance));
+            }
+        }
+    }
+}
+
+
 } // namespace Grain::DSP::Tests

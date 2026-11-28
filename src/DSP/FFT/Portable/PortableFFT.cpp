@@ -1,3 +1,4 @@
+
 #include "PortableFFT.hpp"
 
 #include <cmath>
@@ -5,9 +6,22 @@
 
 namespace Grain {
 
-PortableFFT::PortableFFT(std::size_t size) noexcept
+PortableFFT::PortableFFT(std::size_t size)
     : size_(size),
-      bin_count_(size / 2 + 1) {
+      bin_count_(size / 2 + 1),
+      twiddles_(size) {
+
+    constexpr double tau = 2.0 * std::numbers::pi_v<double>;
+
+    for (std::size_t i = 0; i < size_; ++i) {
+        const double angle =
+            tau * static_cast<double>(i) / static_cast<double>(size_);
+
+        twiddles_[i] = std::complex<double>(
+            std::cos(angle),
+            -std::sin(angle)
+        );
+    }
 }
 
 
@@ -34,22 +48,18 @@ auto PortableFFT::forward(
         return Result::InvalidArgument;
     }
 
-    constexpr double tau = 2.0 * std::numbers::pi_v<double>;
-
     for (std::size_t k = 0; k < bin_count_; ++k) {
         double real = 0.0;
         double imaginary = 0.0;
 
         for (std::size_t n = 0; n < size_; ++n) {
-            const double angle =
-                tau * static_cast<double>(k)
-                * static_cast<double>(n)
-                / static_cast<double>(size_);
+            const std::size_t twiddle_index = (k * n) % size_;
+            const std::complex<double>& twiddle = twiddles_[twiddle_index];
 
             const double sample = static_cast<double>(input[n]);
 
-            real += sample * std::cos(angle);
-            imaginary -= sample * std::sin(angle);
+            real += sample * twiddle.real();
+            imaginary += sample * twiddle.imag();
         }
 
         output[k] = std::complex<float>(
@@ -70,8 +80,6 @@ auto PortableFFT::inverse(
         return Result::InvalidArgument;
     }
 
-    constexpr double tau = 2.0 * std::numbers::pi_v<double>;
-
     const bool has_nyquist = size_ > 1 && size_ % 2 == 0;
     const std::size_t last_pair_bin =
         has_nyquist ? bin_count_ - 1 : bin_count_;
@@ -80,17 +88,16 @@ auto PortableFFT::inverse(
         double value = static_cast<double>(input[0].real());
 
         for (std::size_t k = 1; k < last_pair_bin; ++k) {
-            const double angle =
-                tau * static_cast<double>(k)
-                * static_cast<double>(n)
-                / static_cast<double>(size_);
+            const std::size_t twiddle_index = (k * n) % size_;
+            const std::complex<double>& twiddle = twiddles_[twiddle_index];
 
             const double real = static_cast<double>(input[k].real());
             const double imaginary = static_cast<double>(input[k].imag());
 
+            // Use the conjugate twiddle for the inverse transform.
             value += 2.0 * (
-                real * std::cos(angle)
-                - imaginary * std::sin(angle)
+                real * twiddle.real()
+                + imaginary * twiddle.imag()
             );
         }
 
