@@ -607,4 +607,121 @@ TEST_CASE("ConvolutionStream handles repeated finish calls",
 }
 
 
+TEST_CASE("ConvolutionStream resets state when replacing impulse response",
+          "[DSP][ConvolutionStream]")
+{
+    const std::vector<float> input = {
+        1.0f, 0.5f, -0.25f, 0.75f,
+        -0.5f, 0.25f, 0.125f, -0.75f
+    };
+
+    const std::vector<float> firstImpulseResponse = {
+        1.0f, 0.5f, 0.25f, -0.125f
+    };
+
+    const std::vector<float> secondImpulseResponse = {
+        0.25f, -0.5f, 0.75f
+    };
+
+    ConvolutionStreamConfiguration configuration;
+    configuration.partitionSize = 4;
+    configuration.backend = FFTBackendType::Portable;
+
+    std::unique_ptr<ConvolutionStream> stream;
+
+    REQUIRE(ConvolutionStream::create(configuration, stream) == Result::Success);
+
+    std::array<float, 5> outputBuffer {};
+
+    const auto processSignal = [&](std::span<const float> impulseResponse) {
+        REQUIRE(stream->setImpulseResponse(impulseResponse) == Result::Success);
+
+        std::vector<float> actual;
+        std::size_t inputOffset = 0;
+
+        while (inputOffset < input.size()) {
+            std::size_t inputConsumed = 0;
+            std::size_t outputProduced = 0;
+
+            REQUIRE(stream->process(
+                std::span<const float>(
+                    input.data() + inputOffset,
+                    input.size() - inputOffset
+                ),
+                outputBuffer,
+                inputConsumed,
+                outputProduced
+            ) == Result::Success);
+
+            inputOffset += inputConsumed;
+
+            actual.insert(
+                actual.end(),
+                outputBuffer.begin(),
+                outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+            );
+
+            REQUIRE((inputConsumed > 0 || outputProduced > 0));
+        }
+
+        bool finished = false;
+
+        while (!finished) {
+            std::size_t outputProduced = 0;
+
+            REQUIRE(stream->finish(
+                outputBuffer,
+                outputProduced,
+                finished
+            ) == Result::Success);
+
+            actual.insert(
+                actual.end(),
+                outputBuffer.begin(),
+                outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+            );
+        }
+
+        return actual;
+    };
+
+    // First convolution.
+    const std::vector<float> firstActual = processSignal(firstImpulseResponse);
+
+    // Replacing the impulse response must reset all previous stream state.
+    const std::vector<float> secondActual = processSignal(secondImpulseResponse);
+
+    // Verify both results against independent offline references.
+    std::vector<float> firstExpected;
+    std::vector<float> secondExpected;
+
+    REQUIRE(Convolution::process(
+        input,
+        firstImpulseResponse,
+        firstExpected,
+        ConvolutionConfiguration{4, FFTBackendType::Portable}
+    ) == Result::Success);
+
+    REQUIRE(Convolution::process(
+        input,
+        secondImpulseResponse,
+        secondExpected,
+        ConvolutionConfiguration{4, FFTBackendType::Portable}
+    ) == Result::Success);
+
+    REQUIRE(firstActual.size() == firstExpected.size());
+    REQUIRE(secondActual.size() == secondExpected.size());
+
+    for (std::size_t i = 0; i < firstExpected.size(); ++i) {
+        INFO("First convolution sample index: " << i);
+        REQUIRE(firstActual[i] == Catch::Approx(firstExpected[i]).margin(1.0e-4f));
+    }
+
+    for (std::size_t i = 0; i < secondExpected.size(); ++i) {
+        INFO("Second convolution sample index: " << i);
+        REQUIRE(secondActual[i] == Catch::Approx(secondExpected[i]).margin(1.0e-4f));
+    }
+}
+
+
 } // namespace Grain::DSP::Tests
