@@ -1,7 +1,12 @@
 #include <grain/DSP/FFT/FFT.hpp>
 
-#include <grain/DSP/FFT/FFTBackend.hpp>
+#include "FFTBackend.hpp"
+
 #include "Portable/PortableFFT.hpp"
+
+#if defined(GRAIN_HAS_ACCELERATE)
+#include "macOS/AccelerateFFT.hpp"
+#endif
 
 #include <new>
 #include <utility>
@@ -34,25 +39,72 @@ auto FFT::create(
     const FFTConfiguration& configuration,
     std::unique_ptr<FFT>& output
 ) noexcept -> Result {
+
     output.reset();
 
     if (configuration.size == 0) {
         return Result::InvalidArgument;
     }
 
-    if (configuration.backend == FFTBackendType::Accelerate ||
-        configuration.backend == FFTBackendType::FFTW) {
-        return Result::Unsupported;
-    }
-
-    if (configuration.backend != FFTBackendType::Automatic &&
-        configuration.backend != FFTBackendType::Portable) {
+    if (
+        configuration.backend != FFTBackendType::Automatic &&
+        configuration.backend != FFTBackendType::Portable &&
+        configuration.backend != FFTBackendType::Accelerate &&
+        configuration.backend != FFTBackendType::FFTW
+    ) {
         return Result::InvalidArgument;
     }
 
+    //--------------------------------------------------------------------------
+    //  Backend Selection
+    //--------------------------------------------------------------------------
+
     try {
-        std::unique_ptr<FFTBackend> backend =
-            std::make_unique<PortableFFT>(configuration.size);
+        std::unique_ptr<FFTBackend> backend;
+
+        if (configuration.backend == FFTBackendType::Automatic) {
+
+#if defined(GRAIN_HAS_ACCELERATE)
+            const Result accelerate_result =
+                createAccelerateFFT(configuration.size, backend);
+
+            if (accelerate_result == Result::OutOfMemory ||
+                accelerate_result == Result::Error) {
+                return accelerate_result;
+                }
+#endif
+
+            // Use the portable backend if Accelerate is unavailable
+            // or does not support this transform size.
+            if (!backend) {
+                backend = std::make_unique<PortableFFT>(
+                    configuration.size
+                );
+            }
+        }
+        else if (configuration.backend == FFTBackendType::Accelerate) {
+
+#if defined(GRAIN_HAS_ACCELERATE)
+            const Result result =
+                createAccelerateFFT(configuration.size, backend);
+
+            if (result != Result::Success) {
+                return result;
+            }
+#else
+            return Result::Unsupported;
+#endif
+
+        }
+        else if (configuration.backend == FFTBackendType::Portable) {
+            backend = std::make_unique<PortableFFT>(
+                configuration.size
+            );
+        }
+        else {
+            // FFTW is implemented in a later milestone.
+            return Result::Unsupported;
+        }
 
         std::unique_ptr<Impl> impl =
             std::make_unique<Impl>(std::move(backend));

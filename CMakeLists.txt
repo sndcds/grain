@@ -468,6 +468,13 @@ if(APPLE)
             src/Platform/macOS/CocoaFont.mm
             src/Platform/macOS/GrainRootView.mm
             src/Platform/macOS/CocoaAnimationDriver.mm
+            src/DSP/FFT/macOS/AccelerateFFT.cpp
+    )
+
+    target_compile_definitions(
+            Grain
+            PRIVATE
+            GRAIN_HAS_ACCELERATE=1
     )
 
     target_link_libraries(
@@ -478,6 +485,7 @@ if(APPLE)
             "-framework CoreText"
             "-framework CoreFoundation"
             "-framework CoreVideo"
+            "-framework Accelerate"
     )
 
 elseif(WIN32)

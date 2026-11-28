@@ -1,8 +1,7 @@
 #pragma once
 
 #include <grain/DSP/FFT/FFT.hpp>
-#include <grain/DSP/FFT/FFTBackend.hpp>
-
+#include "../FFTBackend.hpp"
 
 namespace Grain {
 

@@ -18,8 +18,10 @@ using Catch::Matchers::WithinAbs;
 constexpr float kTolerance = 1.0e-4f;
 
 
-TEST_CASE("FFT creation", "[DSP][FFT]") {
-    SECTION("creates an automatic portable backend") {
+TEST_CASE("FFT creation", "[DSP][FFT]")
+{
+    SECTION("creates an automatic backend")
+    {
         std::unique_ptr<FFT> fft;
 
         REQUIRE(
@@ -30,10 +32,16 @@ TEST_CASE("FFT creation", "[DSP][FFT]") {
         REQUIRE(fft != nullptr);
         REQUIRE(fft->size() == 8);
         REQUIRE(fft->binCount() == 5);
+
+#if defined(__APPLE__)
+        REQUIRE(fft->backend() == FFTBackendType::Accelerate);
+#else
         REQUIRE(fft->backend() == FFTBackendType::Portable);
+#endif
     }
 
-    SECTION("creates an arbitrary transform size") {
+    SECTION("creates an arbitrary transform size")
+    {
         std::unique_ptr<FFT> fft;
 
         REQUIRE(
@@ -41,11 +49,17 @@ TEST_CASE("FFT creation", "[DSP][FFT]") {
             == Result::Success
         );
 
+        REQUIRE(fft != nullptr);
         REQUIRE(fft->size() == 7);
         REQUIRE(fft->binCount() == 4);
+
+        // The current Accelerate implementation supports even sizes only.
+        // Automatic selection should therefore fall back to Portable.
+        REQUIRE(fft->backend() == FFTBackendType::Portable);
     }
 
-    SECTION("rejects a zero transform size") {
+    SECTION("rejects a zero transform size")
+    {
         std::unique_ptr<FFT> fft;
 
         REQUIRE(
@@ -56,23 +70,28 @@ TEST_CASE("FFT creation", "[DSP][FFT]") {
         REQUIRE(fft == nullptr);
     }
 
-    SECTION("rejects unavailable optimized backends") {
+    SECTION("rejects unavailable optimized backends")
+    {
         std::unique_ptr<FFT> fft;
 
+#if !defined(__APPLE__)
         REQUIRE(
             FFT::create(
                 FFTConfiguration{8, FFTBackendType::Accelerate},
                 fft
-            ) == Result::Unsupported
+            )
+            == Result::Unsupported
         );
 
         REQUIRE(fft == nullptr);
+#endif
 
         REQUIRE(
             FFT::create(
                 FFTConfiguration{8, FFTBackendType::FFTW},
                 fft
-            ) == Result::Unsupported
+            )
+            == Result::Unsupported
         );
 
         REQUIRE(fft == nullptr);
@@ -277,6 +296,57 @@ TEST_CASE("FFT inverse transform", "[DSP][FFT]") {
             == Result::InvalidArgument
         );
     }
+}
+
+TEST_CASE("FFT Accelerate matches portable backend", "[DSP][FFT]") {
+#if defined(__APPLE__)
+    constexpr std::size_t size = 16;
+
+    std::unique_ptr<FFT> portable;
+    std::unique_ptr<FFT> accelerate;
+
+    REQUIRE(
+        FFT::create(
+            FFTConfiguration{size, FFTBackendType::Portable},
+            portable
+        ) == Result::Success
+    );
+
+    REQUIRE(
+        FFT::create(
+            FFTConfiguration{size, FFTBackendType::Accelerate},
+            accelerate
+        ) == Result::Success
+    );
+
+    std::array<float, size> input{};
+    std::array<std::complex<float>, size / 2 + 1> portable_output{};
+    std::array<std::complex<float>, size / 2 + 1> accelerate_output{};
+
+    for (std::size_t i = 0; i < size; ++i) {
+        input[i] = static_cast<float>(i % 5) / 5.0f;
+    }
+
+    REQUIRE(
+        portable->forward(input, portable_output) == Result::Success
+    );
+
+    REQUIRE(
+        accelerate->forward(input, accelerate_output) == Result::Success
+    );
+
+    for (std::size_t i = 0; i < portable_output.size(); ++i) {
+        REQUIRE_THAT(
+            accelerate_output[i].real(),
+            WithinAbs(portable_output[i].real(), kTolerance)
+        );
+
+        REQUIRE_THAT(
+            accelerate_output[i].imag(),
+            WithinAbs(portable_output[i].imag(), kTolerance)
+        );
+    }
+#endif
 }
 
 } // namespace Grain::DSP::Tests
