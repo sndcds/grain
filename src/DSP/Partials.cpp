@@ -43,32 +43,36 @@ auto Partials::create(
 }
 
 
-auto Partials::fftSize() const noexcept -> std::size_t
-{
+auto Partials::fftSize() const noexcept -> std::size_t {
     return fft_size_;
 }
 
 
-auto Partials::binCount() const noexcept -> std::size_t
-{
+auto Partials::binCount() const noexcept -> std::size_t {
     return bins_.size();
 }
 
 
-auto Partials::hasNyquistBin() const noexcept -> bool
-{
+auto Partials::hasNyquistBin() const noexcept -> bool {
     return fft_size_ % 2 == 0;
 }
 
 
-auto Partials::dc() const noexcept -> float
-{
+auto Partials::dc() const noexcept -> float {
     return bins_.empty() ? 0.0f : bins_[0].real();
 }
 
 
-auto Partials::magnitude(std::size_t binIndex) const noexcept -> float
-{
+auto Partials::nyquist() const noexcept -> float {
+    if (!hasNyquistBin()) {
+        return 0.0f;
+    }
+
+    return bins_.back().real();
+}
+
+
+auto Partials::magnitude(std::size_t binIndex) const noexcept -> float {
     if (binIndex >= bins_.size()) {
         return 0.0f;
     }
@@ -77,8 +81,7 @@ auto Partials::magnitude(std::size_t binIndex) const noexcept -> float
 }
 
 
-auto Partials::phase(std::size_t binIndex) const noexcept -> float
-{
+auto Partials::phase(std::size_t binIndex) const noexcept -> float {
     if (binIndex >= bins_.size()) {
         return 0.0f;
     }
@@ -183,8 +186,7 @@ auto Partials::copyToSpectrum(
 }
 
 
-void Partials::clear() noexcept
-{
+void Partials::clear() noexcept {
     std::fill(
         bins_.begin(),
         bins_.end(),

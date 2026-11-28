@@ -1,6 +1,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/catch_approx.hpp>
 
 #include <grain/DSP/FFT/FFT.hpp>
 #include <grain/DSP/Partials.hpp>
@@ -241,6 +242,31 @@ TEST_CASE("Partials integrates with FFT forward transform", "[DSP][Partials]")
     for (const std::complex<float>& bin : partials->spectrum()) {
         REQUIRE(std::abs(bin - std::complex<float>{1.0f, 0.0f}) < 1.0e-5f);
     }
+}
+
+
+TEST_CASE("Partials Nyquist bin for even FFT size", "[DSP][Partials]")
+{
+    std::unique_ptr<Partials> partials;
+
+    REQUIRE(Partials::create(8, partials) == Result::Success);
+    REQUIRE(partials != nullptr);
+    REQUIRE(partials->hasNyquistBin());
+
+    REQUIRE(partials->setBin(4, {0.75f, 0.0f}) == Result::Success);
+
+    REQUIRE(partials->nyquist() == Catch::Approx(0.75f));
+}
+
+TEST_CASE("Partials has no Nyquist bin for odd FFT size", "[DSP][Partials]")
+{
+    std::unique_ptr<Partials> partials;
+
+    REQUIRE(Partials::create(7, partials) == Result::Success);
+    REQUIRE(partials != nullptr);
+    REQUIRE_FALSE(partials->hasNyquistBin());
+
+    REQUIRE(partials->nyquist() == Catch::Approx(0.0f));
 }
 
 

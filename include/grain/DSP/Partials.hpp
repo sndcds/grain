@@ -57,6 +57,9 @@ public:
     auto dc() const noexcept -> float;
 
     [[nodiscard]]
+    auto nyquist() const noexcept -> float;
+
+    [[nodiscard]]
     auto magnitude(std::size_t binIndex) const noexcept -> float;
 
     [[nodiscard]]
