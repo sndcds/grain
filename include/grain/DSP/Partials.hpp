@@ -111,6 +111,17 @@ public:
      */
     auto multiply(const Partials& other) noexcept -> Result;
 
+    /**
+     * Interpolates this spectrum towards another spectrum.
+     *
+     * Position must be in the range [0, 1].
+     * Interpolation is performed on complex bin values.
+     */
+    auto interpolate(
+        const Partials& other,
+        float position
+    ) noexcept -> Result;
+
 private:
     explicit Partials(std::size_t fftSize);
 

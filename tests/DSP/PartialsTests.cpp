@@ -352,4 +352,80 @@ TEST_CASE("Partials spectrum multiplication", "[DSP][Partials]")
 }
 
 
+TEST_CASE("Partials spectrum interpolation", "[DSP][Partials]")
+{
+    std::unique_ptr<Partials> first;
+    std::unique_ptr<Partials> second;
+
+    REQUIRE(Partials::create(8, first) == Result::Success);
+    REQUIRE(Partials::create(8, second) == Result::Success);
+
+    REQUIRE(first->setBin(0, {1.0f, 0.0f}) == Result::Success);
+    REQUIRE(first->setBin(1, {2.0f, 2.0f}) == Result::Success);
+
+    REQUIRE(second->setBin(0, {3.0f, 0.0f}) == Result::Success);
+    REQUIRE(second->setBin(1, {4.0f, -2.0f}) == Result::Success);
+
+    SECTION("interpolates halfway")
+    {
+        REQUIRE(first->interpolate(*second, 0.5f) == Result::Success);
+
+        REQUIRE(first->spectrum()[0] == std::complex<float>{2.0f, 0.0f});
+        REQUIRE(first->spectrum()[1] == std::complex<float>{3.0f, 0.0f});
+    }
+
+    SECTION("position zero preserves the original spectrum")
+    {
+        const auto original = first->spectrum()[1];
+
+        REQUIRE(first->interpolate(*second, 0.0f) == Result::Success);
+
+        REQUIRE(first->spectrum()[1] == original);
+    }
+
+    SECTION("position one copies the other spectrum")
+    {
+        REQUIRE(first->interpolate(*second, 1.0f) == Result::Success);
+
+        REQUIRE(first->spectrum()[0] == second->spectrum()[0]);
+        REQUIRE(first->spectrum()[1] == second->spectrum()[1]);
+    }
+
+    SECTION("rejects positions outside the valid range")
+    {
+        REQUIRE(first->interpolate(*second, -0.1f) == Result::InvalidArgument);
+        REQUIRE(first->interpolate(*second, 1.1f) == Result::InvalidArgument);
+    }
+
+    SECTION("rejects non-finite positions")
+    {
+        REQUIRE(
+            first->interpolate(
+                *second,
+                std::numeric_limits<float>::quiet_NaN()
+            ) == Result::InvalidArgument
+        );
+
+        REQUIRE(
+            first->interpolate(
+                *second,
+                std::numeric_limits<float>::infinity()
+            ) == Result::InvalidArgument
+        );
+    }
+
+    SECTION("rejects different FFT sizes")
+    {
+        std::unique_ptr<Partials> differentSize;
+
+        REQUIRE(Partials::create(16, differentSize) == Result::Success);
+
+        REQUIRE(
+            first->interpolate(*differentSize, 0.5f)
+            == Result::InvalidArgument
+        );
+    }
+}
+
+
 } // namespace Grain::DSP::Tests

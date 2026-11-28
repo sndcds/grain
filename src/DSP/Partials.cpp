@@ -220,4 +220,26 @@ auto Partials::multiply(const Partials& other) noexcept -> Result {
     return Result::Success;
 }
 
+
+auto Partials::interpolate(
+    const Partials& other,
+    float position
+) noexcept -> Result
+{
+    if (fft_size_ != other.fft_size_ || !std::isfinite(position)) {
+        return Result::InvalidArgument;
+    }
+
+    if (position < 0.0f || position > 1.0f) {
+        return Result::InvalidArgument;
+    }
+
+    for (std::size_t i = 0; i < bins_.size(); ++i) {
+        bins_[i] += position * (other.bins_[i] - bins_[i]);
+    }
+
+    return Result::Success;
+}
+
+
 } // namespace Grain
