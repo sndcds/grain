@@ -15,3 +15,21 @@ target_compile_features(
         PRIVATE
         cxx_std_23
 )
+
+
+add_executable(
+        GrainConvolutionStreamBenchmarks
+        ConvolutionStreamBenchmark.cpp
+)
+
+target_link_libraries(
+        GrainConvolutionStreamBenchmarks
+        PRIVATE
+        Grain
+)
+
+target_compile_features(
+        GrainConvolutionStreamBenchmarks
+        PRIVATE
+        cxx_std_23
+)
