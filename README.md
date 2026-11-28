@@ -40,3 +40,8 @@ Wayland requires a Wayland session. To also test the OpenGL renderer:
 ```sh
 GDK_BACKEND=x11 GSK_RENDERER=gl GTK_A11Y=none xvfb-run -a ./build/linux-gtk4/tests/GrainGtk4Tests
 ```
+
+
+## Digital Signal Processing
+
+- [Fast Fourier Transform](docs/DSP/FFT.md)

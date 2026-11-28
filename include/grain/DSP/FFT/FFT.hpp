@@ -10,6 +10,26 @@
 
 namespace Grain {
 
+/**
+ * FFT backend implementation.
+ *
+ * Automatic:
+ *   Selects the best available backend for the requested transform size.
+ *   Currently prefers Accelerate when available and supported, otherwise
+ *   falls back to Portable.
+ *
+ * Portable:
+ *   Platform-independent C++ implementation.
+ *   Supports all positive transform sizes.
+ *
+ * Accelerate:
+ *   Apple Accelerate/vDSP implementation.
+ *   Available on macOS for even transform sizes >= 2.
+ *
+ * FFTW:
+ *   Reserved for a future FFTW implementation.
+ *   Currently unavailable.
+ */
 enum class FFTBackendType {
     Automatic,
     Portable,
@@ -18,6 +38,9 @@ enum class FFTBackendType {
 };
 
 
+/**
+ * Configuration used when creating an FFT instance.
+ */
 struct FFTConfiguration {
     /// Number of real samples in the transform.
     std::size_t size = 1024;
@@ -29,6 +52,22 @@ struct FFTConfiguration {
 
 /**
  * Real-valued Fast Fourier Transform.
+ *
+ * Transform conventions:
+ * - Forward transforms are unnormalized.
+ * - Inverse transforms are normalized by 1 / size().
+ * - Only the non-redundant half of the real-valued spectrum is exposed.
+ *
+ * Backend selection:
+ * - Automatic selects the best available backend.
+ * - Portable is always available for positive transform sizes.
+ * - Accelerate is available on macOS for supported sizes.
+ * - FFTW is currently unsupported.
+ *
+ * Memory:
+ * Backend setup and working memory are allocated during create().
+ * The current implementations do not allocate temporary memory during
+ * forward() or inverse().
  *
  * Thread safety:
  * An FFT instance must not be used for concurrent forward() or inverse()
@@ -43,9 +82,19 @@ public:
      * The output pointer is reset before creation. On success, it contains
      * the newly created FFT instance.
      *
+     * Automatic backend selection falls back to Portable when an optimized
+     * backend is unavailable or does not support the requested size.
+     * Resource allocation errors are returned instead of triggering fallback.
+     *
      * @param configuration Transform size and backend configuration.
      * @param output Receives the created FFT instance.
-     * @return Success, InvalidArgument, Unsupported, OutOfMemory or Error.
+     *
+     * @return
+     * - Success: FFT instance created.
+     * - InvalidArgument: Invalid configuration or zero transform size.
+     * - Unsupported: Requested backend unavailable or incompatible.
+     * - OutOfMemory: Memory allocation failed.
+     * - Error: Other initialization error.
      */
     [[nodiscard]]
     static auto create(
@@ -74,7 +123,11 @@ public:
     [[nodiscard]]
     auto binCount() const noexcept -> std::size_t;
 
-    /// Returns the backend implementation selected during creation.
+    /**
+     * Returns the backend implementation selected during creation.
+     *
+     * This may differ from the requested backend when Automatic is used.
+     */
     [[nodiscard]]
     auto backend() const noexcept -> FFTBackendType;
 
@@ -89,6 +142,8 @@ public:
      * Both spans must have exactly the expected sizes:
      * - input: size() real samples
      * - output: binCount() complex frequency bins
+     *
+     * No temporary memory allocation is performed.
      *
      * @return Success, InvalidArgument or NotInitialized.
      */
@@ -110,6 +165,8 @@ public:
      * The imaginary components of the DC and Nyquist bins are ignored.
      *
      * Both spans must have exactly the expected sizes.
+     *
+     * No temporary memory allocation is performed.
      *
      * @return Success, InvalidArgument or NotInitialized.
      */
