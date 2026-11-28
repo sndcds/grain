@@ -39,6 +39,7 @@
 #include "grain/DSP/FFT/FFT.hpp"
 #include "grain/DSP/Partials.hpp"
 #include <grain/DSP/Convolution.hpp>
+#include <grain/DSP/ConvolutionStream.hpp>
 
 #include "grain/Geometry/Arc.hpp"
 #include "grain/Geometry/Circle.hpp"
