@@ -499,4 +499,112 @@ TEST_CASE("ConvolutionStream handles output buffers smaller than a partition",
 }
 
 
+TEST_CASE("ConvolutionStream handles repeated finish calls",
+          "[DSP][ConvolutionStream]")
+{
+    const std::vector<float> input = {1.0f, 0.5f, -0.25f};
+    const std::vector<float> impulseResponse = {1.0f, 0.5f, 0.25f};
+
+    ConvolutionStreamConfiguration configuration;
+    configuration.partitionSize = 2;
+    configuration.backend = FFTBackendType::Portable;
+
+    std::unique_ptr<ConvolutionStream> stream;
+
+    REQUIRE(ConvolutionStream::create(configuration, stream) == Result::Success);
+    REQUIRE(stream->setImpulseResponse(impulseResponse) == Result::Success);
+
+    std::array<float, 2> outputBuffer {};
+    std::vector<float> actual;
+
+    // Feed all input, allowing process() to consume it in multiple calls.
+    std::size_t inputOffset = 0;
+
+    while (inputOffset < input.size()) {
+        std::size_t inputConsumed = 0;
+        std::size_t outputProduced = 0;
+
+        REQUIRE(stream->process(
+            std::span<const float>(
+                input.data() + inputOffset,
+                input.size() - inputOffset
+            ),
+            outputBuffer,
+            inputConsumed,
+            outputProduced
+        ) == Result::Success);
+
+        inputOffset += inputConsumed;
+
+        actual.insert(
+            actual.end(),
+            outputBuffer.begin(),
+            outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+        );
+
+        REQUIRE((inputConsumed > 0 || outputProduced > 0));
+    }
+
+    REQUIRE(inputOffset == input.size());
+
+    // Once finish() begins, process() must reject further input.
+    bool finished = false;
+    std::size_t outputProduced = 0;
+
+    REQUIRE(stream->finish(
+        outputBuffer, outputProduced, finished
+    ) == Result::Success);
+
+    actual.insert(
+        actual.end(),
+        outputBuffer.begin(),
+        outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+    );
+
+    std::size_t inputConsumed = 0;
+
+    REQUIRE(stream->process(
+        input, outputBuffer, inputConsumed, outputProduced
+    ) == Result::InvalidArgument);
+
+    // Continue finishing until all convolution tail samples are delivered.
+    while (!finished) {
+        REQUIRE(stream->finish(
+            outputBuffer, outputProduced, finished
+        ) == Result::Success);
+
+        actual.insert(
+            actual.end(),
+            outputBuffer.begin(),
+            outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+        );
+    }
+
+    // Calling finish() again after completion must be harmless.
+    REQUIRE(stream->finish(
+        outputBuffer, outputProduced, finished
+    ) == Result::Success);
+
+    REQUIRE(finished);
+    REQUIRE(outputProduced == 0);
+
+    // Compare against the offline convolution reference.
+    std::vector<float> expected;
+
+    REQUIRE(Convolution::process(
+        input,
+        impulseResponse,
+        expected,
+        ConvolutionConfiguration{2, FFTBackendType::Portable}
+    ) == Result::Success);
+
+    REQUIRE(actual.size() == expected.size());
+
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        INFO("Sample index: " << i);
+        REQUIRE(actual[i] == Catch::Approx(expected[i]).margin(1.0e-4f));
+    }
+}
+
+
 } // namespace Grain::DSP::Tests
