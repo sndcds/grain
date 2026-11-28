@@ -38,6 +38,7 @@
 #include "grain/DSP/WeightedSamples.hpp"
 #include "grain/DSP/FFT/FFT.hpp"
 #include "grain/DSP/Partials.hpp"
+#include <grain/DSP/Convolution.hpp>
 
 #include "grain/Geometry/Arc.hpp"
 #include "grain/Geometry/Circle.hpp"
