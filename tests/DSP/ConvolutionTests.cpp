@@ -260,5 +260,4 @@ TEST_CASE("Convolution preserves impulse response alignment", "[DSP][Convolution
     }
 }
 
-
 } // namespace Grain::DSP::Tests
