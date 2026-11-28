@@ -45,6 +45,12 @@ option(
 )
 
 option(
+        GRAIN_BUILD_BENCHMARKS
+        "Build benchmarks"
+        OFF
+)
+
+option(
         GRAIN_ENABLE_SANITIZERS
         "Enable AddressSanitizer and UndefinedBehaviorSanitizer"
         OFF
@@ -644,5 +650,17 @@ if(GRAIN_BUILD_TESTS)
     enable_testing()
 
     add_subdirectory(tests)
+
+endif()
+
+
+
+#-------------------------------------------------------------------------------
+#   Benchmarks.
+#-------------------------------------------------------------------------------
+
+if(GRAIN_BUILD_BENCHMARKS)
+
+    add_subdirectory(benchmarks)
 
 endif()
