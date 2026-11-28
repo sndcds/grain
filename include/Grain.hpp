@@ -106,6 +106,8 @@
 #include "grain/UI/LayoutStyle.hpp"
 #include "grain/UI/UIElement.hpp"
 #include "grain/UI/UIStyles.hpp"
+#include "grain/UI/UIMenuItem.hpp"
+#include "grain/UI/UIMenuSeparator.hpp"
 
 #include "grain/Animation/Animation.hpp"
 #include "grain/Animation/AnimationDriver.hpp"

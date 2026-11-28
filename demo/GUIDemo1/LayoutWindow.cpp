@@ -785,8 +785,8 @@ LayoutWindow::LayoutWindow(App& app) {
         },
         {
             .label = "Snap to guides",
-            .status = PopupItemStatus::Selectable |
-                      PopupItemStatus::Selected,
+            // .status = PopupItemStatus::Selectable |
+            //           PopupItemStatus::Selected,
             .tag = 3
         },
         {

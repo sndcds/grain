@@ -1,11 +1,9 @@
 #include <grain/UI/MenuPopup.hpp>
 
-#include <grain/UI/Button.hpp>
 #include <grain/UI/View.hpp>
+#include <grain/UI/UIMenuItem.hpp>
+#include <grain/UI/UIMenuSeparator.hpp>
 #include <grain/Platform/Window.hpp>
-#include <grain/Image/Image.hpp>
-#include <grain/Text/Font.hpp>
-#include <grain/Graphics/GraphicContext.hpp>
 
 #include <functional>
 #include <memory>
@@ -15,189 +13,6 @@
 namespace Grain {
 
 namespace {
-
-constexpr double CheckColumnWidth = 16.0;
-constexpr double CheckColumnGap = 4.0;
-constexpr double IconColumnWidth = 18.0;
-constexpr double IconColumnGap = 8.0;
-constexpr double HorizontalPadding = 8.0;
-
-class MenuPopupButton final : public Button {
-public:
-    MenuPopupButton(
-        std::string title,
-        const Image* icon,
-        bool selected
-    )
-        : Button(std::move(title)),
-          icon_(icon),
-          selected_(selected)
-    {
-    }
-
-    [[nodiscard]]
-    auto selected() const -> bool {
-        return selected_;
-    }
-
-    void setSelected(bool selected) {
-        if (selected_ == selected) {
-            return;
-        }
-
-        selected_ = selected;
-        invalidate();
-    }
-
-    void setActive(bool active) {
-        if (active_ == active) {
-            return;
-        }
-
-        active_ = active;
-        invalidate();
-    }
-
-    void draw(
-        GraphicContext& gc,
-        const Rectd& dirty_rect
-    ) override {
-        (void)dirty_rect;
-
-        const Rectd item_bounds = bounds();
-
-        if (!visible()) {
-            return;
-        }
-
-        if (!enabled()) {
-            gc.setFillColor({0.92f, 0.92f, 0.92f, 1.0f});
-        }
-        else if (pressed()) {
-            gc.setFillColor({0.78f, 0.82f, 0.90f, 1.0f});
-        }
-        else if (active_ || hovered()) {
-            gc.setFillColor({0.86f, 0.89f, 0.94f, 1.0f});
-        }
-        else if (selected_) {
-            gc.setFillColor({0.88f, 0.91f, 0.97f, 1.0f});
-        }
-        else {
-            gc.setFillColor({1.0f, 1.0f, 1.0f, 0.0f});
-        }
-
-        gc.addRoundRectPath(item_bounds, 5.0);
-        gc.fillPath();
-
-        // The checkmark column is always reserved, even when unchecked.
-        const double check_x =
-            item_bounds.x + HorizontalPadding;
-
-        if (selected_) {
-            gc.setStrokeColor({0.12f, 0.12f, 0.12f, 1.0f});
-            gc.setStrokeWidth(1.8);
-
-            const double center_y =
-                item_bounds.y + item_bounds.height / 2.0;
-
-            gc.beginPath();
-            gc.moveTo({check_x + 2.0, center_y});
-            gc.lineTo({check_x + 6.0, center_y + 4.0});
-            gc.lineTo({check_x + 13.0, center_y - 4.0});
-            gc.strokePath();
-        }
-
-        // The icon column is also always reserved.
-        const double icon_x =
-            check_x + CheckColumnWidth + CheckColumnGap;
-
-        if (icon_ != nullptr) {
-            constexpr double icon_size = 18.0;
-
-            const Rectd icon_bounds{
-                icon_x,
-                item_bounds.y + (item_bounds.height - icon_size) / 2.0,
-                icon_size,
-                icon_size
-            };
-
-            gc.drawImage(*icon_, icon_bounds);
-        }
-
-        const double text_left =
-            icon_x + IconColumnWidth + IconColumnGap;
-
-        static Font* font = new Font("SFPro-Regular", 16.0f);
-
-        gc.setFillColor(
-            enabled()
-                ? Color{0.12f, 0.12f, 0.12f, 1.0f}
-                : Color{0.55f, 0.55f, 0.55f, 1.0f}
-        );
-
-        const Rectd text_bounds{
-            text_left,
-            item_bounds.y,
-            item_bounds.right() - text_left - HorizontalPadding,
-            item_bounds.height
-        };
-
-        gc.drawTextInRect(
-            title(),
-            text_bounds,
-            Alignment::Center,
-            font
-        );
-    }
-
-    void layoutSizing() override {
-        Button::layoutSizing();
-
-        layout_result_.intrinsic_size.width +=
-            HorizontalPadding * 2.0 +
-            CheckColumnWidth +
-            CheckColumnGap +
-            IconColumnWidth +
-            IconColumnGap;
-
-        layoutPreferredSizing();
-    }
-
-private:
-    const Image* icon_ = nullptr;
-    bool selected_ = false;
-    bool active_ = false;
-};
-
-
-class MenuPopupSeparator final : public Component {
-public:
-    void draw(
-        GraphicContext& gc,
-        const Rectd& dirty_rect
-    ) override {
-        (void)dirty_rect;
-
-        const Rectd item_bounds = bounds();
-
-        gc.setStrokeColor({0.82f, 0.82f, 0.82f, 1.0f});
-        gc.setStrokeWidth(1.0);
-
-        const double y =
-            item_bounds.y + item_bounds.height / 2.0;
-
-        gc.beginPath();
-        gc.moveTo({item_bounds.x + 8.0, y});
-        gc.lineTo({item_bounds.right() - 8.0, y});
-        gc.strokePath();
-    }
-
-    void layoutSizing() override {
-        layout_result_.intrinsic_size = {0.0, 9.0};
-        layoutPreferredSizing();
-    }
-};
-
 
 class MenuPopupView final : public View {
 public:
@@ -216,9 +31,9 @@ public:
         const PopupItem& item,
         const LayoutComponentStyle& item_style,
         const LayoutComponentStyle& separator_style
-    ) -> MenuPopupButton* {
+    ) -> UIMenuItem* {
         if (item.type == PopupItemType::Separator) {
-            auto& separator = addChild<MenuPopupSeparator>();
+            auto& separator = addChild<UIMenuSeparator>();
             separator.setStyle(separator_style);
             buttons_.push_back(nullptr);
             return nullptr;
@@ -227,7 +42,7 @@ public:
         const bool initially_selected =
             hasStatus(item.status, PopupItemStatus::Selected);
 
-        auto& button = addChild<MenuPopupButton>(
+        auto& button = addChild<UIMenuItem>(
             item.label,
             item.icon,
             initially_selected
@@ -292,7 +107,7 @@ public:
     }
 
 private:
-    std::vector<MenuPopupButton*> buttons_;
+    std::vector<UIMenuItem*> buttons_;
     std::size_t active_index_ = static_cast<std::size_t>(-1);
 
     ActivateHandler activate_handler_;
@@ -377,7 +192,7 @@ public:
     MenuPopupLayout layout_;
 
     std::vector<PopupItem> items_;
-    std::vector<MenuPopupButton*> buttons_;
+    std::vector<UIMenuItem*> buttons_;
 
     // Destroy Popup before destroying layout_ and items_.
     std::unique_ptr<Popup> popup_;
@@ -400,7 +215,7 @@ public:
         buttons_.reserve(items_.size());
 
         for (const PopupItem& item : items_) {
-            MenuPopupButton* button = content->addMenuItem(
+            UIMenuItem* button = content->addMenuItem(
                 item,
                 layout_.item,
                 layout_.separator
@@ -421,7 +236,7 @@ public:
             }
         });
 
-        content->initializeActiveItem();
+        // content->initializeActiveItem();
 
         popup_ = std::make_unique<Popup>(
             parent,

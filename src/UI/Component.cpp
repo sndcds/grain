@@ -14,13 +14,13 @@ void Component::invalidate() {
 }
 
 
-bool Component::contains(const Vec2d& point) const {
+auto Component::contains(const Vec2d& point) const -> bool {
     const auto& rect = bounds();
     return rect.contains(point);
 }
 
 
-bool Component::enabled() const {
+auto Component::enabled() const -> bool {
     return enabled_;
 }
 

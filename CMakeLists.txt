@@ -306,6 +306,8 @@ target_sources(
         src/UI/Slider.cpp
         src/UI/TextField.cpp
         src/UI/LayoutEngine.cpp
+        src/UI/UIMenuItem.cpp
+        src/UI/UIMenuSeparator.cpp
 
         src/Animation/Animation.cpp
         src/Animation/AnimationDriver.cpp
@@ -432,6 +434,8 @@ target_sources(
         include/grain/UI/LayoutStyle.hpp
         include/grain/UI/UIElement.hpp
         include/grain/UI/UIStyles.hpp
+        include/grain/UI/UIMenuItem.hpp
+        include/grain/UI/UIMenuSeparator.hpp
 
         include/grain/Animation/Animation.hpp
         include/grain/Animation/AnimationDriver.hpp
