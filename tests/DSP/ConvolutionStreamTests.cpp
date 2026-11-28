@@ -308,15 +308,12 @@ TEST_CASE("ConvolutionStream handles an empty input",
 }
 
 
-TEST_CASE("ConvolutionStream reset clears processing history",
-          "[DSP][ConvolutionStream]")
-{
+TEST_CASE("ConvolutionStream reset clears processing history", "[DSP][ConvolutionStream]") {
     const std::vector<float> input = {
-        1.0f, 2.0f, 3.0f, 4.0f
+        1.0F, 0.5F, -0.25F, 0.75F, 0.2F, -0.4F, 0.8F, 0.1F
     };
-
     const std::vector<float> impulseResponse = {
-        1.0f, 0.5f, 0.25f
+        0.5F, 0.25F, -0.1F
     };
 
     ConvolutionStreamConfiguration configuration;
@@ -324,34 +321,64 @@ TEST_CASE("ConvolutionStream reset clears processing history",
     configuration.backend = FFTBackendType::Portable;
 
     std::unique_ptr<ConvolutionStream> stream;
+    REQUIRE(ConvolutionStream::create(configuration, stream) == Result::Success);
+    REQUIRE(stream != nullptr);
+    REQUIRE(stream->setImpulseResponse(impulseResponse) == Result::Success);
 
-    REQUIRE(
-        ConvolutionStream::create(configuration, stream) == Result::Success
-    );
+    const auto processInput = [&]() {
+        std::vector<float> result;
+        std::vector<float> outputBuffer(64);
 
-    REQUIRE(
-        stream->setImpulseResponse(impulseResponse) == Result::Success
-    );
+        std::size_t inputConsumed = 0;
+        std::size_t outputProduced = 0;
 
-    std::array<float, 16> output {};
-    std::size_t inputConsumed = 0;
-    std::size_t outputProduced = 0;
-
-    REQUIRE(
-        stream->process(
+        REQUIRE(stream->process(
             input,
-            output,
+            outputBuffer,
             inputConsumed,
             outputProduced
-        ) == Result::Success
-    );
+        ) == Result::Success);
 
-    REQUIRE(inputConsumed == input.size());
+        REQUIRE(inputConsumed == input.size());
+
+        result.insert(
+            result.end(),
+            outputBuffer.begin(),
+            outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+        );
+
+        bool finished = false;
+        while (!finished) {
+            REQUIRE(stream->finish(outputBuffer, outputProduced, finished) == Result::Success);
+
+            result.insert(
+                result.end(),
+                outputBuffer.begin(),
+                outputBuffer.begin() + static_cast<std::ptrdiff_t>(outputProduced)
+            );
+        }
+
+        return result;
+    };
+
+    std::vector<float> expected;
+    REQUIRE(Convolution::process(input, impulseResponse, expected) == Result::Success);
+
+    const std::vector<float> firstResult = processInput();
+
+    REQUIRE(firstResult.size() == expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(firstResult[i] == Catch::Approx(expected[i]).margin(1.0e-4F));
+    }
 
     stream->reset();
 
-    // After reset, the same input must produce the same result.
-    verifyStreamingConvolution(input, impulseResponse, 2);
+    const std::vector<float> secondResult = processInput();
+
+    REQUIRE(secondResult.size() == expected.size());
+    for (std::size_t i = 0; i < expected.size(); ++i) {
+        REQUIRE(secondResult[i] == Catch::Approx(expected[i]).margin(1.0e-4F));
+    }
 }
 
 } // namespace Grain::DSP::Tests
