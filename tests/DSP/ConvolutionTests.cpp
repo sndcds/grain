@@ -7,6 +7,7 @@
 #include <array>
 #include <cstddef>
 #include <vector>
+#include <cmath>
 
 namespace Grain::DSP::Tests {
 
@@ -182,5 +183,24 @@ TEST_CASE("Convolution validates arguments", "[DSP][Convolution]")
         REQUIRE(output.empty());
     }
 }
+
+
+TEST_CASE("Convolution longer signals", "[DSP][Convolution]")
+{
+    std::vector<float> input(4096);
+    std::vector<float> impulseResponse(1024);
+
+    for (std::size_t i = 0; i < input.size(); ++i) {
+        input[i] = std::sin(static_cast<float>(i) * 0.13f);
+    }
+
+    for (std::size_t i = 0; i < impulseResponse.size(); ++i) {
+        impulseResponse[i] =
+            std::exp(-static_cast<float>(i) * 0.01f);
+    }
+
+    verifyConvolution(input, impulseResponse, 256);
+}
+
 
 } // namespace Grain::DSP::Tests
