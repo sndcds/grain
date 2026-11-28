@@ -600,6 +600,11 @@ static void dispatchToTarget(
 }
 
 
+void View::clearHoverState() {
+    updateHoveredComponent(nullptr);
+}
+
+
 void View::dispatchMouseEvent(const Event& event) {
 
     mouse_pos_ = event.mouse_pos_;

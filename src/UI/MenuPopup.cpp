@@ -74,6 +74,8 @@ public:
     }
 
     void resetInteractionState() {
+        clearHoverState();
+
         active_index_ = static_cast<std::size_t>(-1);
 
         for (UIMenuItem* button : buttons_) {
@@ -247,9 +249,6 @@ public:
         });
 
 
-        content->initializeActiveItem();
-        content->resetInteractionState();
-
         popup_ = std::make_unique<Popup>(
             parent,
             std::move(content),
@@ -303,6 +302,19 @@ public:
             popup_->hide();
         }
     }
+
+    void show() const {
+        if (!popup_) {
+            return;
+        }
+
+        auto& content = popup_->contentView();
+        auto& menu_view = static_cast<MenuPopupView&>(content);
+
+        menu_view.resetInteractionState();
+
+        popup_->show();
+    }
 };
 
 
@@ -331,8 +343,8 @@ MenuPopup::~MenuPopup() = default;
 
 
 void MenuPopup::show() {
-    if (impl_ && impl_->popup_) {
-        impl_->popup_->show();
+    if (impl_) {
+        impl_->show();
     }
 }
 

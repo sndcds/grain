@@ -10,7 +10,6 @@ add_executable(
         Math/Vec3Tests.cpp
         Math/Mat3Tests.cpp
         Math/QuadrilateralTests.cpp
-        Math/CircleTests.cpp
         Math/EasingTests.cpp
         Math/FunctionsTests.cpp
         Math/GeoTests.cpp
@@ -30,6 +29,7 @@ add_executable(
         String/StringTests.cpp
         String/StringUtf8Tests.cpp
         Input/InputTests.cpp
+        DSP/FFTTests.cpp
 )
 
 target_link_libraries(

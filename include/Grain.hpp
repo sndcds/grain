@@ -36,6 +36,7 @@
 #include "grain/DSP/DSPWindow.hpp"
 #include "grain/DSP/ValueLUT.hpp"
 #include "grain/DSP/WeightedSamples.hpp"
+#include "grain/DSP/FFT/FFT.hpp"
 
 #include "grain/Geometry/Arc.hpp"
 #include "grain/Geometry/Circle.hpp"

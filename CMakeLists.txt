@@ -89,7 +89,7 @@ include(cmake/CPM.cmake)
 if(GRAIN_BUILD_TESTS)
 
     CPMAddPackage(
-            "gh:catchorg/Catch2@3.8.1"
+            "gh:catchorg/Catch2@3.11.0"
     )
 
 endif()
@@ -253,6 +253,8 @@ target_sources(
         src/Math/NumberSeries.cpp
 
         src/DSP/WeightedSamples.cpp
+        src/DSP/FFT/FFT.cpp
+        src/DSP/FFT/Portable/PortableFFT.cpp
 
         src/String/String.cpp
         src/String/StringUtf8.cpp
@@ -357,6 +359,7 @@ target_sources(
         include/grain/Math/NumberSeries.hpp
 
         include/grain/DSP/WeightedSamples.hpp
+        include/grain/DSP/FFT/FFT.hpp
 
         include/grain/Geometry/Arc.hpp
         include/grain/Geometry/Circle.hpp
@@ -575,8 +578,9 @@ target_compile_features(
 target_link_libraries(
         Grain
         PUBLIC
-        pqxx
+        libpqxx::pqxx
         Pal::Sigslot
+        PkgConfig::LUA
 )
 
 target_link_libraries(
@@ -588,7 +592,6 @@ target_link_libraries(
         JPEG::JPEG
         PkgConfig::WEBP
         PkgConfig::FFMPEG
-        PkgConfig::LUA
 )
 
 

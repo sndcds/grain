@@ -118,6 +118,8 @@ public:
 		return *style_;
 	}
 
+	void clearHoverState();
+
 	auto element() -> LayoutElementStyle override {
 		return style_->element;
 	}
