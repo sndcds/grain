@@ -349,4 +349,84 @@ TEST_CASE("FFT Accelerate matches portable backend", "[DSP][FFT]") {
 #endif
 }
 
+TEST_CASE("FFT Accelerate inverse matches portable backend", "[DSP][FFT]")
+{
+#if defined(__APPLE__)
+    constexpr std::size_t size = 16;
+
+    std::unique_ptr<FFT> portable;
+    std::unique_ptr<FFT> accelerate;
+
+    REQUIRE(
+        FFT::create(
+            FFTConfiguration{size, FFTBackendType::Portable},
+            portable
+        ) == Result::Success
+    );
+
+    REQUIRE(
+        FFT::create(
+            FFTConfiguration{size, FFTBackendType::Accelerate},
+            accelerate
+        ) == Result::Success
+    );
+
+    const std::array<float, size> input = {
+        0.25f, -0.5f, 0.75f, 1.0f,
+        -0.25f, 0.5f, -0.75f, 0.125f,
+        0.875f, -0.375f, 0.625f, -1.0f,
+        0.5f, 0.25f, -0.125f, 0.375f
+    };
+
+    std::array<std::complex<float>, size / 2 + 1> spectrum{};
+    std::array<std::complex<float>, size / 2 + 1> accelerate_spectrum{};
+
+    std::array<float, size> portable_output{};
+    std::array<float, size> accelerate_output{};
+    std::array<float, size> round_trip_output{};
+
+    SECTION("inverse matches portable backend")
+    {
+        REQUIRE(portable->forward(input, spectrum) == Result::Success);
+
+        REQUIRE(
+            portable->inverse(spectrum, portable_output)
+            == Result::Success
+        );
+
+        REQUIRE(
+            accelerate->inverse(spectrum, accelerate_output)
+            == Result::Success
+        );
+
+        for (std::size_t i = 0; i < size; ++i) {
+            REQUIRE_THAT(
+                accelerate_output[i],
+                WithinAbs(portable_output[i], kTolerance)
+            );
+        }
+    }
+
+    SECTION("forward and inverse recover the original signal")
+    {
+        REQUIRE(
+            accelerate->forward(input, accelerate_spectrum)
+            == Result::Success
+        );
+
+        REQUIRE(
+            accelerate->inverse(accelerate_spectrum, round_trip_output)
+            == Result::Success
+        );
+
+        for (std::size_t i = 0; i < size; ++i) {
+            REQUIRE_THAT(
+                round_trip_output[i],
+                WithinAbs(input[i], kTolerance)
+            );
+        }
+    }
+#endif
+}
+
 } // namespace Grain::DSP::Tests
