@@ -29,6 +29,11 @@ public:
 
     void setActive(bool active);
 
+    void resetInteractionState() {
+        setActive(false);
+        setHovered(false);
+    }
+
     void draw(
         GraphicContext& gc,
         const Rectd& dirty_rect

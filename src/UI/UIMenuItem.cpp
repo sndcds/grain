@@ -53,7 +53,6 @@ auto UIMenuItem::selected() const -> bool {
 
 
 void UIMenuItem::setSelected(bool selected) {
-    std::cout << "setSelected: " << selected_ << std::endl;
     if (selected_ == selected) {
         return;
     }
@@ -96,7 +95,7 @@ void UIMenuItem::draw(
     else if (pressed()) {
         gc.setFillColor({0.72f, 0.72f, 0.72f, 1.0f});
     }
-    else if (active_ || hovered()) {
+    else if (hovered()) { // active_ ||
         gc.setFillColor({0.82f, 0.82f, 0.82f, 1.0f});
     }
     else {

@@ -73,6 +73,16 @@ public:
         }
     }
 
+    void resetInteractionState() {
+        active_index_ = static_cast<std::size_t>(-1);
+
+        for (UIMenuItem* button : buttons_) {
+            if (button != nullptr) {
+                button->resetInteractionState();
+            }
+        }
+    }
+
     void handleKeyEvent(const Event& event) override {
         if (event.type_ != EventType::KeyDown) {
             return;
@@ -236,7 +246,9 @@ public:
             }
         });
 
-        // content->initializeActiveItem();
+
+        content->initializeActiveItem();
+        content->resetInteractionState();
 
         popup_ = std::make_unique<Popup>(
             parent,
