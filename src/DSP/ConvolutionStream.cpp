@@ -462,9 +462,8 @@ auto ConvolutionStream::finish(
     }
 
     if (!impl_->finish_started_) {
-        impl_->finish_started_ = true;
-
         if (impl_->input_samples_total_ == 0) {
+            impl_->finish_started_ = true;
             impl_->finished_ = true;
             finished = true;
             return Result::Success;
@@ -473,12 +472,14 @@ auto ConvolutionStream::finish(
         if (impl_->impulse_response_size_ - 1 >
             std::numeric_limits<std::size_t>::max() - impl_->input_samples_total_) {
             return Result::InvalidArgument;
-        }
+            }
 
         impl_->finish_target_samples_ =
             impl_->input_samples_total_ + impl_->impulse_response_size_ - 1;
-    }
 
+        impl_->finish_started_ = true;
+    }
+    
     std::size_t outputOffset = 0;
 
     while (outputOffset < output.size()) {
