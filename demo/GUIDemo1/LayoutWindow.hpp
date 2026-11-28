@@ -15,7 +15,7 @@ private:
     // The App owns the actual Window.
     Grain::Window* window_ = nullptr;
 
-    std::unique_ptr<Grain::Popup> popup_;
+    std::unique_ptr<Grain::MenuPopup> popup_;
 };
 
 } // namespace Demo

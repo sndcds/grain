@@ -204,46 +204,6 @@ public:
 
 
 //------------------------------------------------------------------------------
-//  PopupContentView
-//------------------------------------------------------------------------------
-
-class PopupContentView final : public Grain::View {
-public:
-
-    explicit PopupContentView(
-        const LayoutComponentStyle& button_style
-    ) {
-        for (int i = 1; i <= 5; ++i) {
-
-            auto& button = addChild<Button>(
-                "Popup Button " + std::to_string(i)
-            );
-
-            button.setStyle(button_style);
-        }
-    }
-
-
-    void drawContent(
-        GraphicContext& gc,
-        const Rectd& dirty_rect
-    ) override {
-
-        (void)dirty_rect;
-
-        const auto& b = bounds();
-
-        gc.setFillColor(Color::fromRGBA32(0xFFF3CDFF));
-        gc.fillRect({0, 0, b.width, b.height});
-
-        gc.setStrokeColor(Color::fromRGBA32(0xD39E00FF));
-        gc.setStrokeWidth(2.0);
-        gc.strokeRect({1, 1, b.width - 2, b.height - 2});
-    }
-};
-
-
-//------------------------------------------------------------------------------
 //  TextWordLayoutView
 //------------------------------------------------------------------------------
 
@@ -798,8 +758,9 @@ LayoutWindow::LayoutWindow(App& app) {
     window_->show();
 
 
+
     //--------------------------------------------------------------------------
-    //  Popup
+    //  Context menu
     //--------------------------------------------------------------------------
 
     PopupOptions options;
@@ -808,33 +769,71 @@ LayoutWindow::LayoutWindow(App& app) {
     options.offset_x = 0.0;
     options.offset_y = 6.0;
     options.dismiss_on_outside_click = true;
+    options.accepts_keyboard_focus = true;
 
-    popup_ = std::make_unique<Grain::Popup>(
+    std::vector<PopupItem> menu_items{
+        {
+            .label = "Update text",
+            .tag = 1
+        },
+        {
+            .label = "Reset rotation",
+            .tag = 2
+        },
+        {
+            .type = PopupItemType::Separator
+        },
+        {
+            .label = "Snap to guides",
+            .status = PopupItemStatus::Selectable |
+                      PopupItemStatus::Selected,
+            .tag = 3
+        },
+        {
+            .label = "Unavailable action",
+            .status = PopupItemStatus::Disabled,
+            .tag = 4
+        }
+    };
+
+    popup_ = std::make_unique<MenuPopup>(
         *window_,
-        std::make_unique<PopupContentView>(
-            styles_.componentStyle("popup-button")
-        ),
+        std::move(menu_items),
         Rectd{0, 0, 1, 1},
-        Sized{240, 200},
+        Sized{240, 180},
+        MenuPopupLayout{},
         options
     );
 
-    LayoutViewStyle popup_content_style;
+    popup_->selected.connect(
+        [&drawing_view](std::uint64_t tag) {
 
-    popup_content_style.direction = LayoutDirection::TopToBottom;
-    popup_content_style.element.padding = {8, 8, 8, 8};
-    popup_content_style.element.child_gap = 4;
+            switch (tag) {
+                case 1:
+                    drawing_view.onButtonClicked();
+                    break;
 
-    popup_->setContentStyle(popup_content_style);
+                case 2:
+                    drawing_view.setRotation(0.0);
+                    break;
 
-    // Connect right-clicks in the drawing view to the popup.
+                case 3:
+                    std::cout << "Snap to guides toggled\n";
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    );
+
+    // Right-click opens the context menu.
     drawing_view.setContextMenuHandler(
         [this, &drawing_view](const Vec2d& position) {
 
             const Rectd& view_bounds = drawing_view.bounds();
 
-            // Convert the drawing view's local mouse position
-            // into coordinates relative to the window content view.
+            // Convert drawing-view coordinates into window coordinates.
             const Rectd anchor{
                 view_bounds.x + position.x,
                 view_bounds.y + position.y,
@@ -846,6 +845,7 @@ LayoutWindow::LayoutWindow(App& app) {
             popup_->show();
         }
     );
+
 }
 
 } // namespace Demo
