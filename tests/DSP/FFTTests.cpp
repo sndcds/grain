@@ -595,8 +595,8 @@ TEST_CASE("FFT Accelerate round trips across transform sizes", "[DSP][FFT]")
 
 TEST_CASE("FFT Portable round trips across transform sizes", "[DSP][FFT]")
 {
-    constexpr std::array<std::size_t, 7> sizes = {
-        1, 2, 7, 8, 16, 31, 32
+    constexpr std::array<std::size_t, 11> sizes = {
+        1, 2, 4, 8, 16, 32, 64, 128, 512, 1024, 4096
     };
 
     for (const std::size_t size : sizes) {
@@ -642,8 +642,8 @@ TEST_CASE("FFT Portable round trips across transform sizes", "[DSP][FFT]")
 
 TEST_CASE("FFT Portable radix-2 matches direct DFT reference", "[DSP][FFT]")
 {
-    constexpr std::array<std::size_t, 7> sizes = {
-        1, 2, 4, 8, 16, 32, 64
+    constexpr std::array<std::size_t, 11> sizes = {
+        1, 2, 4, 8, 16, 32, 64, 128, 512, 1024, 4096
     };
 
     for (const std::size_t size : sizes) {
