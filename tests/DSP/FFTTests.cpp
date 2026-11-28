@@ -639,4 +639,91 @@ TEST_CASE("FFT Portable round trips across transform sizes", "[DSP][FFT]")
 }
 
 
+
+TEST_CASE("FFT Portable radix-2 matches direct DFT reference", "[DSP][FFT]")
+{
+    constexpr std::array<std::size_t, 7> sizes = {
+        1, 2, 4, 8, 16, 32, 64
+    };
+
+    for (const std::size_t size : sizes) {
+        CAPTURE(size);
+
+        std::unique_ptr<FFT> fft;
+
+        REQUIRE(
+            FFT::create(
+                FFTConfiguration{size, FFTBackendType::Portable},
+                fft
+            ) == Result::Success
+        );
+
+        std::vector<float> input(size);
+        std::vector<float> output(size);
+
+        std::vector<std::complex<float>> spectrum(fft->binCount());
+        std::vector<std::complex<float>> reference_spectrum(fft->binCount());
+
+        for (std::size_t n = 0; n < size; ++n) {
+            const double phase =
+                2.0 * std::numbers::pi_v<double>
+                * static_cast<double>(n)
+                / static_cast<double>(size);
+
+            input[n] = static_cast<float>(
+                0.375
+                + std::sin(phase)
+                + static_cast<double>(n % 3) * 0.125
+            );
+        }
+
+        // Calculate an independent direct DFT reference.
+        for (std::size_t k = 0; k < fft->binCount(); ++k) {
+            double real = 0.0;
+            double imaginary = 0.0;
+
+            for (std::size_t n = 0; n < size; ++n) {
+                const double angle =
+                    2.0 * std::numbers::pi_v<double>
+                    * static_cast<double>(k)
+                    * static_cast<double>(n)
+                    / static_cast<double>(size);
+
+                real += static_cast<double>(input[n]) * std::cos(angle);
+                imaginary -= static_cast<double>(input[n]) * std::sin(angle);
+            }
+
+            reference_spectrum[k] = std::complex<float>(
+                static_cast<float>(real),
+                static_cast<float>(imaginary)
+            );
+        }
+
+        REQUIRE(fft->forward(input, spectrum) == Result::Success);
+
+        for (std::size_t k = 0; k < fft->binCount(); ++k) {
+            REQUIRE_THAT(
+                spectrum[k].real(),
+                WithinAbs(reference_spectrum[k].real(), kTolerance)
+            );
+
+            REQUIRE_THAT(
+                spectrum[k].imag(),
+                WithinAbs(reference_spectrum[k].imag(), kTolerance)
+            );
+        }
+
+        // Test inverse against the independently calculated spectrum.
+        REQUIRE(
+            fft->inverse(reference_spectrum, output)
+            == Result::Success
+        );
+
+        for (std::size_t n = 0; n < size; ++n) {
+            REQUIRE_THAT(output[n], WithinAbs(input[n], kTolerance));
+        }
+    }
+}
+
+
 } // namespace Grain::DSP::Tests
