@@ -428,4 +428,42 @@ TEST_CASE("Partials spectrum interpolation", "[DSP][Partials]")
 }
 
 
+TEST_CASE("Partials move operations", "[DSP][Partials]")
+{
+    std::unique_ptr<Partials> source;
+    REQUIRE(Partials::create(8, source) == Result::Success);
+
+    REQUIRE(source->setBin(4, {0.75f, 0.0f}) == Result::Success);
+
+    SECTION("move constructor")
+    {
+        Partials moved(std::move(*source));
+
+        REQUIRE(moved.fftSize() == 8);
+        REQUIRE(moved.binCount() == 5);
+        REQUIRE(moved.nyquist() == Catch::Approx(0.75f));
+
+        REQUIRE(source->fftSize() == 0);
+        REQUIRE(source->binCount() == 0);
+        REQUIRE_FALSE(source->hasNyquistBin());
+        REQUIRE(source->nyquist() == 0.0f);
+    }
+
+    SECTION("move assignment")
+    {
+        std::unique_ptr<Partials> destination;
+        REQUIRE(Partials::create(16, destination) == Result::Success);
+
+        *destination = std::move(*source);
+
+        REQUIRE(destination->fftSize() == 8);
+        REQUIRE(destination->nyquist() == Catch::Approx(0.75f));
+
+        REQUIRE(source->fftSize() == 0);
+        REQUIRE(source->binCount() == 0);
+        REQUIRE(source->nyquist() == 0.0f);
+    }
+}
+
+
 } // namespace Grain::DSP::Tests

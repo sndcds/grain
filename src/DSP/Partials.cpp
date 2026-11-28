@@ -5,6 +5,7 @@
 #include <cmath>
 #include <new>
 #include <stdexcept>
+#include <utility>
 
 namespace Grain {
 
@@ -12,6 +13,27 @@ Partials::Partials(std::size_t fftSize)
     : fft_size_(fftSize),
       bins_(fftSize / 2 + 1, std::complex<float>{0.0f, 0.0f})
 {
+}
+
+
+Partials::Partials(Partials&& other) noexcept
+    : fft_size_(std::exchange(other.fft_size_, 0)),
+      bins_(std::move(other.bins_))
+{
+    other.bins_.clear();
+}
+
+
+
+auto Partials::operator = (Partials&& other) noexcept -> Partials&
+{
+    if (this != &other) {
+        fft_size_ = std::exchange(other.fft_size_, 0);
+        bins_ = std::move(other.bins_);
+        other.bins_.clear();
+    }
+
+    return *this;
 }
 
 
@@ -54,7 +76,7 @@ auto Partials::binCount() const noexcept -> std::size_t {
 
 
 auto Partials::hasNyquistBin() const noexcept -> bool {
-    return fft_size_ % 2 == 0;
+    return fft_size_ > 0 && fft_size_ % 2 == 0;
 }
 
 

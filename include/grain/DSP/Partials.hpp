@@ -39,10 +39,10 @@ public:
     ~Partials() = default;
 
     Partials(const Partials&) = default;
-    auto operator=(const Partials&) -> Partials& = default;
+    auto operator = (const Partials&) -> Partials& = default;
 
-    Partials(Partials&&) noexcept = default;
-    auto operator=(Partials&&) noexcept -> Partials& = default;
+    Partials(Partials&& other) noexcept;
+    auto operator = (Partials&& other) noexcept -> Partials&;
 
     [[nodiscard]]
     auto fftSize() const noexcept -> std::size_t;

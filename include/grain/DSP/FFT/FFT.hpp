@@ -105,10 +105,10 @@ public:
     ~FFT();
 
     FFT(const FFT&) = delete;
-    auto operator=(const FFT&) -> FFT& = delete;
+    auto operator = (const FFT&) -> FFT& = delete;
 
     FFT(FFT&&) noexcept;
-    auto operator=(FFT&&) noexcept -> FFT&;
+    auto operator = (FFT&&) noexcept -> FFT&;
 
     /// Returns the number of real samples in the transform.
     [[nodiscard]]

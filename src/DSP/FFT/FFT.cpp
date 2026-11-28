@@ -32,7 +32,7 @@ FFT::~FFT() = default;
 
 FFT::FFT(FFT&&) noexcept = default;
 
-auto FFT::operator=(FFT&&) noexcept -> FFT& = default;
+auto FFT::operator = (FFT&&) noexcept -> FFT& = default;
 
 
 auto FFT::create(

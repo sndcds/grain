@@ -143,10 +143,10 @@ public:
     );
 
     MenuPopup(const MenuPopup&) = delete;
-    auto operator=(const MenuPopup&) -> MenuPopup& = delete;
+    auto operator = (const MenuPopup&) -> MenuPopup& = delete;
 
     MenuPopup(MenuPopup&&) = delete;
-    auto operator=(MenuPopup&&) -> MenuPopup& = delete;
+    auto operator = (MenuPopup&&) -> MenuPopup& = delete;
 
     ~MenuPopup();
 

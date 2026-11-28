@@ -31,10 +31,10 @@ public:
     );
 
     Popup(const Popup&) = delete;
-    auto operator=(const Popup&) -> Popup& = delete;
+    auto operator = (const Popup&) -> Popup& = delete;
 
     Popup(Popup&&) = delete;
-    auto operator=(Popup&&) -> Popup& = delete;
+    auto operator = (Popup&&) -> Popup& = delete;
 
     ~Popup();
 

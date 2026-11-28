@@ -15,10 +15,10 @@ public:
     Emitter() = default;
 
     Emitter(const Emitter&) = delete;
-    Emitter& operator=(const Emitter&) = delete;
+    Emitter& operator = (const Emitter&) = delete;
 
     Emitter(Emitter&&) = delete;
-    Emitter& operator=(Emitter&&) = delete;
+    Emitter& operator = (Emitter&&) = delete;
 
     template<typename... ConnectArgs>
     [[nodiscard]]
